@@ -206,8 +206,6 @@ def simulate_XXZ(N, M, num_bonds, equilibration_steps, mc_steps, sites, beta, di
     average_cumulative_loop_size = np.mean(cumulative_loop_size_list[-int(equilibration_steps/10):])
     N_l = max(int(np.round(2*M/average_cumulative_loop_size)),10)
 
-    #print("Equilibration Finished")
-
     n_array = np.zeros(mc_steps)
     for step in range(mc_steps):
         # diagonal updates first

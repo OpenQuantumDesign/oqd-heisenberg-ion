@@ -6,23 +6,26 @@ import exact_diagonalization as ed
 import matplotlib.pyplot as plt
 
 # Some test parameters
-epsilon = 0.5
+gamma = 0.1
 N = 3
 J = 1.0
 T = 0.1
 beta = J/T
-#Delta_list = np.linspace(0.0,2.0,num=3,endpoint=True)
-Delta_list = np.linspace(0.0,2.0,num=2,endpoint=True)
-#h_list = np.linspace(0.0,2.0,num=21,endpoint=True)
-h_list = np.linspace(0.0,2.0,num=2,endpoint=True)
+Delta_list = np.linspace(-2.0,3.0,num=5,endpoint=True)
+#Delta_list = np.linspace(0.1,2.0,num=3,endpoint=True)
+h_list = np.linspace(0.0,4.0,num=5,endpoint=True)
+#h_list = np.linspace(0.0,2.0,num=5,endpoint=True)
 h_B_list = h_list/(J*(N-1))
+#Delta_list = [0.8]
+#h_list = [0.15, 0.25, 0.3]
+#h_B_list = h_list
 num_bonds = int(N * (N-1)/2)
-alpha = 1.0
+alpha = 10.0
 M_init = 10
 #mc_steps=5000
 #equilibration_steps=1000
-mc_steps=1000
-equilibration_steps=100
+mc_steps=10000
+equilibration_steps=1000
 N_l_init = 10
 
 E_MC_List = np.zeros((len(Delta_list), len(h_list)))
@@ -35,7 +38,7 @@ if not os.path.exists(out_dir):
 out_file = os.path.join(out_dir,"energies_table_N_{}_alpha_{}.csv".format(N,alpha))
 
 with open(out_file, 'w') as f:
-    f.write("epsilon={},N={},T={},J={},alpha={},mc steps={},eq steps={},Delta pts={},h pts={}\n".format(epsilon, N, T, J, alpha, mc_steps, equilibration_steps, len(Delta_list), len(h_list)))
+    f.write("gamma={},N={},T={},J={},alpha={},mc steps={},eq steps={},Delta pts={},h pts={}\n".format(gamma, N, T, J, alpha, mc_steps, equilibration_steps, len(Delta_list), len(h_list)))
     f.write("Delta, h, E0 ED, E0 SSE, E0 SSE Error\n")
     for i1 in range(len(Delta_list)):
         for i2 in range(len(h_list)):
@@ -44,15 +47,18 @@ with open(out_file, 'w') as f:
             h = h_list[i2]
             h_B = h_B_list[i2]
 
-            diag_update_prob_table, max_norm_diag_probs, diag_norm = SSE_init.generate_diag_update_table(N, num_bonds, epsilon, Delta, alpha, h_B)
+            #diag_update_prob_table, max_norm_diag_probs, diag_norm = SSE_init.generate_diag_update_table(N, num_bonds, epsilon, Delta, alpha, h_B)
 
-            vertex_weights, spectrum_offset = SSE_init.generate_vertex_weights(epsilon, h_B, Delta, alpha, N, num_bonds)
+            #vertex_weights, spectrum_offset = SSE_init.generate_vertex_weights(epsilon, h_B, Delta, alpha, N, num_bonds)
 
-            loop_update_prob_table = SSE_init.generate_heat_bath_prob_table(num_bonds, vertex_weights)
+            #loop_update_prob_table = SSE_init.generate_heat_bath_prob_table(num_bonds, vertex_weights)
             sites = SSE_init.geometry(N, num_bonds)
 
+            diag_prob_table, max_over_states, max_diag_norm, vertex_weights, spectrum_offset, directed_loop_prob_table = SSE_init.compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delta)
+            #loop_update_prob_table = SSE_init.directed_loop_prob_table(num_bonds, vertex_weights, sites, alpha, epsilon, h_B, Delta)
+
             energy_array, energy_mean, energy_error = SSE_sim.simulate_XXZ(N, M_init, num_bonds, equilibration_steps, mc_steps, sites, beta, 
-                diag_update_prob_table, max_norm_diag_probs, diag_norm, loop_update_prob_table)
+                diag_prob_table, max_over_states, max_diag_norm, directed_loop_prob_table)
 
             energy_array = energy_array + J*spectrum_offset
 

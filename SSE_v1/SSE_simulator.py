@@ -7,6 +7,11 @@ def off_diagonal_updates(Sm_array, spin_array, M, N, N_l, n, max_loop_size, site
     # For a discussion of the algorithm, see Appendix A of: https://arxiv.org/pdf/cond-mat/0202316
 
     if n == 0:
+
+        for s in range(N):
+            # Flip disconnected spins with probability 1/2
+            spin_array[s] = np.random.choice([1,-1]) * spin_array[s]
+
         return Sm_array, spin_array, 0
     else:
         # temp arrays to store indices identifying the first and last vertices for each spin
@@ -84,7 +89,7 @@ def off_diagonal_updates(Sm_array, spin_array, M, N, N_l, n, max_loop_size, site
             cumulative_loop_size += loop_size # For tracking number of vertices visited in off-diagonal update
             loop_size = 0
             
-            # pick a pick randomly to start
+            # pick a leg randomly to start
             j_0 = np.random.randint(num_legs_per_vertex*n)
             j = j_0
 

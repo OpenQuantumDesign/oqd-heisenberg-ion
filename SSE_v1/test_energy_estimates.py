@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 gamma = 0.1
 N = 3
 J = 1.0
-T = 0.1
+T = 1.0
 beta = J/T
-Delta_list = np.linspace(-2.0,3.0,num=5,endpoint=True)
+Delta_list = np.linspace(0.0,0.5,num=2,endpoint=True)
 #Delta_list = np.linspace(0.1,2.0,num=3,endpoint=True)
-h_list = np.linspace(0.0,4.0,num=5,endpoint=True)
+h_list = np.linspace(0.0,0.5,num=4,endpoint=True)
 #h_list = np.linspace(0.0,2.0,num=5,endpoint=True)
 h_B_list = h_list/(J*(N-1))
 #Delta_list = [0.8]

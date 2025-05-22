@@ -61,7 +61,7 @@ new_vertex_map = generate_new_vertex_type_array()
 
 def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B):
 
-    if h_B < 0.0: 
+    if h_B < 0.0:
         raise Exception("h_B needs to be greater than or equal to 0")
     else:
         Delta_over_four_rb_pow_alpha = Delta/(4.0 * r_b_pow_alpha)

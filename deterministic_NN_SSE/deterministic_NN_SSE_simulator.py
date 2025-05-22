@@ -2,6 +2,89 @@ import numpy as np
 from deterministic_NN_SSE_initializer import *
 import statistical_analysis as sa
 
+def populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs):
+
+    # temp arrays to store indices identifying the first and last vertices for each spin
+    first_vertex_leg = -1 * np.ones(N, dtype=int)
+    last_vertex_leg = -1 * np.ones(N, dtype=int)
+
+    p = 0
+    p_list = np.zeros(n, dtype=int)
+    b_list = np.zeros(n, dtype=int)
+
+    vertex_array = np.zeros(n, dtype=int)
+    linked_list = np.zeros(total_num_legs, dtype=int)
+
+    # TODO: optimization: can likely populate p_list and b_list in diagonal updates and iterate over n<M here instead of M
+    # For populating vertex_array and linked_list
+    for t in range(M):
+        if Sm_array[t] != 0:
+
+            bond_num = Sm_array[t] // 2
+            bond_index = bond_num-1
+            i_b = sites[bond_index,0]
+            j_b = sites[bond_index,1]
+
+            p_list[p] = t
+            b_list[p] = bond_num
+
+            # set first_vertex_leg if site never encountered before
+            if last_vertex_leg[i_b] == -1:
+                first_vertex_leg[i_b] = num_legs_per_vertex*p
+                last_vertex_leg[i_b] = num_legs_per_vertex*p+2 # exit leg identifier requires +2
+            else: # can link to previous vertex leg for this site if encountered before
+                linked_list[num_legs_per_vertex*p] = last_vertex_leg[i_b]
+                linked_list[last_vertex_leg[i_b]] = num_legs_per_vertex*p # all links are bi-directional
+                last_vertex_leg[i_b] = num_legs_per_vertex*p+2
+
+            # Need to follow this logic for both legs
+            if last_vertex_leg[j_b] == -1:
+                first_vertex_leg[j_b] = num_legs_per_vertex*p+1
+                last_vertex_leg[j_b] = num_legs_per_vertex*p+3
+            else:
+                linked_list[num_legs_per_vertex*p+1] = last_vertex_leg[j_b]
+                linked_list[last_vertex_leg[j_b]] = num_legs_per_vertex*p+1
+                last_vertex_leg[j_b] = num_legs_per_vertex*p+3
+
+            # propagate for off-diagonal operators, set vertex in both cases 
+            if Sm_array[t] % 2 == 1:
+                vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], -spin_array[i_b], -spin_array[j_b])]
+                spin_array[i_b] = -spin_array[i_b]
+                spin_array[j_b] = -spin_array[j_b]
+            else:
+                vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], spin_array[i_b], spin_array[j_b])]
+            
+            p+=1
+
+    # Periodic due to trace - connect the first and last spins in expansion direction
+    for i in range(N):
+        if last_vertex_leg[i] != -1:
+            linked_list[last_vertex_leg[i]] = first_vertex_leg[i]
+            linked_list[first_vertex_leg[i]] = last_vertex_leg[i]
+
+    return first_vertex_leg, linked_list, vertex_array, p_list, b_list
+
+def update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg):
+
+    p=0
+    for t in range(M):
+        if Sm_array[t] != 0:
+            b = Sm_array[t]//2
+            Sm_array[t] = 2*b + isotropic_operator_type[vertex_array[p]]
+            p += 1
+        
+    for s in range(N):
+        # Flip disconnected spins with probability 1/2
+        if first_vertex_leg[s] == -1:
+            spin_array[s] = np.random.choice([1,-1]) * spin_array[s]
+        else:
+            # Update connected spins according to the first vertex acting on them - consistency in (1+1)D space ensured by construction
+            q = first_vertex_leg[s] // num_legs_per_vertex
+            l = first_vertex_leg[s] % num_legs_per_vertex
+            spin_array[s] = leg_spin[vertex_array[q]][l]
+
+    return Sm_array, spin_array
+
 def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotropic_exit_leg_map, vertex_map, new_vertex_map, leg_spin):
 
     # For a discussion of the algorithm, see Appendix A of: https://arxiv.org/pdf/cond-mat/0202316
@@ -13,64 +96,9 @@ def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotrop
         return Sm_array, spin_array
     
     else:
-        # temp arrays to store indices identifying the first and last vertices for each spin
-        first_vertex_leg = -1 * np.ones(N, dtype=int)
-        last_vertex_leg = -1 * np.ones(N, dtype=int)
-
-        p = 0
-        p_list = np.zeros(n, dtype=int)
-        b_list = np.zeros(n, dtype=int)
-
-        vertex_array = np.zeros(n, dtype=int)
         total_num_legs = num_legs_per_vertex*n
-        linked_list = np.zeros(total_num_legs, dtype=int)
-
-        # TODO: optimization: can likely populate p_list and b_list in diagonal updates and iterate over n<M here instead of M
-        # For populating vertex_array and linked_list
-        for t in range(M):
-            if Sm_array[t] != 0:
-
-                bond_num = Sm_array[t] // 2
-                bond_index = bond_num-1
-                i_b = sites[bond_index,0]
-                j_b = sites[bond_index,1]
-
-                p_list[p] = t
-                b_list[p] = bond_num
-
-                # set first_vertex_leg if site never encountered before
-                if last_vertex_leg[i_b] == -1:
-                    first_vertex_leg[i_b] = num_legs_per_vertex*p
-                    last_vertex_leg[i_b] = num_legs_per_vertex*p+2 # exit leg identifier requires +2
-                else: # can link to previous vertex leg for this site if encountered before
-                    linked_list[num_legs_per_vertex*p] = last_vertex_leg[i_b]
-                    linked_list[last_vertex_leg[i_b]] = num_legs_per_vertex*p # all links are bi-directional
-                    last_vertex_leg[i_b] = num_legs_per_vertex*p+2
-
-                # Need to follow this logic for both legs
-                if last_vertex_leg[j_b] == -1:
-                    first_vertex_leg[j_b] = num_legs_per_vertex*p+1
-                    last_vertex_leg[j_b] = num_legs_per_vertex*p+3
-                else:
-                    linked_list[num_legs_per_vertex*p+1] = last_vertex_leg[j_b]
-                    linked_list[last_vertex_leg[j_b]] = num_legs_per_vertex*p+1
-                    last_vertex_leg[j_b] = num_legs_per_vertex*p+3
-
-                # propagate for off-diagonal operators, set vertex in both cases 
-                if Sm_array[t] % 2 == 1:
-                    vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], -spin_array[i_b], -spin_array[j_b])]
-                    spin_array[i_b] = -spin_array[i_b]
-                    spin_array[j_b] = -spin_array[j_b]
-                else:
-                    vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], spin_array[i_b], spin_array[j_b])]
-                
-                p+=1
-
-        # Periodic due to trace - connect the first and last spins in expansion direction
-        for i in range(N):
-            if last_vertex_leg[i] != -1:
-                linked_list[last_vertex_leg[i]] = first_vertex_leg[i]
-                linked_list[first_vertex_leg[i]] = last_vertex_leg[i]
+        
+        first_vertex_leg, linked_list, vertex_array = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
 
         # Construct deterministic loops
         disconnected_leg_flags = np.ones(total_num_legs, dtype=int)
@@ -110,22 +138,7 @@ def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotrop
                         if j == j_0:
                             loop_closed = True
 
-        p=0
-        for t in range(M):
-            if Sm_array[t] != 0:
-                b = Sm_array[t]//2
-                Sm_array[t] = 2*b + isotropic_operator_type[vertex_array[p]]
-                p += 1
-            
-        for s in range(N):
-            # Flip disconnected spins with probability 1/2
-            if first_vertex_leg[s] == -1:
-                spin_array[s] = np.random.choice([1,-1]) * spin_array[s]
-            else:
-                # Update connected spins according to the first vertex acting on them - consistency in (1+1)D space ensured by construction
-                q = first_vertex_leg[s] // num_legs_per_vertex
-                l = first_vertex_leg[s] % num_legs_per_vertex
-                spin_array[s] = leg_spin[vertex_array[q]][l]
+        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg)
         
         return Sm_array, spin_array
     
@@ -140,64 +153,9 @@ def off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, xy_exit_leg_ma
         return Sm_array, spin_array
     
     else:
-        # temp arrays to store indices identifying the first and last vertices for each spin
-        first_vertex_leg = -1 * np.ones(N, dtype=int)
-        last_vertex_leg = -1 * np.ones(N, dtype=int)
-
-        p = 0
-        p_list = np.zeros(n, dtype=int)
-        b_list = np.zeros(n, dtype=int)
-
-        vertex_array = np.zeros(n, dtype=int)
         total_num_legs = num_legs_per_vertex*n
-        linked_list = np.zeros(total_num_legs, dtype=int)
 
-        # TODO: optimization: can likely populate p_list and b_list in diagonal updates and iterate over n<M here instead of M
-        # For populating vertex_array and linked_list
-        for t in range(M):
-            if Sm_array[t] != 0:
-
-                bond_num = Sm_array[t] // 2
-                bond_index = bond_num-1
-                i_b = sites[bond_index,0]
-                j_b = sites[bond_index,1]
-
-                p_list[p] = t
-                b_list[p] = bond_num
-
-                # set first_vertex_leg if site never encountered before
-                if last_vertex_leg[i_b] == -1:
-                    first_vertex_leg[i_b] = num_legs_per_vertex*p
-                    last_vertex_leg[i_b] = num_legs_per_vertex*p+2 # exit leg identifier requires +2
-                else: # can link to previous vertex leg for this site if encountered before
-                    linked_list[num_legs_per_vertex*p] = last_vertex_leg[i_b]
-                    linked_list[last_vertex_leg[i_b]] = num_legs_per_vertex*p # all links are bi-directional
-                    last_vertex_leg[i_b] = num_legs_per_vertex*p+2
-
-                # Need to follow this logic for both legs
-                if last_vertex_leg[j_b] == -1:
-                    first_vertex_leg[j_b] = num_legs_per_vertex*p+1
-                    last_vertex_leg[j_b] = num_legs_per_vertex*p+3
-                else:
-                    linked_list[num_legs_per_vertex*p+1] = last_vertex_leg[j_b]
-                    linked_list[last_vertex_leg[j_b]] = num_legs_per_vertex*p+1
-                    last_vertex_leg[j_b] = num_legs_per_vertex*p+3
-
-                # propagate for off-diagonal operators, set vertex in both cases 
-                if Sm_array[t] % 2 == 1:
-                    vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], -spin_array[i_b], -spin_array[j_b])]
-                    spin_array[i_b] = -spin_array[i_b]
-                    spin_array[j_b] = -spin_array[j_b]
-                else:
-                    vertex_array[p] = vertex_map[(spin_array[i_b], spin_array[j_b], spin_array[i_b], spin_array[j_b])]
-                
-                p+=1
-
-        # Periodic due to trace - connect the first and last spins in expansion direction
-        for i in range(N):
-            if last_vertex_leg[i] != -1:
-                linked_list[last_vertex_leg[i]] = first_vertex_leg[i]
-                linked_list[first_vertex_leg[i]] = last_vertex_leg[i]
+        first_vertex_leg, linked_list, vertex_array = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
 
         # Construct deterministic loops
         disconnected_leg_flags = np.ones(total_num_legs, dtype=int)
@@ -237,22 +195,7 @@ def off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, xy_exit_leg_ma
                         if j == j_0:
                             loop_closed = True
 
-        p=0
-        for t in range(M):
-            if Sm_array[t] != 0:
-                b = Sm_array[t]//2
-                Sm_array[t] = 2*b + general_operator_type[vertex_array[p]]
-                p += 1
-            
-        for s in range(N):
-            # Flip disconnected spins with probability 1/2
-            if first_vertex_leg[s] == -1:
-                spin_array[s] = np.random.choice([1,-1]) * spin_array[s]
-            else:
-                # Update connected spins according to the first vertex acting on them - consistency in (1+1)D space ensured by construction
-                q = first_vertex_leg[s] // num_legs_per_vertex
-                l = first_vertex_leg[s] % num_legs_per_vertex
-                spin_array[s] = leg_spin[vertex_array[q]][l]
+        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg)
         
         return Sm_array, spin_array
 

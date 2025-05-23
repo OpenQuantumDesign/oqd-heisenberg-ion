@@ -2,3 +2,4 @@
 .DS_Store
 /Results
 deterministic_NN_SSE/__pycache__/
+scratch/

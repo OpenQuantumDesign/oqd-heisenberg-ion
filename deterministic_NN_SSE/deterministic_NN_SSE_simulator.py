@@ -1,6 +1,7 @@
 import numpy as np
 from deterministic_NN_SSE_initializer import *
 import statistical_analysis as sa
+import estimators as est
 
 def populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs):
 
@@ -64,13 +65,13 @@ def populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total
 
     return first_vertex_leg, linked_list, vertex_array, p_list, b_list
 
-def update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg):
+def update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg, op_type):
 
     p=0
     for t in range(M):
         if Sm_array[t] != 0:
             b = Sm_array[t]//2
-            Sm_array[t] = 2*b + isotropic_operator_type[vertex_array[p]]
+            Sm_array[t] = 2*b + op_type[vertex_array[p]]
             p += 1
         
     for s in range(N):
@@ -98,7 +99,7 @@ def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotrop
     else:
         total_num_legs = num_legs_per_vertex*n
         
-        first_vertex_leg, linked_list, vertex_array = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
+        first_vertex_leg, linked_list, vertex_array, p_list, b_list  = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
 
         # Construct deterministic loops
         disconnected_leg_flags = np.ones(total_num_legs, dtype=int)
@@ -131,14 +132,11 @@ def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotrop
                     # Continue along linked list to get next j, close loop if required
                     j = num_legs_per_vertex*p + l_x
                     disconnected_leg_flags[j] = 0
+                    j = linked_list[j]
                     if j == j_0:
                         loop_closed = True
-                    else:
-                        j = linked_list[j]
-                        if j == j_0:
-                            loop_closed = True
 
-        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg)
+        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg, isotropic_operator_type)
         
         return Sm_array, spin_array
     
@@ -155,7 +153,7 @@ def off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, xy_exit_leg_ma
     else:
         total_num_legs = num_legs_per_vertex*n
 
-        first_vertex_leg, linked_list, vertex_array = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
+        first_vertex_leg, linked_list, vertex_array, p_list, b_list = populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs)
 
         # Construct deterministic loops
         disconnected_leg_flags = np.ones(total_num_legs, dtype=int)
@@ -188,14 +186,11 @@ def off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, xy_exit_leg_ma
                     # Continue along linked list to get next j, close loop if required
                     j = num_legs_per_vertex*p + l_x
                     disconnected_leg_flags[j] = 0
+                    j = linked_list[j]
                     if j == j_0:
                         loop_closed = True
-                    else:
-                        j = linked_list[j]
-                        if j == j_0:
-                            loop_closed = True
 
-        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg)
+        Sm_array, spin_array = update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_array, first_vertex_leg, general_operator_type)
         
         return Sm_array, spin_array
 
@@ -281,6 +276,8 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
     num_bonds = get_number_of_bonds(N, boundary_conditions)
     spectrum_offset = num_bonds/4.0
 
+    magnetization_array = np.zeros(mc_steps)
+
     spin_array = np.zeros(N, dtype=int)
     for i in range(N):
         spin_array[i] = (-1)**(interaction_type_index * i)
@@ -311,14 +308,16 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
         n, Sm_array, spin_array = diagonal_updates_isotropic(Sm_array, spin_array, sites, M, n, beta, num_bonds, diagonal_update_condition)
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
+        est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
 
         n_array[step] = n
 
     energy_array = -n_array/beta
 
     energy_mean, energy_error = sa.statistics_binning(energy_array) # use binning for errors etc., can likely improve this for more sensitive estimators
+    magnetization_mean, magnetization_error = sa.statistics_binning(magnetization_array)
 
-    return energy_array, energy_mean, energy_error, spectrum_offset
+    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error
 
 def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_conditions, a=1.25):
 
@@ -330,6 +329,8 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
 
     num_bonds = get_number_of_bonds(N, boundary_conditions)
     spectrum_offset = num_bonds/2.0
+
+    magnetization_array = np.zeros(mc_steps)
 
     spin_array = np.ones(N, dtype=int)
     
@@ -364,13 +365,15 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
         n, Sm_array, spin_array = diagonal_updates_XY(Sm_array, spin_array, sites, M, n, beta, num_bonds)
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
+        est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
 
         n_array[step] = n
 
     energy_array = -n_array/beta
 
     energy_mean, energy_error = sa.statistics_binning(energy_array) # use binning for errors etc., can likely improve this for more sensitive estimators
+    magnetization_mean, magnetization_error = sa.statistics_binning(magnetization_array)
 
-    return energy_array, energy_mean, energy_error, spectrum_offset
+    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error
 
 

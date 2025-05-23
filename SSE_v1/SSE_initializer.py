@@ -69,7 +69,7 @@ def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B):
         Delta_positive = (Delta + 1.0)/(2.0 * r_b_pow_alpha)
         Delta_negative = (Delta - 1.0)/(2.0 * r_b_pow_alpha)
         
-        if Delta_over_four_rb_pow_alpha >= h_B:
+        if Delta_over_four_rb_pow_alpha > h_B:
             offset_b = Delta_over_four_rb_pow_alpha
 
             if h_B >= Delta_negative:
@@ -280,20 +280,20 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
 
         weight_vars = compute_transition_weights(gamma, Delta, abs_index_diff_pow_alpha, h_B)
 
-        a = weight_vars[0]
-        b = weight_vars[1]
-        c = weight_vars[2]
-        a_p = weight_vars[3]
-        b_p = weight_vars[4]
-        c_p = weight_vars[5]
-        b_1 = weight_vars[6]
-        b_2 = weight_vars[7]
-        b_3 = weight_vars[8]
-        b_1_p = weight_vars[9]
-        b_2_p = weight_vars[10]
-        b_3_p = weight_vars[11]
-        epsilon = weight_vars[12]
-        offset = weight_vars[13]
+        a = np.round(weight_vars[0], 15)
+        b = np.round(weight_vars[1], 15)
+        c = np.round(weight_vars[2], 15)
+        a_p = np.round(weight_vars[3], 15)
+        b_p = np.round(weight_vars[4], 15)
+        c_p = np.round(weight_vars[5], 15)
+        b_1 = np.round(weight_vars[6], 15)
+        b_2 = np.round(weight_vars[7], 15)
+        b_3 = np.round(weight_vars[8], 15)
+        b_1_p = np.round(weight_vars[9], 15)
+        b_2_p = np.round(weight_vars[10], 15)
+        b_3_p = np.round(weight_vars[11], 15)
+        epsilon = np.round(weight_vars[12], 15)
+        offset = np.round(weight_vars[13], 15)
 
         vertex_weights[0:4,bond] += offset
         spectrum_offset += offset

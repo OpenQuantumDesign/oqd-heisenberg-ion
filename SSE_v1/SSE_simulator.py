@@ -1,6 +1,7 @@
 import numpy as np
 from SSE_initializer import *
 import math
+import estimators as est
 
 def off_diagonal_updates(Sm_array, spin_array, M, N, N_l, n, max_loop_size, sites, off_diag_prob_table):
 
@@ -179,10 +180,17 @@ def diagonal_updates(Sm_array, spin_array, sites, diagonal_norm, max_norm_diag_p
 
     return n, Sm_array, spin_array
 
-def simulate_XXZ(N, M, num_bonds, equilibration_steps, mc_steps, sites, beta, diag_probs, max_norm_diag_probs, diagonal_norm, off_diag_probs, a=1.25):
+def simulate_XXZ(N, M, num_bonds, equilibration_steps, mc_steps, sites, beta, diag_probs, max_norm_diag_probs, diagonal_norm, off_diag_probs, starting_config, a=1.25):
 
-    spin_array = np.ones(N, dtype=int)
+    #spin_array = np.zeros(N, dtype=int)
+    '''
+    for i in range(N):
+        spin_array[i] = np.random.choice([1,-1])
+    '''
+    spin_array = starting_config
     Sm_array = np.zeros(M, dtype=int)
+
+    magnetization_array = np.zeros(mc_steps)
 
     # Equilibration step
     n=0
@@ -217,14 +225,40 @@ def simulate_XXZ(N, M, num_bonds, equilibration_steps, mc_steps, sites, beta, di
         n, Sm_array, spin_array = diagonal_updates(Sm_array, spin_array, sites, diagonal_norm, max_norm_diag_probs, diag_probs, M, n, beta, num_bonds)
         # off-diagonal updates
         Sm_array, spin_array, cumulative_loop_size = off_diagonal_updates(Sm_array, spin_array, M, N, N_l, n, max_loop_size, sites, off_diag_probs)
+        '''
+        # pick random time-slice for recording structural properties
+        time_slice = np.random.choice(M)
+        for t in range(time_slice):
+            if Sm_array[t] % 2 == 1:
+                # propagate spin array for off-diagonal operators
+                b = Sm_array[t] // 2
+                bond_index = b-1
+                i_b = sites[bond_index,0]
+                j_b = sites[bond_index,1]
+                spin_array[i_b] = -spin_array[i_b]
+                spin_array[j_b] = -spin_array[j_b]
+        '''
+        magnetization_array = est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
+        '''
+        for t in range(time_slice, M):
+            if Sm_array[t] % 2 == 1:
+                # propagate spin array for off-diagonal operators
+                b = Sm_array[t] // 2
+                bond_index = b-1
+                i_b = sites[bond_index,0]
+                j_b = sites[bond_index,1]
+                spin_array[i_b] = -spin_array[i_b]
+                spin_array[j_b] = -spin_array[j_b]
+        '''
 
         n_array[step] = n
 
     energy_array = -n_array/beta
 
     energy_mean, energy_error = statistics_binning(energy_array) # use binning for errors etc., can likely improve this for more sensitive estimators
+    magnetization_mean, magnetization_error = statistics_binning(magnetization_array)
 
-    return energy_array, energy_mean, energy_error
+    return energy_array, energy_mean, energy_error, magnetization_array, magnetization_mean, magnetization_error
 
 def statistics_binning(arr):
     # Average and standard error using the binning method

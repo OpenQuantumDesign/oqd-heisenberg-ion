@@ -10,12 +10,12 @@ N = 8
 J = 1.0
 T_list = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
 beta_list = [J/T for T in T_list]
-boundary_conditions = "PBC"
+boundary_conditions = "OBC"
 interaction_type = "Ferromagnetic"
 M_init = 10
 #mc_steps=5000
 #equilibration_steps=1000
-mc_steps=100000
+mc_steps=1000
 equilibration_steps=2000
 
 E_MC_List = np.zeros(len(beta_list))
@@ -29,7 +29,7 @@ M_z_ED_list = np.zeros(len(beta_list))
 out_dir = "Results"
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
-out_file = os.path.join(out_dir,"energies_table_N_{}_XY_{}_{}.csv".format(N, interaction_type, boundary_conditions))
+out_file = os.path.join(out_dir,"estimators_table_N_{}_XY_{}_{}.csv".format(N, interaction_type, boundary_conditions))
 
 with open(out_file, 'w') as f:
     f.write("N={},J={},mc steps={},eq steps={}, num_beta_pts={}, boundary_conditions = {}\n".format(N, J, mc_steps, equilibration_steps, len(beta_list), boundary_conditions))
@@ -51,10 +51,10 @@ with open(out_file, 'w') as f:
             H_mat_2 = ed_iso.construct_Hamiltonian_3(0.0, boundary_conditions, interaction_type_index, J=1.0)
             evals, evecs = np.linalg.eigh(H_mat_2)
         '''
-        comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/eigenvalues_magnetization_{}_XY_{}.csv".format(N, boundary_conditions)
+        comparison_file = "eigenvalues_magnetization_{}_XY_{}.csv".format(N, boundary_conditions)
         state_index, evals, mag_z, mag_x = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
 
-        energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error = SSE_sim.simulate_XY(N, M_init, equilibration_steps, mc_steps, sites, beta, boundary_conditions)
+        energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error, step_spin = SSE_sim.simulate_XY(N, M_init, equilibration_steps, mc_steps, sites, beta, boundary_conditions)
 
         energy_array = energy_array + J*spectrum_offset
 
@@ -75,6 +75,8 @@ with open(out_file, 'w') as f:
         M_z_ED_list[i1] = ED_magnetization
         M_z_MC_List[i1] = magnetization_mean
         M_z_err_List[i1] = magnetization_error
+
+        np.savetxt(os.path.join(out_dir, "XY_N_{}_T_{}_J_{}_mc_steps_{}_eq_steps_{}_interaction_type_{}_boundary_conditions_{}.csv".format(N, temperature, J, mc_steps, equilibration_steps, interaction_type, boundary_conditions)), step_spin, delimiter=",", fmt="%d")
 
         f.write(str(temperature) + "," + str(beta) + "," + str(ED_energy) + "," + str(energy_mean + J*spectrum_offset) + "," + str(energy_error) + "," + str(ED_magnetization) + "," + str(magnetization_mean) + "," + str(magnetization_error) + "\n")
 

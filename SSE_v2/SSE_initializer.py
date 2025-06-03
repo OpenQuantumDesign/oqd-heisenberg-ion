@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def geometry(N, num_bonds):
 
@@ -57,7 +58,9 @@ def generate_new_vertex_type_array():
 
     return new_vertex_types
 
+
 new_vertex_map = generate_new_vertex_type_array()
+print(new_vertex_map)
 
 def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi):
 
@@ -253,6 +256,16 @@ def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
                
     return diag_prob_table, max_over_states, max_diag_norm, vertex_weights, spectrum_offset, heat_bath_prob_table
 
+def set_probability(val):
+
+    if val < 0.0:
+        if np.abs(val) < 1e-15:
+            return 0.0
+        else:
+            print("invalid probability encountered: ", val)
+    else:
+        return val 
+
 def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delta, ksi):
 
     num_rows = num_vertices * num_legs_indices
@@ -280,6 +293,7 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
 
         weight_vars = compute_transition_weights(gamma, Delta, abs_index_diff_pow_alpha, h_B, ksi)
 
+        '''
         a = np.round(weight_vars[0], 15)
         b = np.round(weight_vars[1], 15)
         c = np.round(weight_vars[2], 15)
@@ -294,6 +308,22 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
         b_3_p = np.round(weight_vars[11], 15)
         epsilon = np.round(weight_vars[12], 15)
         offset = np.round(weight_vars[13], 15)
+        '''
+
+        a = set_probability(weight_vars[0])
+        b = set_probability(weight_vars[1])
+        c = set_probability(weight_vars[2])
+        a_p = set_probability(weight_vars[3])
+        b_p = set_probability(weight_vars[4])
+        c_p = set_probability(weight_vars[5])
+        b_1 = set_probability(weight_vars[6])
+        b_2 = set_probability(weight_vars[7])
+        b_3 = set_probability(weight_vars[8])
+        b_1_p = set_probability(weight_vars[9])
+        b_2_p = set_probability(weight_vars[10])
+        b_3_p = set_probability(weight_vars[11])
+        epsilon = set_probability(weight_vars[12])
+        offset = set_probability(weight_vars[13])
 
         vertex_weights[0:4,bond] += offset
         spectrum_offset += offset
@@ -391,3 +421,57 @@ def update_directed_loop_probs(vertex_enum, l_e, l_x, bond, transition_weight, v
     prob_table[new_row_index, bond] = prob_table[init_row_index, bond]
 
     return prob_table
+
+def write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type):
+
+    num_bonds = int(N*(N-1)/2.0)
+    h_B = h/(J*(N-1))
+    out_dir = "ProbabilityDensities"
+    sites = geometry(N, num_bonds)
+
+    if loop_update_type == "heat_bath":
+        prob_tables = compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta)
+        diag_prob_table = prob_tables[0]
+        max_over_states = prob_tables[1]
+        max_diag_norm = prob_tables[2]
+        vertex_weights = prob_tables[3]
+        spectrum_offset = prob_tables[4]
+        loop_update_prob_table = prob_tables[5]
+
+    elif loop_update_type == "directed_loops": 
+        prob_tables = compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delta, ksi)
+        diag_prob_table = prob_tables[0]
+        max_over_states = prob_tables[1]
+        max_diag_norm = prob_tables[2]
+        vertex_weights = prob_tables[3]
+        spectrum_offset = prob_tables[4]
+        loop_update_prob_table = prob_tables[5]
+
+    else:
+        raise Exception("Invalid key word argument for loop_update_type")
+    
+    file_prefix = "N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}".format(N, Delta, h, alpha, gamma, ksi, J)
+
+    geometry_file_name = os.path.join(out_dir, "N_{}_geometry.csv".format(N))
+    diag_file_name = os.path.join(out_dir, file_prefix + "_diag_probs.csv")
+    max_over_states_file_name = os.path.join(out_dir, file_prefix + "_max_over_states.csv")
+    loop_update_table_file_name = os.path.join(out_dir, file_prefix + "_{}_off_diag_table.csv".format(loop_update_type))
+
+    np.savetxt(geometry_file_name, sites, delimiter=",", fmt="%d", header="N={}, NumBonds={}".format(N, num_bonds))
+    np.savetxt(diag_file_name, diag_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={}".format(N, Delta, h, alpha, gamma, ksi, J))
+    np.savetxt(max_over_states_file_name, max_over_states, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},norm={}".format(N, Delta, h, alpha, gamma, ksi, J, max_diag_norm))
+    np.savetxt(loop_update_table_file_name, loop_update_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},spectrum_offset={},loop_update_type={}".format(N, Delta, h, alpha, gamma, ksi, J, spectrum_offset, loop_update_type))
+
+    return 0
+
+if __name__=="__main__":
+    gamma = 0.0
+    Delta = 1.1
+    h_list = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    N = 8
+    alpha = 1.0
+    ksi = 0.0
+    J = 1.0
+    loop_update_type = "directed_loops"
+    for h in h_list:
+        write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type)

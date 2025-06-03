@@ -278,6 +278,8 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
 
     magnetization_array = np.zeros(mc_steps)
 
+    step_spin = np.zeros((mc_steps, N), dtype=int)
+
     spin_array = np.zeros(N, dtype=int)
     for i in range(N):
         spin_array[i] = (-1)**(interaction_type_index * i)
@@ -309,6 +311,7 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
         est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
+        step_spin[step, :] = spin_array
 
         n_array[step] = n
 
@@ -317,7 +320,7 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
     energy_mean, energy_error = sa.statistics_binning(energy_array) # use binning for errors etc., can likely improve this for more sensitive estimators
     magnetization_mean, magnetization_error = sa.statistics_binning(magnetization_array)
 
-    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error
+    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error, step_spin
 
 def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_conditions, a=1.25):
 
@@ -339,6 +342,7 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
         spin_array[i] = (-1)**i
     
     Sm_array = np.zeros(M, dtype=int)
+    step_spin = np.zeros((mc_steps, N), dtype=int)
 
     # Equilibration step
     n=0
@@ -366,6 +370,7 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
         est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
+        step_spin[step, :] = spin_array
 
         n_array[step] = n
 
@@ -374,6 +379,6 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
     energy_mean, energy_error = sa.statistics_binning(energy_array) # use binning for errors etc., can likely improve this for more sensitive estimators
     magnetization_mean, magnetization_error = sa.statistics_binning(magnetization_array)
 
-    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error
+    return energy_array, energy_mean, energy_error, spectrum_offset, magnetization_array, magnetization_mean, magnetization_error, step_spin
 
 

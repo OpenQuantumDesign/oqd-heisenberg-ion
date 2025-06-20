@@ -23,10 +23,19 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path, std
 
         rowData.clear();
         while (std::getline(rowStream, entry, ',')) {
-            rowData.push_back(std::stod(entry));
-            if (isnan(rowData.back()) || rowData.back() < 0.0) {
+            double table_val = std::stod(entry);
+            if (isnan(table_val)) {
                 throw std::runtime_error("Invalid value encountered\n");
             }
+            else if (table_val < 0.0){
+                if (table_val > -1e-15){
+                    throw std::runtime_error("Small negative value encountered\n");
+                }
+                else {
+                    throw std::runtime_error("Large negative value encountered\n");
+                }
+            }
+            rowData.push_back(table_val);
         }
 
         data_container.push_back(rowData);
@@ -59,10 +68,11 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path, std
 
         rowData.clear();
         while (std::getline(rowStream, entry, ',')) {
-            rowData.push_back(std::stoi(entry));
-            if (isnan(rowData.back()) || rowData.back() < 0.0) {
+            int table_val = std::stoi(entry);
+            if (isnan(table_val) || table_val < 0) {
                 throw std::runtime_error("Invalid value encountered\n");
             }
+            rowData.push_back(table_val);
         }
 
         data_container.push_back(rowData);
@@ -94,8 +104,17 @@ std::string ProbabilityTables::readVectorFile(const std::string &file_path, std:
         std::stringstream rowStream(line);
 
         rowData = std::stod(line);
-        if (isnan(rowData) || rowData < 0.0) {
+
+        if (isnan(rowData)) {
             throw std::runtime_error("Invalid value encountered\n");
+        }
+        else if (rowData < 0.0){
+            if (rowData > -1e-15){
+                throw std::runtime_error("Small negative value encountered\n");
+            }
+            else {
+                throw std::runtime_error("Large negative value encountered\n");
+            }
         }
         data_container.push_back(rowData);
     }

@@ -17,12 +17,16 @@ private:
 
     std::vector<int> p_list;
     std::vector<int> b_list;
+    std::vector<int> id_list;
 
     std::vector<int> first_vertex_leg;
     std::vector<int> last_vertex_leg;
 
     std::vector<int> vertex_configuration;
+    std::vector<int> disorder_vertex_locations;
     std::vector<int> linked_list;
+
+    bool skip_loop_update;
 
     double beta;
 
@@ -33,8 +37,11 @@ private:
     int M;
     int n;
     int N_l;
+    int num_clusters;
     int max_loop_size;
+    int count_non_skipped_loop_updates;
     int N;
+    int num_free_spins;
 
     std::vector<int> n_list;
     std::vector<int> cumulative_loop_size_list;
@@ -45,23 +52,35 @@ private:
     std::mt19937_64 off_diagonal_update_generator;
     std::mt19937_64 disconnected_spin_flip_generator;
     std::mt19937_64 loop_start_pos_generator;
-    std::mt19937_64 metropolis_generator;
+    std::mt19937_64 metropolis_generator_1;
+    std::mt19937_64 metropolis_generator_2;
+    std::mt19937_64 metropolis_generator_3;
 
     int init_config_seed=1;
     int diagonal_update_seed=2;
     int off_diagonal_update_seed=3;
     int disconnected_spin_flip_seed=4;
     int loop_start_pos_seed=5;
-    int metropolis_seed=6;
+    int metropolis_seed_1 =6;
+    int metropolis_seed_2 = 7;
+    int metropolis_seed_3 = 8;
+
+    std::uniform_real_distribution<double> metropolis_acceptance_distribution = std::uniform_real_distribution<double>(0.0,1.0);
+    std::uniform_int_distribution<> spin_flip_dist = std::uniform_int_distribution<>(0, 1);
+    std::uniform_int_distribution<> loop_start_pos_dist;
 
     int num_free_flips;
     int equilibration_steps;
     int mc_steps;
     double a_parameter;
 
+    int num_winding;
+
     int cumulative_loop_size;
 
     std::vector<int> spin_labels;
+
+    std::vector<double> out_leg_probs;
 
     void setInitialConfiguration();
 
@@ -69,14 +88,27 @@ private:
 
     void offDiagonalUpdatesXXZh(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
+    void multiBranchClusterUpdate(const ProbabilityTables &prob_tables, const VertexTypes &vertexTypes);
+
+    void populateLinkedList(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
+
     void initializeOffDiagonalUpdates();
 
     void populateOperatorLocations(const int &num_fill_zeros);
 
+    void randomSpinFlipsXXZ();
+
+    void flipAllSpins();
+
+    static double computeAverage(std::vector<int> &vector_entries, const double &num_samples_in);
+
 public:
-    explicit ConfigurationGenerator(const SimulationParameters &sim_params);
+    ConfigurationGenerator(const SimulationParameters &sim_params, const ProbabilityTables &prob_tables);
 
     void simulateProbabilisticLoopsXXZh(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                        const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+
+    void simulateProbabilisticLoopsXXZ(const ProbabilityTables &prob_tables, Estimators &estimators,
                                         const SimulationParameters &sim_params, const VertexTypes &vertex_types);
 };
 

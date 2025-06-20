@@ -14,19 +14,30 @@ VertexTypes::VertexTypes(){
     std::vector<int> config_5 = {1, -1, -1, 1};
     std::vector<int> config_6 = {-1, 1, 1, -1};
 
+    config_to_index_mapping = { {15,0}, {5,1}, {-5,2},
+                                {-15,3}, {3,4}, {-3,5}};
+    /*
     config_to_index_mapping[config_1] = 0;
     config_to_index_mapping[config_2] = 1;
     config_to_index_mapping[config_3] = 2;
     config_to_index_mapping[config_4] = 3;
     config_to_index_mapping[config_5] = 4;
     config_to_index_mapping[config_6] = 5;
+    */
 
     is_off_diag = {0,0,0,0,1,1};
+    twist_mapping = {0,0,0,0,-1,1};
 
     index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
 
     populateAllowedExitLegs();
 }
+
+int VertexTypes::getVertexTypeIndex(const std::vector<int> &config) const {
+    int config_key = 8*config[0] + 4*config[1] + 2*config[2] + config[3];
+    int vertex_type = config_to_index_mapping.at(config_key);
+    return vertex_type;
+};
 
 // Can also construct a map that does this via indices like in the python version
 int VertexTypes::getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, const int &old_vertex_index) const
@@ -34,9 +45,10 @@ int VertexTypes::getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, cons
 
     std::vector<int> old_config = getVertexConfig(old_vertex_index);
 
-    std::vector<int> new_config = flipInputOutputLegs(l_e, l_x, old_config);
+    old_config.at(l_e) = -old_config.at(l_e);
+    old_config.at(l_x) = -old_config.at(l_x);
 
-    int new_index = getVertexTypeIndex(new_config);
+    int new_index = getVertexTypeIndex(old_config);
 
     return new_index;
 };
@@ -71,14 +83,3 @@ void VertexTypes::populateAllowedExitLegs() {
         }
     }
 }
-
-// Need to add the following code to this
-// map from the vertex type index and input leg to allowed exit legs
-// std::vector<std::vector<std::vector<int>>> allowed_exit_legs;
-// for each vertex type
-// for each input leg
-// for each exit leg
-// flip input and exit legs
-// if exit allowed (can be checked using config_to_index_mapping)
-// add composite index = vertex type index * 16 + input leg * 4 + exit leg to allowed_exit_legs
-// then get the output leg indices for prob_table indexing in config_generator from this vector

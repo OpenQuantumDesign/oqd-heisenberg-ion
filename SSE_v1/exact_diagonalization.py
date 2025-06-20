@@ -20,7 +20,7 @@ def construct_Hamiltonian_2(Delta, J=1.0, h=1.0):
 
     return -Delta*J*H_z - J*H_int - h*H_field
 
-def construct_Hamiltonian_3(Delta, alpha, J=1.0, h=1.0):
+def construct_Hamiltonian_3(Delta, alpha, J=1.0, h=0.0):
 
     sigma_z = np.diag([1,-1])
     identity_matrix = np.eye(2)

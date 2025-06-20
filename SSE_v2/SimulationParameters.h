@@ -31,14 +31,13 @@ public:
 
     std::string loop_type;
 
-    int init_M;
+    //int init_M;
     int init_config_index;
 
-    SimulationParameters(const int &num_spins, const double &Delta_in, const double &h_in,
-                         const double &alpha_in, const double &gamma_in, const double &ksi_in,
-                         const double &J_in, const int &num_chars_in, const int &init_M_in,
-                         const double &temperature_in, const std::string &loop_type_in,
-                         const int &simulation_steps_in, const int &eq_steps_in,
+    SimulationParameters(const std::string &num_spins, const std::string &Delta_in, const std::string &h_in,
+                         const std::string &alpha_in, const std::string &gamma_in, const bool &dist_dep_offset,
+                         const std::string &ksi_in,const std::string &J_in, const double &temperature_in,
+                         const std::string &loop_type_in,const int &simulation_steps_in, const int &eq_steps_in,
                          const double &new_M_multiplier_in, const int &init_config_in,
                          const std::string &root_folder_in);
 

@@ -1,17 +1,65 @@
 import numpy as np
 import os
 
-def geometry(N, num_bonds):
+def geometry(N_1, N_2, geometry_type):
+    
+    if geometry_type == "1d":
+        if N_2 == 0:
+            sites, distances, geometry_table, N, num_bonds = geometry_1d(N_1)
+        else: 
+            raise Exception("Geometry type is 1d but N_2  is non-zero.")
+    elif geometry_type == "2d_triangular":
+        sites, distances, geometry_table, N, num_bonds = geometry_2d_triangular(N_1, N_2)
+    else:
+        raise Exception("Geometry type: {} is not implemented. Valid possible choices are: {} and {}.".format(geometry_type, "1d", "2d_triangular"))
 
+    return sites, distances, geometry_table, N, num_bonds
+
+def geometry_1d(N):
+
+    num_bonds = int(N*(N-1)/2)
     sites = np.zeros((num_bonds,2), dtype=int)
+    geometry_table = np.zeros((num_bonds,3))
+    distances = np.zeros(num_bonds)
     b = 0
     for i in range(N):
         for j in range(i+1,N):
             sites[b,0] = i
             sites[b,1] = j
+            distances[b] = j-i
+            geometry_table[b,0] = i
+            geometry_table[b,1] = j
+            geometry_table[b,2] = distances[b]
             b += 1
 
-    return sites
+    return sites, distances, geometry_table, N, num_bonds
+
+def geometry_2d_triangular(N_1, N_2):
+
+    N = N_1 * N_2
+    num_bonds = int(N*(N-1)/2)
+    sites = np.zeros((num_bonds,2), dtype=int)
+    distances = np.zeros(num_bonds)
+    geometry_table = np.zeros(num_bonds,3)
+    b = 0
+    a_1 = np.array([1.0,0.0])
+    a_2 = np.array([-0.5, np.sqrt(3.0)/2.0])
+    for i1 in range(N_1):
+        for i2 in range(N_2):
+            i = i1*N_2 + i2
+            for j1 in range(N_1):
+                for j2 in range(N_2):
+                    j = j1*N_2 + j2
+                    if j > i:
+                        sites[b,0] = i
+                        sites[b,1] = j
+                        distances[b] = np.norm((j1-i1)*a_1 + (j2-i2)*a_2)
+                        geometry_table[b,0] = i
+                        geometry_table[b,1] = j
+                        geometry_table[b,2] = distances[b]
+                        b += 1
+
+    return sites, distances, geometry_table, N, num_bonds
 
 num_vertices = 6
 num_legs_per_vertex = 4
@@ -60,9 +108,8 @@ def generate_new_vertex_type_array():
 
 
 new_vertex_map = generate_new_vertex_type_array()
-print(new_vertex_map)
 
-def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi):
+def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi, dist_dep_gamma):
 
     if h_B < 0.0:
         raise Exception("h_B needs to be greater than or equal to 0")
@@ -101,36 +148,74 @@ def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi):
             b_2 = 0.0
 
         elif Delta < 0.0:
-            offset_b = h_B - Delta_over_four_rb_pow_alpha
 
-            if h_B <= Delta_positive:
-                b_2_p = 0.0
-                epsilon = Delta_positive/2.0 - h_B/2.0 + gamma
+            if h_B == 0.0:
+                offset_b = -Delta/(4*r_b_pow_alpha)
+                if Delta < -1.0:
+                    if dist_dep_gamma:
+                        epsilon = gamma - Delta/(4.0*r_b_pow_alpha)
+                        c_p = gamma - Delta/(4.0*r_b_pow_alpha)
+                        #epsilon = gamma + 0.1/(r_b_pow_alpha)
+                        #c_p = gamma + 0.1/(r_b_pow_alpha)
+                    else:
+                        epsilon = gamma
+                        c_p = gamma
+                    c = c_p
+                    a_p = 1.0/(2.0*r_b_pow_alpha)
+                    b_p = 0.0
+                    a = a_p
+                    b = b_p
+                    b_2_p = -(1.0 + Delta)/(2*r_b_pow_alpha)
+                    b_2 = b_2_p
+                    b_3_p = 0.0
+                    b_1_p = 0.0
+                    b_1 = b_1_p
+                    b_3 = b_3_p
+                else:
+                    b_2_p = 0.0
+                    b_p = (1.0 + Delta)/(4.0*r_b_pow_alpha)
+                    a_p = (1.0 - Delta)/(4.0*r_b_pow_alpha)
+                    c_p = gamma
+                    epsilon = ((1.0 + Delta)/(4.0 * r_b_pow_alpha)) + gamma
+                    c = c_p
+                    a = a_p
+                    b = b_p
+                    b_1_p = 0.0
+                    b_3_p = 0.0
+                    b_2 = b_2_p
+                    b_1 = b_1_p
+                    b_3 = b_3_p
             else:
-                b_2_p = h_B - Delta_positive + ksi
-                epsilon = gamma
-            
-            if h_B <= -Delta_positive:
-                b_2 = -h_B - Delta_positive + ksi
-            else:
-                b_2 = 0.0
+                offset_b = h_B - Delta_over_four_rb_pow_alpha
 
-            if h_B <= -Delta_negative:
-                b_3 = 0.0
-            else: 
-                b_3 = h_B + Delta_negative + ksi
-            
-            a_p = -Delta_negative/2.0 + h_B/2.0 - b_2_p/2.0
-            b_p = Delta_positive/2.0 - h_B/2.0 + b_2_p/2.0
-            c_p = epsilon - Delta_positive/2.0 + h_B/2.0 - b_2_p/2.0
+                if h_B <= Delta_positive:
+                    b_2_p = 0.0
+                    epsilon = Delta_positive/2.0 - h_B/2.0 + gamma
+                else:
+                    b_2_p = h_B - Delta_positive + ksi
+                    epsilon = gamma
+                
+                if h_B <= -Delta_positive:
+                    b_2 = -h_B - Delta_positive + ksi
+                else:
+                    b_2 = 0.0
 
-            a = -Delta_negative/2.0 - h_B/2.0 + b_3/2.0 - b_2/2.0
-            b = Delta_positive/2.0 + h_B/2.0 + b_2/2.0 - b_3/2.0
-            c = 3.0*h_B/2.0 + epsilon - Delta_positive/2.0 - b_2/2.0 - b_3/2.0
+                if h_B <= -Delta_negative:
+                    b_3 = 0.0
+                else: 
+                    b_3 = h_B + Delta_negative + ksi
+                
+                a_p = -Delta_negative/2.0 + h_B/2.0 - b_2_p/2.0
+                b_p = Delta_positive/2.0 - h_B/2.0 + b_2_p/2.0
+                c_p = epsilon - Delta_positive/2.0 + h_B/2.0 - b_2_p/2.0
 
-            b_1 = 0.0
-            b_1_p = 0.0
-            b_3_p = 0.0
+                a = -Delta_negative/2.0 - h_B/2.0 + b_3/2.0 - b_2/2.0
+                b = Delta_positive/2.0 + h_B/2.0 + b_2/2.0 - b_3/2.0
+                c = 3.0*h_B/2.0 + epsilon - Delta_positive/2.0 - b_2/2.0 - b_3/2.0
+
+                b_1 = 0.0
+                b_1_p = 0.0
+                b_3_p = 0.0
         
         else:
             offset_b = h_B
@@ -171,12 +256,12 @@ def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi):
         offset_b += epsilon
         return (a,b,c,a_p,b_p,c_p,b_1,b_2,b_3,b_1_p,b_2_p,b_3_p,epsilon,offset_b)
     
-def compute_offset(gamma, Delta, r_b_pow_alpah, h_B):
+def compute_offset(gamma, Delta, r_b_pow_alpha, h_B):
 
     if h_B < 0.0: 
         raise Exception("h_B needs to be greater than or equal to 0")
     else:
-        Delta_over_four_rb_pow_alpha = Delta/(4.0 * r_b_pow_alpah)
+        Delta_over_four_rb_pow_alpha = Delta/(4.0 * r_b_pow_alpha)
         
         if Delta_over_four_rb_pow_alpha > h_B:
             offset_b = Delta_over_four_rb_pow_alpha
@@ -192,7 +277,7 @@ def compute_offset(gamma, Delta, r_b_pow_alpah, h_B):
 
 # Generating this table might be slow for large systems because size grows as N^2. Simpler but slightly slower approach would be to
 # compute 3 non-zero heat bath probabilities on the fly 
-def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
+def compute_prob_tables_heat_bath(num_bonds, sites, distances, alpha, gamma, h_B, Delta):
 
     num_rows = num_vertices * num_legs_indices
     heat_bath_prob_table = np.zeros((num_rows, num_bonds))
@@ -207,7 +292,8 @@ def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
 
         i_b = sites[bond, 0]
         j_b = sites[bond, 1]
-        abs_index_diff_pow_alpha = (j_b - i_b)**alpha
+        #abs_index_diff_pow_alpha = (j_b - i_b)**alpha
+        abs_index_diff_pow_alpha = (distances[bond])**alpha
 
         vertex_weights[0, bond] = ((Delta/4.0) * (1.0/abs_index_diff_pow_alpha)) + h_B
         vertex_weights[1, bond] = -((Delta/4.0) * (1.0/abs_index_diff_pow_alpha))
@@ -216,7 +302,11 @@ def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
         vertex_weights[4, bond] = 0.5/(abs_index_diff_pow_alpha)
         vertex_weights[5, bond] = vertex_weights[4, bond]
 
-        diag_prob_table[:, bond] = vertex_weights[0:4, bond]
+        #diag_prob_table[:, bond] = vertex_weights[0:4, bond]
+        diag_prob_table[0, bond] = vertex_weights[0, bond]
+        diag_prob_table[1, bond] = vertex_weights[1, bond]
+        diag_prob_table[2, bond] = vertex_weights[2, bond]
+        diag_prob_table[3, bond] = vertex_weights[3, bond]
 
         offset = compute_offset(gamma, Delta, abs_index_diff_pow_alpha, h_B)
 
@@ -224,6 +314,11 @@ def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
         spectrum_offset += offset
 
         diag_prob_table[:,bond] += offset
+
+        diag_prob_table[0,bond] = set_probability(diag_prob_table[0,bond])
+        diag_prob_table[1,bond] = set_probability(diag_prob_table[1,bond])
+        diag_prob_table[2,bond] = set_probability(diag_prob_table[2,bond])
+        diag_prob_table[3,bond] = set_probability(diag_prob_table[3,bond])
 
         max_over_states[bond] = np.max(diag_prob_table[:,bond])
         diag_prob_table[:,bond] /= max_over_states[bond]
@@ -247,7 +342,7 @@ def compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta):
                         count_invalid_vertices += 1
                         heat_bath_prob_table[row_index, bond] = 0.0
                     else:
-                        heat_bath_prob_table[row_index, bond] = vertex_weights[new_vertex, bond]
+                        heat_bath_prob_table[row_index, bond] = set_probability(vertex_weights[new_vertex, bond])
                         norm += vertex_weights[new_vertex, bond]
 
                 heat_bath_prob_table[row_index-num_legs_per_vertex+1:row_index+1, bond] /= norm
@@ -260,13 +355,14 @@ def set_probability(val):
 
     if val < 0.0:
         if np.abs(val) < 1e-15:
+            print("Correcting small negative")
             return 0.0
         else:
             print("invalid probability encountered: ", val)
     else:
         return val 
 
-def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delta, ksi):
+def compute_prob_tables_directed_loops(num_bonds, sites, distances, alpha, gamma, h_B, Delta, ksi, dist_dep_gamma):
 
     num_rows = num_vertices * num_legs_indices
     directed_loop_prob_table = np.zeros((num_rows, num_bonds))
@@ -280,7 +376,8 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
         
         i_b = sites[bond, 0]
         j_b = sites[bond, 1]
-        abs_index_diff_pow_alpha = (j_b - i_b)**alpha
+        #abs_index_diff_pow_alpha = (j_b - i_b)**alpha
+        abs_index_diff_pow_alpha = (distances[bond])**alpha
 
         vertex_weights[0, bond] = ((Delta/4.0) * (1.0/abs_index_diff_pow_alpha)) + h_B
         vertex_weights[1, bond] = -((Delta/4.0) * (1.0/abs_index_diff_pow_alpha))
@@ -291,7 +388,7 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
 
         diag_prob_table[:, bond] = vertex_weights[0:4, bond]
 
-        weight_vars = compute_transition_weights(gamma, Delta, abs_index_diff_pow_alpha, h_B, ksi)
+        weight_vars = compute_transition_weights(gamma, Delta, abs_index_diff_pow_alpha, h_B, ksi, dist_dep_gamma)
 
         '''
         a = np.round(weight_vars[0], 15)
@@ -310,6 +407,7 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
         offset = np.round(weight_vars[13], 15)
         '''
 
+        '''
         a = set_probability(weight_vars[0])
         b = set_probability(weight_vars[1])
         c = set_probability(weight_vars[2])
@@ -324,11 +422,33 @@ def compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delt
         b_3_p = set_probability(weight_vars[11])
         epsilon = set_probability(weight_vars[12])
         offset = set_probability(weight_vars[13])
+        '''
+        
+        
+        a = weight_vars[0]
+        b = weight_vars[1]
+        c = weight_vars[2]
+        a_p = weight_vars[3]
+        b_p = weight_vars[4]
+        c_p = weight_vars[5]
+        b_1 = weight_vars[6]
+        b_2 = weight_vars[7]
+        b_3 = weight_vars[8]
+        b_1_p = weight_vars[9]
+        b_2_p = weight_vars[10]
+        b_3_p = weight_vars[11]
+        epsilon = weight_vars[12]
+        offset = weight_vars[13]
 
         vertex_weights[0:4,bond] += offset
         spectrum_offset += offset
 
         diag_prob_table[:,bond] += offset
+
+        diag_prob_table[0,bond] = set_probability(diag_prob_table[0,bond])
+        diag_prob_table[1,bond] = set_probability(diag_prob_table[1,bond])
+        diag_prob_table[2,bond] = set_probability(diag_prob_table[2,bond])
+        diag_prob_table[3,bond] = set_probability(diag_prob_table[3,bond])
 
         max_over_states[bond] = np.max(diag_prob_table[:,bond])
         diag_prob_table[:,bond] /= max_over_states[bond]
@@ -406,7 +526,7 @@ def update_directed_loop_probs(vertex_enum, l_e, l_x, bond, transition_weight, v
     init_composite_leg_index, init_row_index = get_composite_row_prob_index(vertex_enum, l_e, l_x)
     normalization = vertex_weights[vertex_enum, bond]
     if normalization != 0.0:
-        prob_table[init_row_index, bond] = transition_weight/normalization
+        prob_table[init_row_index, bond] = set_probability(transition_weight/normalization)
 
     new_vertex_enum, new_l_e, new_l_x = get_symmetric_indices(vertex_enum, l_e, l_x, vertical_swap_mapping)
     new_composite_leg_index, new_row_index = get_composite_row_prob_index(new_vertex_enum, new_l_e, new_l_x)
@@ -422,15 +542,15 @@ def update_directed_loop_probs(vertex_enum, l_e, l_x, bond, transition_weight, v
 
     return prob_table
 
-def write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type):
+def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma):
 
+    out_dir = "ProbabilityDensities"
+    sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type)
     num_bonds = int(N*(N-1)/2.0)
     h_B = h/(J*(N-1))
-    out_dir = "ProbabilityDensities"
-    sites = geometry(N, num_bonds)
 
     if loop_update_type == "heat_bath":
-        prob_tables = compute_prob_tables_heat_bath(num_bonds, sites, alpha, gamma, h_B, Delta)
+        prob_tables = compute_prob_tables_heat_bath(num_bonds, sites, distances, alpha, gamma, h_B, Delta)
         diag_prob_table = prob_tables[0]
         max_over_states = prob_tables[1]
         max_diag_norm = prob_tables[2]
@@ -439,7 +559,7 @@ def write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type):
         loop_update_prob_table = prob_tables[5]
 
     elif loop_update_type == "directed_loops": 
-        prob_tables = compute_prob_tables_directed_loops(num_bonds, sites, alpha, gamma, h_B, Delta, ksi)
+        prob_tables = compute_prob_tables_directed_loops(num_bonds, sites, distances, alpha, gamma, h_B, Delta, ksi, dist_dep_gamma)
         diag_prob_table = prob_tables[0]
         max_over_states = prob_tables[1]
         max_diag_norm = prob_tables[2]
@@ -450,14 +570,18 @@ def write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type):
     else:
         raise Exception("Invalid key word argument for loop_update_type")
     
-    file_prefix = "N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}".format(N, Delta, h, alpha, gamma, ksi, J)
+    if dist_dep_gamma:
+        dist_dep_offset = 1
+    else:
+        dist_dep_offset = 0
+    file_prefix = "N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}_dist_dep_offset_{}".format(N, Delta, h, alpha, gamma, ksi, J, dist_dep_offset)
 
     geometry_file_name = os.path.join(out_dir, "N_{}_geometry.csv".format(N))
     diag_file_name = os.path.join(out_dir, file_prefix + "_diag_probs.csv")
     max_over_states_file_name = os.path.join(out_dir, file_prefix + "_max_over_states.csv")
     loop_update_table_file_name = os.path.join(out_dir, file_prefix + "_{}_off_diag_table.csv".format(loop_update_type))
 
-    np.savetxt(geometry_file_name, sites, delimiter=",", fmt="%d", header="N={}, NumBonds={}".format(N, num_bonds))
+    np.savetxt(geometry_file_name, geometry_table, delimiter=",", fmt="%d", header="N={}, NumBonds={}".format(N, num_bonds))
     np.savetxt(diag_file_name, diag_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={}".format(N, Delta, h, alpha, gamma, ksi, J))
     np.savetxt(max_over_states_file_name, max_over_states, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},norm={}".format(N, Delta, h, alpha, gamma, ksi, J, max_diag_norm))
     np.savetxt(loop_update_table_file_name, loop_update_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},spectrum_offset={},loop_update_type={}".format(N, Delta, h, alpha, gamma, ksi, J, spectrum_offset, loop_update_type))
@@ -465,13 +589,26 @@ def write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type):
     return 0
 
 if __name__=="__main__":
-    gamma = 0.0
-    Delta = 1.1
-    h_list = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    N = 8
+    
+    #Delta_list = [-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0]
+    #Delta_list = [-3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0]
+    Delta_list = [-20.0,-19.0,-18.0,-17.0,-11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-10.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0, 11.0, 12.0, 13.0, 14.0, 15.0]
+    #Delta_list = [-3.0]
+
+    h_list = [0.0]
+    N_1 = 100
+    N_2 = 0
     alpha = 1.0
     ksi = 0.0
     J = 1.0
     loop_update_type = "directed_loops"
-    for h in h_list:
-        write_prob_tables(gamma, Delta, h, N, alpha, ksi, J, loop_update_type)
+    lattice_type = "1d"
+    dist_dep_gamma = True
+
+    for Delta in Delta_list:
+        if Delta < 0.0:
+            gamma = 0.0
+        else:
+            gamma = 0.1
+        for h in h_list:
+            write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma)

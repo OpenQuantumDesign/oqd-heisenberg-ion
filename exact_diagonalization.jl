@@ -8,13 +8,20 @@ function r_distance(index_i, index_j, alpha)
     return (1 / dist)
 end
 
-function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
+function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B, theta)
+
+    println(delta)
+    println("\n")
 
     Dim = 2^N
+    J_Z = delta
+
+    exp_theta = exp(theta*1im)
+    exp_minus_theta = exp(-theta*1im)
 
     cutoff = 1e-3
     # initialise Hamiltonian
-    Hamiltonian = zeros(Float32, Dim, Dim)
+    Hamiltonian = zeros(ComplexF64, Dim, Dim)
 
     for Ket = 0:Dim-1
         Diagonal = 0.0
@@ -26,9 +33,9 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
 
                 #if cutoff not wanted, comment the following lines
 
-                if var_ij < cutoff
-                    continue
-                end
+                #if var_ij < cutoff
+                #    continue
+                #end
 
                 #S^Z part, similar to before 
                 Spin1 = 2 * ((Ket >> i) & 1) - 1
@@ -40,16 +47,15 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
                 bit_i = 2^i
                 bit_j = 2^j
                 Bra = Ket ⊻ bit_i ⊻ bit_j
-                Hamiltonian[Bra+1, Ket+1] += -1.0 * J_X * 0.25 * r_distance(i, j, alpha)
+                #Hamiltonian[Bra+1, Ket+1] += -1.0 * J_X * 0.25 * r_distance(i, j, alpha) * cos(theta)
 
                 si = (Ket >> i) & 1
                 sj = (Ket >> j) & 1
 
                 #S^Y part- not all terms have the same sign from the fact that S^Y=1/2i (S^+-S^-). I expanded S^Y*S^Y to check which terms would have an overall minus sign. 
 
-                Bra = Ket ⊻ (bit_i) ⊻ (bit_j)
-                sign = (si == sj) ? 1 : -1
-                Hamiltonian[Bra+1, Ket+1] += -(-0.25) * 1 * J_Y * r_distance(i, j, alpha) * sign
+                sign = (si == sj) ? 0 : 1
+                Hamiltonian[Bra+1, Ket+1] += -0.5 * 1 * J_Y * r_distance(i, j, alpha) * sign * exp((si-sj) * theta * 1im)
 
 
             end
@@ -71,11 +77,15 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
 
     end
 
+    #for row_index=1:8
+    #    println(Hamiltonian[row_index,:])
+    #end
+
     Diag = eigen(Hamiltonian)
     EigenVectors = Diag.vectors  #this gives the groundstate eigenvector
     EigenEnergies = Diag.values
 
-    index = findmin(EigenEnergies)
+    #index = findmin(EigenEnergies)
 
     #magnetization per site 
     #magnetization along Z
@@ -114,6 +124,19 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
         mag_X_all[ev] = real(mag_X) / N
     end
 
+    for row_index=0:7
+        if imag(EigenEnergies[row_index+1]) < 1e-12
+            EigenEnergies[row_index+1] = real(EigenEnergies[row_index+1])
+        else
+            println("Large imaginary part in energy")
+            println(EigenEnergies[row_index + 1])
+        end
+    end
+
+    #EigenEnergies = real.(EigenEnergies)
+    println(EigenEnergies)
+    println("\n")
+
     results_df = DataFrame(
         Index=1:Dim,
         Eigenvalue=EigenEnergies,
@@ -121,19 +144,27 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
         MagX=mag_X_all,
     )
 
-    CSV.write("Results/Exact_Diagonalization/ED_N_$(N)_Delta_$(delta)_h_$(h)_Jx_$(J_X)_Jy_$(J_Y)_alpha_$(alpha)_B_$(B)_Heisenberg_OBC.csv", results_df)
+    CSV.write("Results/Exact_Diagonalization/ED_N_$(N)_Delta_$(delta)_h_$(h)_Jx_$(J_X)_Jy_$(J_Y)_alpha_$(alpha)_B_$(B)_theta_$(theta)_Heisenberg_OBC.csv", results_df)
 
 end
 
-N = 8
+N = 9
 J=1.0
 J_X = J
 J_Y = J
-delta = 1.1
-h_list = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
-J_Z = delta
+delta_list = [-11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -17.0, -18.0, -19.0, -20.0, -3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-10.0,-2.0,-1.0, 0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0]
+#delta_list = [-17.0, -18.0, -19.0, -20.0]
+#delta_list = [0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0, 11.0, 12.0, 13.0, 14.0, 15.0]
+#delta_list = [0.0]
+#h_list = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+h_list = [0.0]
+theta = 0.1
 alpha = 1.0
 B=0.0
-for h in h_list
-    exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
+for delta in delta_list
+    for h in h_list
+        exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B, theta)
+        exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B, 0.0)
+        exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B, -theta)
+    end
 end

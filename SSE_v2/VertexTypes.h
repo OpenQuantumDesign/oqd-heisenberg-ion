@@ -5,7 +5,7 @@
 
 class VertexTypes {
 private:
-    std::map<std::vector<int>, int> config_to_index_mapping;
+    std::map<int, int> config_to_index_mapping;
     std::vector<std::vector<int>> index_to_config_mapping;
 
     void populateAllowedExitLegs();
@@ -23,11 +23,9 @@ public:
     std::vector<int> allowed_exit_legs;
 
     std::vector<int> is_off_diag;
+    std::vector<int> twist_mapping;
 
-    int getVertexTypeIndex(const std::vector<int> &config) const {
-        int vertex_type = config_to_index_mapping.at(config);
-        return vertex_type;
-    };
+    int getVertexTypeIndex(const std::vector<int> &config) const;
 
     std::vector<int> getVertexConfig(const int &vertex_index) const {
         return index_to_config_mapping.at(vertex_index);

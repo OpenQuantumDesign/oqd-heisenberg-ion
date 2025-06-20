@@ -16,11 +16,14 @@ private:
     std::vector<std::vector<int>> step_spin_configs;
     bool track_spin_configs;
 
+    std::vector<double> step_spin_stiffness;
+
 public:
     Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs);
 
     void updateAllProperties(const int &i_step_n, const std::vector<int> &spin_configs,
-                             const SimulationParameters &sim_params, const double &spectrum_offset);
+                             const SimulationParameters &sim_params, const double &spectrum_offset,
+                             const int &winding);
 
     void trackSpinConfigs(const std::vector<int> &spin_configs) {
         step_spin_configs.push_back(spin_configs);

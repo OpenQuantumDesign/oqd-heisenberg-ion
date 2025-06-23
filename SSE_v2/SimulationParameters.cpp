@@ -5,7 +5,9 @@ SimulationParameters::SimulationParameters(const std::string &num_spins, const s
                                            const std::string &ksi_in,const std::string &J_in, const double &temperature_in,
                                            const std::string &loop_type_in,const int &simulation_steps_in, const int &eq_steps_in,
                                            const double &new_M_multiplier_in, const int &init_config_in,
-                                           const std::string &root_folder_in) {
+                                           const std::string &root_folder_in, const std::vector<int> &input_spin_config,
+                                           const int &init_M_in, const int &init_n_in, const std::vector<int> &init_op_locs,
+                                           const int &winding_in, const int &initial_start_config_index) {
 
     N = std::stoi(num_spins);
     num_bonds = (int)(((double)N * ((double)N-1.0))/2.0);
@@ -36,12 +38,23 @@ SimulationParameters::SimulationParameters(const std::string &num_spins, const s
         distance_dep_offset = "0";
     }
 
+    init_config_index = init_config_in;
+    initial_init_config_index = 0;
+    if (init_config_index == -2) {
+        init_spin_config = input_spin_config;
+        init_M = init_M_in;
+        init_n = init_n_in;
+        init_operator_locations = init_op_locs;
+        winding = winding_in;
+        initial_init_config_index = initial_start_config_index;
+    }
+
     file_prefix = "N_" + num_spins +"_Delta_" + Delta_in + "_h_" + h_in + "_alpha_" + alpha_in + "_gamma_" +
             gamma_in + "_ksi_" + ksi_in + "_J_" + J_in + "_dist_dep_offset_" + distance_dep_offset;
 
-    out_dir_subfolder = "/Results/SSE/" + file_prefix + "_" + loop_type + "_input_config_" + std::to_string(init_config_in);
+    out_dir_subfolder = "/Results/SSE/" + file_prefix + "_" + loop_type +
+            "_input_config_" + std::to_string(init_config_in) +
+            "_initial_input_config_" + std::to_string(initial_start_config_index);
     root_folder = root_folder_in;
-
-    init_config_index = init_config_in;
 
 }

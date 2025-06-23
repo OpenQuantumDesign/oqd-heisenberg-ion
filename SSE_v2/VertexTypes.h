@@ -21,6 +21,9 @@ public:
     VertexTypes();
 
     std::vector<int> allowed_exit_legs;
+    std::vector<int> flip_left_half_vertex_map;
+    std::vector<int> flip_right_half_vertex_map;
+    std::vector<int> flip_full_vertex_map;
 
     std::vector<int> is_off_diag;
     std::vector<int> twist_mapping;

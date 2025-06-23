@@ -31,6 +31,10 @@ VertexTypes::VertexTypes(){
     index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
 
     populateAllowedExitLegs();
+
+    flip_left_half_vertex_map = {2, 3, 0, 1};
+    flip_right_half_vertex_map = {1, 0, 3, 2};
+    flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
 }
 
 int VertexTypes::getVertexTypeIndex(const std::vector<int> &config) const {

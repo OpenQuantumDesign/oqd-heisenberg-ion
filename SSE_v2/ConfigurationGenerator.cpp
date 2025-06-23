@@ -4,17 +4,15 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
 
     init_config_index = sim_params.init_config_index;
 
-    init_M = (int)(2 * sim_params.beta * prob_tables.max_diagonal_norm);
-
     // Will be set during equilibration
     average_cumulative_loop_size = 1;
     max_loop_size = 10;
-    n = 0;
-    M = init_M;
     N_l = 1;
-    num_clusters = 100;
+    num_clusters = 1;
     count_non_skipped_loop_updates = 0;
+    count_non_skipped_cluster_updates = 0;
     skip_loop_update = true;
+    num_bonds = sim_params.num_bonds;
 
     beta = sim_params.beta;
 
@@ -33,13 +31,30 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     metropolis_generator_1.seed(metropolis_seed_1);
     metropolis_generator_2.seed(metropolis_seed_2);
     metropolis_generator_3.seed(metropolis_seed_3);
+    cluster_start_pos_generator.seed(cluster_start_pos_generator_seed);
+    metropolis_generator_4.seed(metropolis_seed_4);
 
     spin_labels = {-1,1};
 
-    ConfigurationGenerator::setInitialConfiguration();
-    ConfigurationGenerator::populateOperatorLocations(M);
+    ConfigurationGenerator::setInitialConfiguration(sim_params);
+    if (init_config_index == -2){
+        operator_locations = sim_params.init_operator_locations;
+        n = sim_params.init_n;
+        init_M = sim_params.init_M;
+        M = init_M;
+        num_winding = sim_params.winding;
+    }
+    else {
+        init_M = (int)(2 * sim_params.beta * prob_tables.max_diagonal_norm);
+        M = init_M;
+        n=0;
+        ConfigurationGenerator::populateOperatorLocations(M);
+        num_winding = 0;
+    }
 
-    num_winding = 0;
+    for (int i = 0; i<N; i++){
+        cluster_spin_probs.push_back(0);
+    }
 }
 
 void ConfigurationGenerator::populateOperatorLocations(const int &num_fill_zeros) {
@@ -55,7 +70,7 @@ void ConfigurationGenerator::populateOperatorLocations(const int &num_fill_zeros
     }
 }
 
-void ConfigurationGenerator::setInitialConfiguration() {
+void ConfigurationGenerator::setInitialConfiguration(const SimulationParameters &sim_params) {
 
     if (init_config_index == 0){
         std::uniform_int_distribution<> initial_config_dist(0, 1);
@@ -83,6 +98,9 @@ void ConfigurationGenerator::setInitialConfiguration() {
             }
         }
     }
+    else if (init_config_index == -2) {
+        spin_configuration = sim_params.init_spin_config;
+    }
     else {
         throw std::runtime_error("Invalid initial configuration index provided\n");
     }
@@ -98,7 +116,12 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
 
     p_list.clear();
     b_list.clear();
-    id_list.clear();
+    //id_list.clear();
+    //diag_op_p_list.clear();
+    //off_diag_op_p_list.clear();
+    //diag_disorder_op_p_list.clear();
+    //diag_order_op_p_list.clear();
+    //count_p = 0;
 
     //std::uniform_real_distribution<double> metropolis_acceptance_distribution(0.0,1.0);
     std::discrete_distribution<int> diag_update_distribution(prob_tables.max_norm_probabilities.begin(),
@@ -124,13 +147,25 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
                     n++;
                     p_list.push_back(t);
                     b_list.push_back(bond_num);
+
+                    //diag_op_p_list.push_back(count_p);
+                    /*
                     if (vertex_type == 1 or vertex_type == 2){
-                        disorder_vertex_locations.push_back(t);
+                        diag_disorder_op_p_list.push_back(count_p);
                     }
+                     */
+                    /*
+                    else {
+                        diag_order_op_p_list.push_back(count_p);
+                    }
+                     */
+                    //count_p++;
                 }
+                /*
                 else{
                     id_list.push_back(t);
                 }
+                 */
             }
         }
         else if (operator_locations.at(t) % 2 == 1){
@@ -138,10 +173,12 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
             int b = (operator_locations.at(t) - 1)/2;
             b_list.push_back(b);
             int bond_index = b - 1;
+            //off_diag_op_p_list.push_back(count_p);
             int i_b = prob_tables.lattice_sites.at(bond_index).at(0);
             int j_b = prob_tables.lattice_sites.at(bond_index).at(1);
             spin_configuration.at(i_b) = -spin_configuration.at(i_b);
             spin_configuration.at(j_b) = -spin_configuration.at(j_b);
+            //count_p++;
         }
         else {
             double acceptance_prob = (M_minus_n + 1.0)/(beta * prob_tables.max_diagonal_norm);
@@ -149,7 +186,7 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
             if (u_1 < acceptance_prob) {
                 operator_locations.at(t) = 0;
                 n--;
-                id_list.push_back(t);
+                //id_list.push_back(t);
             }
             else {
                 p_list.push_back(t);
@@ -159,10 +196,19 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
                 int j_b = prob_tables.lattice_sites.at(b-1).at(1);
                 std::vector<int> diag_config = {spin_configuration.at(i_b), spin_configuration.at(j_b),
                                                 spin_configuration.at(i_b), spin_configuration.at(j_b)};
-                int vertex_type = vertex_types.getVertexTypeIndex(diag_config);
+                //int vertex_type = vertex_types.getVertexTypeIndex(diag_config);
+                //diag_op_p_list.push_back(count_p);
+                /*
                 if (vertex_type == 1 or vertex_type == 2){
-                    disorder_vertex_locations.push_back(t);
+                    diag_disorder_op_p_list.push_back(count_p);
                 }
+                 */
+                /*
+                else {
+                    diag_order_op_p_list.push_back(count_p);
+                }
+                 */
+                //count_p++;
             }
         }
     }
@@ -193,21 +239,163 @@ void ConfigurationGenerator::initializeOffDiagonalUpdates() {
 
 void ConfigurationGenerator::multiBranchClusterUpdate(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types){
 
-    if (n == 0) {
-        for (int i = 0; i < N; i++) {
-            int multiplier = spin_labels.at(spin_flip_dist(disconnected_spin_flip_generator));
-            spin_configuration.at(i) = multiplier * spin_configuration.at(i);
-        }
-        num_free_spins = N;
+    int num_disorder_vertex_indices = diag_disorder_op_p_list.size()-1;
+
+
+    if (num_disorder_vertex_indices == -1) {
+        cluster_affected_spin_count = 0;
     }
+
+    if (n == 0) {
+        cluster_affected_spin_count = 0;
+    }
+
     else {
-        int num_disorder_vertex_indices = disorder_vertex_locations.size()-1;
-        std::uniform_int_distribution<> distrib(0, num_disorder_vertex_indices);
+        int num_disorder_vertex_indices = diag_disorder_op_p_list.size()-1; // can also use diag_op_p_list here
+        std::uniform_int_distribution<> cluster_start_pos_dist(0, num_disorder_vertex_indices);
+
+        //std::uniform_int_distribution<> cluster_start_pos_dist(0, n-1);
         ConfigurationGenerator::populateLinkedList(prob_tables, vertex_types);
-        //for (int i = 0; i<num_clusters; i++) {
 
-        //}
+        std::unordered_set<int> cluster;
+        std::vector<int> cluster_vector;
+        std::vector<int> traversal_list;
+        std::vector<int> vertex_update_locations;
+        std::vector<int> updated_vertex_types;
+        cluster_affected_spin_count = 0;
+        //count_non_skipped_cluster_updates = 0;
 
+        for (int i = 0; i<num_clusters; i++) {
+
+            cluster.clear();
+            cluster_vector.clear();
+            traversal_list.clear();
+            vertex_update_locations.clear();
+            updated_vertex_types.clear();
+
+            for (int bond_iter=0; bond_iter<num_bonds; bond_iter++){
+                cluster_bond_prob_list.push_back(1.0);
+            }
+            sliced_by_cluster.clear();
+
+            int p_0_index = cluster_start_pos_dist(cluster_start_pos_generator);
+            int p_0 = diag_disorder_op_p_list.at(p_0_index);
+            //int p_0 = cluster_start_pos_dist(cluster_start_pos_generator);
+
+            int j_02 = num_legs_per_vertex * p_0 + 2;
+            int j_03 = num_legs_per_vertex * p_0 + 3;
+
+            int bond_index = b_list.at(p_0) - 1;
+            sliced_by_cluster.insert(bond_index);
+            int i_b = prob_tables.lattice_sites.at(bond_index).at(0);
+            int j_b = prob_tables.lattice_sites.at(bond_index).at(1);
+
+            cluster_spin_probs.at(i_b) += 1;
+            cluster_spin_probs.at(j_b) += 1;
+
+            cluster.insert(i_b);
+            cluster.insert(j_b);
+
+            cluster_vector.push_back(i_b);
+            cluster_vector.push_back(j_b);
+
+            traversal_list.push_back(j_02);
+            traversal_list.push_back(j_03);
+
+            while(!traversal_list.empty()) {
+
+                int j_int = traversal_list.back();
+                traversal_list.pop_back();
+
+                int j = linked_list.at(j_int);
+
+                bool traversed = false;
+                while(!traversed) {
+
+                    int p = j / num_legs_per_vertex;
+                    int l = j % num_legs_per_vertex;
+
+                    bond_index = b_list.at(p) - 1;
+                    i_b = prob_tables.lattice_sites.at(bond_index).at(0);
+                    j_b = prob_tables.lattice_sites.at(bond_index).at(1);
+
+                    if (!cluster.contains(i_b)) {
+                        int vertex_type = vertex_configuration.at(p);
+                        if (vertex_type < 4) {
+                            int new_vertex_type = vertex_types.flip_right_half_vertex_map.at(vertex_type);
+                            cluster_bond_prob_list.at(bond_index) *= prob_tables.vertex_weights.at(new_vertex_type).at(bond_index);
+                            cluster_bond_prob_list.at(bond_index) /= prob_tables.vertex_weights.at(vertex_type).at(bond_index);
+                            vertex_update_locations.push_back(p);
+                            updated_vertex_types.push_back(new_vertex_type);
+                        }
+                        else {
+                            cluster.insert(i_b);
+                            cluster_vector.push_back(i_b);
+                            traversal_list.push_back(num_legs_per_vertex*p + 2);
+                            cluster_spin_probs.at(i_b) += 1;
+                            sliced_by_cluster.insert(bond_index);
+                        }
+                    }
+                    else if (!cluster.contains(j_b)) {
+                        int vertex_type = vertex_configuration.at(p);
+                        if (vertex_type < 4) {
+                            int new_vertex_type = vertex_types.flip_left_half_vertex_map.at(vertex_type);
+                            cluster_bond_prob_list.at(bond_index) *= prob_tables.vertex_weights.at(new_vertex_type).at(bond_index);
+                            cluster_bond_prob_list.at(bond_index) /= prob_tables.vertex_weights.at(vertex_type).at(bond_index);
+                            vertex_update_locations.push_back(p);
+                            updated_vertex_types.push_back(new_vertex_type);
+                        }
+                        else {
+                            cluster.insert(j_b);
+                            cluster_vector.push_back(j_b);
+                            traversal_list.push_back(num_legs_per_vertex*p + 3);
+                            cluster_spin_probs.at(j_b) += 1;
+                            sliced_by_cluster.insert(bond_index);
+                        }
+                    }
+
+                    j = num_legs_per_vertex*p + l+2;
+                    if (j != j_int){
+
+                        j = linked_list.at(j);
+                        if (j != j_int) {
+                            continue;
+                        }
+                        else {
+                            traversed=true;
+                        }
+                    }
+                    else {
+                        traversed=true;
+                    }
+
+                }
+            }
+
+            double transition_prob = 1.0;
+            for (int bond_iter=0;bond_iter<num_bonds;bond_iter++){
+                if (!sliced_by_cluster.contains(bond_iter)){
+                    transition_prob *= cluster_bond_prob_list.at(bond_iter);
+                }
+            }
+
+            double u = metropolis_acceptance_distribution(metropolis_generator_4);
+            cluster_affected_spin_count += cluster_vector.size();
+            if (u < transition_prob) {
+                count_non_skipped_cluster_updates++;
+                for (int k = 0; k < cluster_vector.size(); k++) {
+                    int site_index = cluster_vector.at(k);
+                    spin_configuration.at(site_index) *= -1;
+                }
+                for (int k = 0; k < vertex_update_locations.size(); k++) {
+                    int vertex_index = vertex_update_locations.at(k);
+                    int bond_index = b_list.at(vertex_index)-1;
+                    if (!sliced_by_cluster.contains(bond_index)) {
+                        vertex_configuration.at(vertex_index) = updated_vertex_types.at(k);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -439,7 +627,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
 
         estimators.updateAllProperties(n, spin_configuration, sim_params,
-                                       prob_tables.spectrum_offset, num_winding);
+                                       prob_tables.spectrum_offset, num_winding, skip_loop_update);
     }
 
     estimators.outputStepData(sim_params);
@@ -460,6 +648,13 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     double avg_cumul_loop_size_d = 1.0;
     double prob_non_skip_update = 1.0;
     double N_l_d = 1.0;
+
+    int cumulative_cluster_size_sum = 1;
+    double avg_cumul_cluster_size_d = 1.0;
+    double num_clusters_d = 1.0;
+    double prob_cluster_flip = 1.0;
+    int clusters_attempted = 0;
+    //cluster_affected_spin_count = 0;
 
     for (int step=0; step<equilibration_steps; step++) {
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
@@ -495,8 +690,10 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         //N_l = 2 * std::max((int)(avg_n / (average_cumulative_loop_size * prob_non_skip_update)), avg_n/2);
         //num_free_flips = N_l;
-
+        //clusters_attempted += num_clusters;
+        //ConfigurationGenerator::multiBranchClusterUpdate(prob_tables, vertex_types);
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
+
         //ConfigurationGenerator::flipAllSpins();
         ConfigurationGenerator::randomSpinFlipsXXZ();
 
@@ -515,12 +712,21 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         cumulative_loop_size_sum += cumulative_loop_size;
         cumulative_loop_size_list.push_back(cumulative_loop_size);
-        avg_cumul_loop_size_d = ((double)cumulative_loop_size_sum)/((double)step+1);
+        avg_cumul_loop_size_d = ((double)cumulative_loop_size_sum)/((double)step+1.0);
         prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)step+1.0);
         N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
         N_l = std::round(N_l_d);
         N_l = std::max(N_l,1);
         num_free_flips = N_l;
+
+        /*
+        cumulative_cluster_size_sum += cluster_affected_spin_count;
+        cumulative_cluster_size_list.push_back(cluster_affected_spin_count);
+        avg_cumul_cluster_size_d = ((double)cumulative_cluster_size_sum)/((double)step+1);
+        num_clusters_d = 5.0*N/(avg_cumul_cluster_size_d);
+        num_clusters = std::round(num_clusters_d);
+        num_clusters = std::max(num_clusters, 1);
+        */
 
         if (cumulative_loop_size_list.size() == avg_num_samples){
             break;
@@ -567,6 +773,13 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     N_l = std::max(N_l, 1);
     num_free_flips = N_l;
 
+    //avg_cumul_cluster_size_d = ConfigurationGenerator::computeAverage(cumulative_cluster_size_list,avg_num_samples);
+    /*
+    num_clusters_d = 5.0*N/(avg_cumul_cluster_size_d);
+    num_clusters = std::round(num_clusters_d);
+    num_clusters = std::max(num_clusters, 1);
+    */
+
     for (int step=0; step<equilibration_steps; step++){
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
 
@@ -606,10 +819,10 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         //N_l = 2 * std::max((int)(avg_n / (average_cumulative_loop_size * prob_non_skip_update)), avg_n/2);
         //num_free_flips = N_l;
-
+        //clusters_attempted += num_clusters;
+        //ConfigurationGenerator::multiBranchClusterUpdate(prob_tables, vertex_types);
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
-        estimators.updateAllProperties(n, spin_configuration, sim_params,
-                                       prob_tables.spectrum_offset, num_winding);
+        //estimators.updateAllProperties(n, spin_configuration, sim_params, prob_tables.spectrum_offset, num_winding);
         //ConfigurationGenerator::flipAllSpins();
 
         //estimators.updateAllProperties(n, spin_configuration, sim_params,
@@ -642,6 +855,16 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         N_l = std::max(N_l, 1);
         num_free_flips = N_l;
 
+        /*
+        avg_cumul_cluster_size_d = ((avg_cumul_cluster_size_d * avg_num_samples)
+                                    - cumulative_cluster_size_list.at(cumulative_cluster_size_list.size() - (int)avg_num_samples)
+                                    + cluster_affected_spin_count)/avg_num_samples;
+        cumulative_cluster_size_list.push_back(cluster_affected_spin_count);
+        num_clusters_d = 5.0*N/(avg_cumul_cluster_size_d);
+        num_clusters = std::round(num_clusters_d);
+        num_clusters = std::max(num_clusters, 1);
+         */
+
         if (step % 10000 == 0) {
             std::cout << "step = " << step << "\n";
             std::cout << "average n = " << avg_n_d << "\n";
@@ -654,11 +877,13 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
                 std::cout << spin_configuration.at(spin_index) << ",";
             }
             std::cout << "\n";
+            std::cout << "N clusters = " << num_clusters_d << "\n";
+            std::cout << "average cumulative cluster size = " << avg_cumul_cluster_size_d << "\n";
         }
+
     }
 
     max_loop_size = std::max(10000*avg_n,1);
-
 
     /*
     if (!skip_loop_update){
@@ -694,6 +919,16 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     N_l = std::max(N_l, 1);
     num_free_flips = N_l;
 
+    /*
+    avg_cumul_cluster_size_d = ((avg_cumul_cluster_size_d * avg_num_samples)
+                                - cumulative_cluster_size_list.at(cumulative_cluster_size_list.size() - (int)avg_num_samples)
+                                + cluster_affected_spin_count)/avg_num_samples;
+    cumulative_cluster_size_list.push_back(cluster_affected_spin_count);
+    num_clusters_d = 5.0*N/(avg_cumul_cluster_size_d);
+    num_clusters = std::round(num_clusters_d);
+    num_clusters = std::max(num_clusters, 1);
+    */
+
     //N_l = 2 * std::max((int)(avg_n / (average_cumulative_loop_size * prob_non_skip_update)), avg_n/2);
     //num_free_flips = N_l;
 
@@ -705,9 +940,19 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     std::cout << "N_l = " << N_l_d << "\n";
     std::cout << "max loop size = " << max_loop_size << "\n";
 
+    std::cout << "Clusters Attempted Equilibration = " << clusters_attempted << "\n";
+    std::cout << "Clusters Accepted Equilibration = " << count_non_skipped_cluster_updates << "\n";
+
+    clusters_attempted = 0;
+    count_non_skipped_cluster_updates = 0;
+
     for (int step=0; step<mc_steps; step++){
 
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
+
+        clusters_attempted += num_clusters;
+        //ConfigurationGenerator::multiBranchClusterUpdate(prob_tables, vertex_types);
+
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
         /*
         int M_new = std::max(2*n,M);
@@ -716,7 +961,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         */
 
         estimators.updateAllProperties(n, spin_configuration, sim_params,
-                                       prob_tables.spectrum_offset, num_winding);
+                                       prob_tables.spectrum_offset, num_winding, skip_loop_update);
 
         //ConfigurationGenerator::flipAllSpins();
 
@@ -726,7 +971,9 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         ConfigurationGenerator::randomSpinFlipsXXZ();
     }
 
-    estimators.outputStepData(sim_params);
+    std::cout << "Delta = " << sim_params.Delta << "\n";
+    std::cout << "Clusters Attempted Run = " << clusters_attempted << "\n";
+    std::cout << "Clusters Accepted Run = " << count_non_skipped_cluster_updates << "\n";
 }
 
 double ConfigurationGenerator::computeAverage(std::vector<int> &vector_entries, const double &num_samples_in){

@@ -12,6 +12,7 @@
 class ProbabilityTables {
 private:
     std::string diagonal_probabilities_file;
+    std::string vertex_weights_file;
     std::string loop_update_probabilities_file;
     std::string max_norm_probabilities_file;
     std::string geometry_file;
@@ -28,6 +29,8 @@ public:
     std::vector<std::vector<double>> diagonal_probabilities;
     std::vector<double> max_norm_probabilities;
     double max_diagonal_norm;
+
+    std::vector<std::vector<double>> vertex_weights;
 
     std::vector<std::vector<double>> loop_update_probabilities;
 

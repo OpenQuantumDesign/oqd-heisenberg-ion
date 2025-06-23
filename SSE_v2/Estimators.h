@@ -23,7 +23,7 @@ public:
 
     void updateAllProperties(const int &i_step_n, const std::vector<int> &spin_configs,
                              const SimulationParameters &sim_params, const double &spectrum_offset,
-                             const int &winding);
+                             const int &winding, const bool &skip_loop_update_step);
 
     void trackSpinConfigs(const std::vector<int> &spin_configs) {
         step_spin_configs.push_back(spin_configs);
@@ -32,6 +32,8 @@ public:
     void outputStepData(const SimulationParameters &sim_params) const;
 
     void outputDiagnostics(const SimulationParameters &sim_params) const;
+
+    void outputClusterHistogram(const SimulationParameters &sim_params, const std::vector<int> &cluster_probs) const;
 
 };
 

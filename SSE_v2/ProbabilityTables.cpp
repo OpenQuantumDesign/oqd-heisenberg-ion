@@ -155,6 +155,8 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
 
     diagonal_probabilities_file =
             sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_diag_probs.csv";
+    vertex_weights_file =
+            sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_vertex_weights.csv";
     loop_update_probabilities_file = sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_" +
                                      sim_params.loop_type + "_off_diag_table.csv";
     max_norm_probabilities_file =
@@ -165,6 +167,7 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
     std::string header_diag_prob_file = readTabularFile(diagonal_probabilities_file, diagonal_probabilities);
     std::string header_loop_update_file = readTabularFile(loop_update_probabilities_file, loop_update_probabilities);
     std::string header_max_norm_file = readVectorFile(max_norm_probabilities_file, max_norm_probabilities);
+    std::string  header_vertex_weights_file = readTabularFile(vertex_weights_file, vertex_weights);
 
     extractHeaderEntry(header_max_norm_file, "norm", max_diagonal_norm);
     extractHeaderEntry(header_loop_update_file, "spectrum_offset", spectrum_offset);

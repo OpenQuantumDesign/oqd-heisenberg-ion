@@ -2,18 +2,18 @@
 
 void Estimators::updateAllProperties(const int &int_step_n, const std::vector<int> &spin_configs,
                                      const SimulationParameters &sim_params, const double &spectrum_offset,
-                                     const int &winding) {
+                                     const int &winding, const bool &skip_loop_update_step) {
 
-    step_energy.push_back(-int_step_n/sim_params.beta + spectrum_offset);
-
-    double M_z = 0.0;
-    for (int i = 0; i < sim_params.N; i++) {
+    if (!skip_loop_update_step){
+        step_energy.push_back(-int_step_n/sim_params.beta + spectrum_offset);
+        double M_z = 0.0;
+        for (int i = 0; i < sim_params.N; i++) {
         M_z += spin_configs.at(i);
+        }
+        M_z *= 0.5/(double)sim_params.N;
+        step_magnetization.push_back(M_z);
+        step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
     }
-    M_z *= 0.5/(double)sim_params.N;
-    step_magnetization.push_back(M_z);
-
-    step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
 }
 
 Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in) {
@@ -43,6 +43,21 @@ void Estimators::outputStepData(const SimulationParameters &sim_params) const {
     }
     ofs.close();
 
+}
+
+void Estimators::outputClusterHistogram(const SimulationParameters &sim_params, const std::vector<int> &cluster_probs) const {
+
+    std::string filePath = out_folder_path + "/" + "Cluster Histogram.csv";
+    std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
+    header += "Site, Cluster Probability\n";
+    std::ofstream ofs(filePath);
+    ofs << header;
+    for (int i = 0; i < sim_params.N; i++){
+        ofs << std::to_string(i+1)
+            << "," << std::to_string(cluster_probs.at(i))
+            << "\n";
+    }
+    ofs.close();
 }
 
 void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const {

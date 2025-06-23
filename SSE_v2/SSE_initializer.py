@@ -150,11 +150,11 @@ def compute_transition_weights(gamma, Delta, r_b_pow_alpha, h_B, ksi, dist_dep_g
         elif Delta < 0.0:
 
             if h_B == 0.0:
-                offset_b = -Delta/(4*r_b_pow_alpha)
+                offset_b = -Delta/(4.0*r_b_pow_alpha)
                 if Delta < -1.0:
                     if dist_dep_gamma:
-                        epsilon = gamma - Delta/(4.0*r_b_pow_alpha)
-                        c_p = gamma - Delta/(4.0*r_b_pow_alpha)
+                        epsilon = gamma - Delta/(10.0*r_b_pow_alpha)
+                        c_p = gamma - Delta/(10.0*r_b_pow_alpha)
                         #epsilon = gamma + 0.1/(r_b_pow_alpha)
                         #c_p = gamma + 0.1/(r_b_pow_alpha)
                     else:
@@ -450,6 +450,13 @@ def compute_prob_tables_directed_loops(num_bonds, sites, distances, alpha, gamma
         diag_prob_table[2,bond] = set_probability(diag_prob_table[2,bond])
         diag_prob_table[3,bond] = set_probability(diag_prob_table[3,bond])
 
+        vertex_weights[0,bond] = set_probability(vertex_weights[0,bond])
+        vertex_weights[1,bond] = set_probability(vertex_weights[1,bond])
+        vertex_weights[2,bond] = set_probability(vertex_weights[2,bond])
+        vertex_weights[3,bond] = set_probability(vertex_weights[3,bond])
+        vertex_weights[4,bond] = set_probability(vertex_weights[4,bond])
+        vertex_weights[5,bond] = set_probability(vertex_weights[5,bond])
+
         max_over_states[bond] = np.max(diag_prob_table[:,bond])
         diag_prob_table[:,bond] /= max_over_states[bond]
         max_diag_norm += max_over_states[bond]
@@ -580,9 +587,11 @@ def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, lo
     diag_file_name = os.path.join(out_dir, file_prefix + "_diag_probs.csv")
     max_over_states_file_name = os.path.join(out_dir, file_prefix + "_max_over_states.csv")
     loop_update_table_file_name = os.path.join(out_dir, file_prefix + "_{}_off_diag_table.csv".format(loop_update_type))
+    vertex_weights_file_name = os.path.join(out_dir, file_prefix + "_vertex_weights.csv".format(loop_update_type))
 
     np.savetxt(geometry_file_name, geometry_table, delimiter=",", fmt="%d", header="N={}, NumBonds={}".format(N, num_bonds))
     np.savetxt(diag_file_name, diag_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={}".format(N, Delta, h, alpha, gamma, ksi, J))
+    np.savetxt(vertex_weights_file_name, vertex_weights, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={}".format(N, Delta, h, alpha, gamma, ksi, J))
     np.savetxt(max_over_states_file_name, max_over_states, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},norm={}".format(N, Delta, h, alpha, gamma, ksi, J, max_diag_norm))
     np.savetxt(loop_update_table_file_name, loop_update_prob_table, delimiter=",", header="N={},Delta={},h={},alpha={},gamma={},ksi={},J={},spectrum_offset={},loop_update_type={}".format(N, Delta, h, alpha, gamma, ksi, J, spectrum_offset, loop_update_type))
 
@@ -596,7 +605,7 @@ if __name__=="__main__":
     #Delta_list = [-3.0]
 
     h_list = [0.0]
-    N_1 = 100
+    N_1 = 9
     N_2 = 0
     alpha = 1.0
     ksi = 0.0

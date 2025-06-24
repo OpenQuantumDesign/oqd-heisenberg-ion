@@ -1,8 +1,9 @@
 #include "VertexTypes.h"
 
 // Can implement more constructors here for special cases as necessary
-VertexTypes::VertexTypes(){
+VertexTypes::VertexTypes(const int &hamiltonian_type){
 
+    /*
     num_vertices = 6;
     num_legs_per_vertex = 4;
     num_composte_leg_indices = 16;
@@ -16,32 +17,109 @@ VertexTypes::VertexTypes(){
 
     config_to_index_mapping = { {15,0}, {5,1}, {-5,2},
                                 {-15,3}, {3,4}, {-3,5}};
-    /*
-    config_to_index_mapping[config_1] = 0;
-    config_to_index_mapping[config_2] = 1;
-    config_to_index_mapping[config_3] = 2;
-    config_to_index_mapping[config_4] = 3;
-    config_to_index_mapping[config_5] = 4;
-    config_to_index_mapping[config_6] = 5;
-    */
 
     is_off_diag = {0,0,0,0,1,1};
     twist_mapping = {0,0,0,0,-1,1};
 
     index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
+    */
 
-    populateAllowedExitLegs();
+    num_legs_per_vertex = 4;
+    num_composite_leg_indices = 16;
 
-    flip_left_half_vertex_map = {2, 3, 0, 1};
-    flip_right_half_vertex_map = {1, 0, 3, 2};
-    flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
+    if (hamiltonian_type == 0) {
+        setVertexMappings();
+        populateAllowedExitLegsXY();
+    }
+    else if (hamiltonian_type == 1) {
+        setVertexMappingsIsotropicAFM();
+        allowed_exit_legs = {3, 2, 1, 0};
+    }
+    else if (hamiltonian_type == -1) {
+        setVertexMappingsIsotropicFM();
+        allowed_exit_legs = {1, 0, 3, 2};
+    }
+    else if (hamiltonian_type == 2) {
+        setVertexMappings();
+        populateAllowedExitLegs();
+    }
+
+    //flip_left_half_vertex_map = {2, 3, 0, 1};
+    //flip_right_half_vertex_map = {1, 0, 3, 2};
+    //flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
 }
 
 int VertexTypes::getVertexTypeIndex(const std::vector<int> &config) const {
     int config_key = 8*config[0] + 4*config[1] + 2*config[2] + config[3];
     int vertex_type = config_to_index_mapping.at(config_key);
     return vertex_type;
-};
+}
+
+void VertexTypes::setVertexMappings() {
+
+    num_vertices = 6;
+
+    std::vector<int> config_1 = {1, 1, 1, 1};
+    std::vector<int> config_2 = {1, -1, 1, -1};
+    std::vector<int> config_3 = {-1, 1, -1, 1};
+    std::vector<int> config_4 = {-1, -1, -1, -1};
+    std::vector<int> config_5 = {1, -1, -1, 1};
+    std::vector<int> config_6 = {-1, 1, 1, -1};
+
+    config_to_index_mapping = { {15,0}, {5,1}, {-5,2},
+                                {-15,3}, {3,4}, {-3,5}};
+
+    is_off_diag = {0,0,0,0,1,1};
+    twist_mapping = {0,0,0,0,-1,1};
+
+    index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
+
+    //flip_left_half_vertex_map = {2, 3, 0, 1};
+    //flip_right_half_vertex_map = {1, 0, 3, 2};
+    //flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
+
+}
+
+void VertexTypes::setVertexMappingsIsotropicAFM() {
+
+    num_vertices = 4;
+
+    std::vector<int> config_1 = {1, 1, 1, 1};
+    //std::vector<int> config_2 = {1, -1, 1, -1};
+    //std::vector<int> config_3 = {-1, 1, -1, 1};
+    std::vector<int> config_4 = {-1, -1, -1, -1};
+    std::vector<int> config_5 = {1, -1, -1, 1};
+    std::vector<int> config_6 = {-1, 1, 1, -1};
+
+    config_to_index_mapping = { {15,0}, {-15,1}, {3,2}, {-3,3}};
+
+    is_off_diag = {0,0,1,1};
+    twist_mapping = {0,0,-1,1};
+
+    index_to_config_mapping = {config_1, config_4, config_5, config_6};
+
+}
+
+void VertexTypes::setVertexMappingsIsotropicFM() {
+
+    num_vertices = 4;
+
+    //std::vector<int> config_1 = {1, 1, 1, 1};
+    std::vector<int> config_2 = {1, -1, 1, -1};
+    std::vector<int> config_3 = {-1, 1, -1, 1};
+    //std::vector<int> config_4 = {-1, -1, -1, -1};
+    std::vector<int> config_5 = {1, -1, -1, 1};
+    std::vector<int> config_6 = {-1, 1, 1, -1};
+
+    config_to_index_mapping = {{5,0}, {-5,1},
+                               {3,2}, {-3,3}};
+
+    is_off_diag = {0,0,1,1};
+    twist_mapping = {0,0,-1,1};
+
+    index_to_config_mapping = {config_2, config_3, config_5, config_6};
+
+}
 
 // Can also construct a map that does this via indices like in the python version
 int VertexTypes::getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, const int &old_vertex_index) const
@@ -55,7 +133,7 @@ int VertexTypes::getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, cons
     int new_index = getVertexTypeIndex(old_config);
 
     return new_index;
-};
+}
 
 std::vector<int> VertexTypes::flipInputOutputLegs(const int &l_e, const int &l_x, const std::vector<int> &old_config) const {
 
@@ -81,6 +159,26 @@ void VertexTypes::populateAllowedExitLegs() {
                     if (new_config == index_to_config_mapping.at(l)) {
                         allowed_exit_legs.push_back(k);
                         break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void VertexTypes::populateAllowedExitLegsXY() {
+
+    for (int i = 0; i < num_vertices; i++) {
+        std::vector<int> old_config = getVertexConfig(i);
+        for (int j = 0; j < num_legs_per_vertex; j++) {
+            for (int k = 0; k < num_legs_per_vertex; k++) {
+                if (k != j) {
+                    std::vector<int> new_config = flipInputOutputLegs(j, k, old_config);
+                    for (int l = 0; l < num_vertices; l++) {
+                        if (new_config == index_to_config_mapping.at(l)) {
+                            allowed_exit_legs.push_back(k);
+                            break;
+                        }
                     }
                 }
             }

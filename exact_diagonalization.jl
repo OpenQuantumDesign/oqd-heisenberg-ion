@@ -278,7 +278,7 @@ function exact_diagonalization(N, delta, h, J_X, J_Y, alpha, B)
 
 end
 
-N = 6
+N = 3
 J=1.0
 J_X = J
 J_Y = J
@@ -288,8 +288,9 @@ delta_list = [-11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -17.0, -18.0, -19.0, -20
 #delta_list = [0.0]
 #h_list = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
 h_list = [0.0]
+delta_list = [-1.0, 0.0, 1.0]
 theta = 0.1
-alpha = 1.0
+alpha = 5.0
 B=0.0
 for delta in delta_list
     for h in h_list

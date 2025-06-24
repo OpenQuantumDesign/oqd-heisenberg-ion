@@ -153,28 +153,30 @@ void ProbabilityTables::extractHeaderEntry(const std::string &header_string, con
 
 ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, const VertexTypes &vertex_types) {
 
-    diagonal_probabilities_file =
-            sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_diag_probs.csv";
-    vertex_weights_file =
-            sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_vertex_weights.csv";
-    loop_update_probabilities_file = sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_" +
-                                     sim_params.loop_type + "_off_diag_table.csv";
+    if (sim_params.hamiltonian_type == 2){
+        diagonal_probabilities_file =
+                sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_diag_probs.csv";
+        vertex_weights_file =
+                sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_vertex_weights.csv";
+        loop_update_probabilities_file = sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_" +
+                                         sim_params.loop_type + "_off_diag_table.csv";
+        std::string header_diag_prob_file = readTabularFile(diagonal_probabilities_file, diagonal_probabilities);
+        std::string header_loop_update_file = readTabularFile(loop_update_probabilities_file, loop_update_probabilities);
+        std::string  header_vertex_weights_file = readTabularFile(vertex_weights_file, vertex_weights);
+        normalizeLoopProbs(vertex_types, sim_params);
+    }
+
     max_norm_probabilities_file =
             sim_params.root_folder + "/ProbabilityDensities/" + sim_params.file_prefix + "_max_over_states.csv";
     geometry_file =
             sim_params.root_folder + "/ProbabilityDensities/" + "/N_" + std::to_string(sim_params.N) + "_geometry.csv";
 
-    std::string header_diag_prob_file = readTabularFile(diagonal_probabilities_file, diagonal_probabilities);
-    std::string header_loop_update_file = readTabularFile(loop_update_probabilities_file, loop_update_probabilities);
     std::string header_max_norm_file = readVectorFile(max_norm_probabilities_file, max_norm_probabilities);
-    std::string  header_vertex_weights_file = readTabularFile(vertex_weights_file, vertex_weights);
 
     extractHeaderEntry(header_max_norm_file, "norm", max_diagonal_norm);
-    extractHeaderEntry(header_loop_update_file, "spectrum_offset", spectrum_offset);
+    extractHeaderEntry(header_max_norm_file, "spectrum_offset", spectrum_offset);
 
     readTabularFile(geometry_file, lattice_sites);
-
-    normalizeLoopProbs(vertex_types, sim_params);
 }
 
 void ProbabilityTables::normalizeLoopProbs(const VertexTypes &vertex_types, const SimulationParameters &sim_params) {
@@ -196,9 +198,11 @@ void ProbabilityTables::normalizeLoopProbs(const VertexTypes &vertex_types, cons
                     double prob = loop_update_probabilities.at( c_2 + l_x).at(b);
                     prob_sum += prob;
                 }
-                for (int k=0; k<vertex_types.num_legs_per_vertex-1; k++){
-                    int l_x = vertex_types.allowed_exit_legs.at(c_1 + k);
-                    loop_update_probabilities.at(c_2 + l_x).at(b) = loop_update_probabilities.at(c_2 + l_x).at(b)/prob_sum;
+                if (prob_sum != 0){
+                    for (int k=0; k<vertex_types.num_legs_per_vertex-1; k++){
+                        int l_x = vertex_types.allowed_exit_legs.at(c_1 + k);
+                        loop_update_probabilities.at(c_2 + l_x).at(b) = loop_update_probabilities.at(c_2 + l_x).at(b)/prob_sum;
+                    }
                 }
             }
         }

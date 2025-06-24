@@ -9,6 +9,7 @@ private:
     std::vector<std::vector<int>> index_to_config_mapping;
 
     void populateAllowedExitLegs();
+    void populateAllowedExitLegsXY();
 
     std::vector<int> flipInputOutputLegs(const int &l_e, const int &l_x, const std::vector<int> &old_config) const;
 
@@ -16,9 +17,13 @@ public:
 
     int num_vertices;
     int num_legs_per_vertex;
-    int num_composte_leg_indices;
+    int num_composite_leg_indices;
 
-    VertexTypes();
+    VertexTypes(const int &hamiltonian_type);
+
+    void setVertexMappings();
+    void setVertexMappingsIsotropicAFM();
+    void setVertexMappingsIsotropicFM();
 
     std::vector<int> allowed_exit_legs;
     std::vector<int> flip_left_half_vertex_map;

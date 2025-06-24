@@ -4,29 +4,9 @@ import math
 import matplotlib.pyplot as plt
 import statistical_analysis as stats
 
-def combine_different_runs(data_1, data_2, drop_samples_1, drop_samples_2):
-
-    data_3 = []
-    data_1 = data_1[drop_samples_1:]
-    data_2 = data_2[drop_samples_2:]
-
-    for i in range(len(data_1)):
-        data_3.append(data_1[i])
-
-    for i in range(len(data_2)):
-        data_3.append(data_2[i])
-
-    return data_3
-
 N=3
-Delta_list = [-20.0,-19.0,-18.0,-17.0,-16.0,-15.0,-14.0,-13.0,-12.0,-11.0,-10.0,-9.0, -8.0, -7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0]
-Delta_list = [-20.0,-19.0,-18.0,-17.0,-16.0,-15.0,-14.0,-13.0,-12.0, -11.0]
-Delta_list = [-20.0,-19.0,-18.0,-17.0,-16.0,-15.0,-14.0,-13.0,-12.0, -11.0,-10.0,-9.0, -8.0, -7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0]
-#Delta_list = [-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
-#Delta_list = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0]
-Delta_list = [-2.0,-1.0, 1.0,2.0,3.0]
 h = 0.0
-alpha=1.0
+alpha=9.0
 J = 1.0
 T = 0.1
 beta = J/T
@@ -41,114 +21,26 @@ stiffness_SSE_list = []
 stiffness_SSE_err_list = []
 theta = 0.1
 start_config = 1
-auto_corr_drop = 20
-eq_drop=10000
-loop_type = "directed_loops"
+loop_type = "deterministic"
 dist_dep_offset = 0
-hamiltonian_type = 2
+hamiltonian_types = [-1,0,1]
+Delta_list = [-1.0, 0.0, 1.0]
+gamma = 0.0
+auto_corr_drop = 1
+eq_drop = 0
 
-#file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}/Cluster Histogram.csv".format(N, -20.0, h, alpha, 0.1, dist_dep_offset, loop_type, start_config)
-#sites, cluster_probs = np.loadtxt(file_1, delimiter=",", skiprows=2, unpack=True)
-#plt.bar(sites, cluster_probs)
-#plt.show()
+for i in range(len(hamiltonian_types)):
 
-for Delta in Delta_list:
-
-    # Best run for N=10
-    '''
-    if Delta <= -15.0:
-        gamma = 0.0
-        eq_drop=1800000
-        auto_corr_drop = 10
-        start_config = 1
-    elif Delta <= -9.0:
-        gamma = 0.0
-        eq_drop=1000000
-        auto_corr_drop = 10
-        start_config = 1
+    Delta = Delta_list[i]
+    hamiltonian_type = hamiltonian_types[i]
+    if hamiltonian_type == -1:
+        start_config = 3
     else:
-        gamma = 0.0
-        eq_drop=1000000
-        auto_corr_drop = 10
         start_config = 1
-    '''
+    init_start_config = start_config
 
-    gamma = 0.1
-    if Delta <= -11.0:
-        #start_config = 1
-        eq_drop = 0
-        gamma = 0.0
-        dist_dep_offset = 1
-    elif Delta <0.0:
-        start_config = 2
-        gamma = 0.1
-        eq_drop = 10000
-        dist_dep_offset = 0
-    else:
-        start_config=1
-        gamma = 0.1
-        eq_drop = 10000
-        dist_dep_offset = 0
-    #auto_corr_drop = 100
-    auto_corr_drop = 1
-
-    gamma=0.0
-    eq_drop=0
-    dist_dep_offset=1
-
-    '''
-    init_start_config = 0
-    start_config = 0 if Delta == -1 else -2
     file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(N, hamiltonian_type, Delta, h, alpha, gamma, dist_dep_offset, loop_type, start_config, init_start_config)
     step_number_1, energy_arr_1, magnetization_arr_1, stiffness_arr_1 = np.loadtxt(file_1, delimiter=",", skiprows=2, unpack=True)
-    '''
-
-    init_start_config = -1 if Delta == -1.0 else 1
-    #start_config = 1 if Delta == -1 else -2
-    start_config = -1 if Delta == -1.0 else 1
-    file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(N, hamiltonian_type, Delta, h, alpha, gamma, dist_dep_offset, loop_type, start_config, init_start_config)
-    step_number_2, energy_arr_2, magnetization_arr_2, stiffness_arr_2 = np.loadtxt(file_2, delimiter=",", skiprows=2, unpack=True)
-
-    '''
-    init_start_config = 2
-    start_config = init_start_config if Delta == -1 else -2
-    file_3 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(N, Delta, h, alpha, gamma, dist_dep_offset, loop_type, start_config, init_start_config)
-    step_number_3, energy_arr_3, magnetization_arr_3, stiffness_arr_3 = np.loadtxt(file_3, delimiter=",", skiprows=2, unpack=True)
-
-    init_start_config = 3
-    start_config = init_start_config if Delta == -1 else -2
-    file_4 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(N, Delta, h, alpha, gamma, dist_dep_offset, loop_type, start_config, init_start_config)
-    step_number_4, energy_arr_4, magnetization_arr_4, stiffness_arr_4 = np.loadtxt(file_4, delimiter=",", skiprows=2, unpack=True)
-
-    init_start_config = 4
-    start_config = init_start_config if Delta == -1 else -2
-    file_5 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(N, Delta, h, alpha, gamma, dist_dep_offset, loop_type, start_config, init_start_config)
-    step_number_5, energy_arr_5, magnetization_arr_5, stiffness_arr_5 = np.loadtxt(file_5, delimiter=",", skiprows=2, unpack=True)
-    '''
-
-    #drop_1 = 100000
-    drop_1 = 10
-    #energy_array = combine_different_runs(energy_arr_1, energy_arr_2, drop_1, drop_1)
-    energy_array = energy_arr_2
-    #energy_array = combine_different_runs(energy_array, energy_arr_3, 0, drop_1)
-    #energy_array = combine_different_runs(energy_array, energy_arr_4, 0, drop_1)
-    #energy_array = combine_different_runs(energy_array, energy_arr_5, 0, drop_1)
-
-    #stiffness_array = combine_different_runs(stiffness_arr_1, stiffness_arr_2, drop_1, drop_1)
-    stiffness_array = stiffness_arr_2
-    #stiffness_array = combine_different_runs(stiffness_array, stiffness_arr_3, 0, drop_1)
-    #stiffness_array = combine_different_runs(stiffness_array, stiffness_arr_4, 0, drop_1)
-    #stiffness_array = combine_different_runs(stiffness_array, stiffness_arr_5, 0, drop_1)
-
-    magnetization_arr_1 = magnetization_arr_2
-
-    energy_arr_1 = energy_array
-    stiffness_arr_1 = stiffness_array
-
-    print(step_number_2[-1])
-
-    #file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_directed_loops_input_config_1/MC Step Outputs.csv".format(N, Delta, h, alpha, gamma)
-    #step_number_2, energy_arr_2, magnetization_arr_2 = np.loadtxt(file_2, delimiter=",", skiprows=2, unpack=True)
 
     comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_OBC.csv".format(N, Delta, h, J, J, alpha)
     state_index, evals, mag_z, mag_x = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
@@ -156,7 +48,7 @@ for Delta in Delta_list:
     state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(comp_file_1, skiprows=1, delimiter=",", unpack=True)
     comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_OBC.csv".format(N, Delta, h, J, J, alpha, -theta)
     state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(comp_file_2, skiprows=1, delimiter=",", unpack=True)
-    
+
     ED_magnetization = 0.0
     energy_theta = 0.0
     energy_zero = 0.0
@@ -189,16 +81,6 @@ for Delta in Delta_list:
     stiffness_SSE_list.append(stiffness[0])
     stiffness_SSE_err_list.append(stiffness[1])
 
-    #energy = combine_dataset_stats(energy_arr_1, energy_arr_2)
-    #mag_z_exp = combine_dataset_stats(magnetization_arr_1, magnetization_arr_2)
-    '''
-    print(energy)
-    print(mag_z_exp)
-    print(energy_zero)
-    print(ED_magnetization)
-    print(stiffness)
-    '''
-
     energy_ED_list.append(energy_zero)
     mag_z_ED_list.append(ED_magnetization)
     energy_SSE_list.append(energy[0])
@@ -206,8 +88,7 @@ for Delta in Delta_list:
     mag_z_SSE_list.append(mag_z_exp[0])
     mag_z_SSE_err_list.append(mag_z_exp[1])
 
-#print(stiffness_SSE_list)
-#print(stiffness_ED_list)
+    print(step_number_1[-1])
 
 plt.figure()
 plt.plot(Delta_list, [0.0]*len(Delta_list), color="C3")

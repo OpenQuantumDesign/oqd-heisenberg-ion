@@ -1,6 +1,6 @@
 #include "Estimators.h"
 
-void Estimators::updateAllProperties(const int &int_step_n, const std::vector<int> &spin_configs,
+void Estimators::updateAllPropertiesProbabilistic(const int &int_step_n, const std::vector<int> &spin_configs,
                                      const SimulationParameters &sim_params, const double &spectrum_offset,
                                      const int &winding, const bool &skip_loop_update_step) {
 
@@ -14,6 +14,20 @@ void Estimators::updateAllProperties(const int &int_step_n, const std::vector<in
         step_magnetization.push_back(M_z);
         step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
     }
+}
+
+void Estimators::updateAllPropertiesDeterministic(const int &int_step_n, const std::vector<int> &spin_configs,
+                                                  const SimulationParameters &sim_params, const double &spectrum_offset,
+                                                  const int &winding) {
+
+    step_energy.push_back(-int_step_n/sim_params.beta + spectrum_offset);
+    double M_z = 0.0;
+    for (int i = 0; i < sim_params.N; i++) {
+        M_z += spin_configs.at(i);
+    }
+    M_z *= 0.5/(double)sim_params.N;
+    step_magnetization.push_back(M_z);
+    step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
 }
 
 Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in) {
@@ -45,6 +59,7 @@ void Estimators::outputStepData(const SimulationParameters &sim_params) const {
 
 }
 
+/*
 void Estimators::outputClusterHistogram(const SimulationParameters &sim_params, const std::vector<int> &cluster_probs) const {
 
     std::string filePath = out_folder_path + "/" + "Cluster Histogram.csv";
@@ -59,6 +74,7 @@ void Estimators::outputClusterHistogram(const SimulationParameters &sim_params, 
     }
     ofs.close();
 }
+ */
 
 void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const {
 

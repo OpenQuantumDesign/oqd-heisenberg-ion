@@ -1,21 +1,30 @@
 import numpy as np
 import os
+import math
 
-def geometry(N_1, N_2, geometry_type):
+def geometry(N_1, N_2, geometry_type, boundary_conditions):
     
     if geometry_type == "1d":
         if N_2 == 0:
-            sites, distances, geometry_table, N, num_bonds = geometry_1d(N_1)
+            if boundary_conditions == 0:
+                sites, distances, geometry_table, N, num_bonds = geometry_1d_OBC(N_1)
+            elif boundary_conditions == 1: 
+                sites, distances, geometry_table, N, num_bonds = geometry_1d_PBC(N_1)
+            else: 
+                raise Exception("Boundary conditions for 1d need to be either 0 (OBC) or 1 (PBC).")
         else: 
-            raise Exception("Geometry type is 1d but N_2  is non-zero.")
+            raise Exception("Geometry type is 1d but N_2 is non-zero.")
     elif geometry_type == "2d_triangular":
-        sites, distances, geometry_table, N, num_bonds = geometry_2d_triangular(N_1, N_2)
+        if boundary_conditions == 0:
+            sites, distances, geometry_table, N, num_bonds = geometry_2d_triangular_OBC(N_1, N_2)
+        else:
+            raise Exception("Boundary conditions for 2d need to be 0 (OBC).")
     else:
         raise Exception("Geometry type: {} is not implemented. Valid possible choices are: {} and {}.".format(geometry_type, "1d", "2d_triangular"))
 
     return sites, distances, geometry_table, N, num_bonds
 
-def geometry_1d(N):
+def geometry_1d_OBC(N):
 
     num_bonds = int(N*(N-1)/2)
     sites = np.zeros((num_bonds,2), dtype=int)
@@ -34,7 +43,30 @@ def geometry_1d(N):
 
     return sites, distances, geometry_table, N, num_bonds
 
-def geometry_2d_triangular(N_1, N_2):
+def geometry_1d_PBC(N):
+
+    num_bonds = int(N*(N-1)/2)
+    sites = np.zeros((num_bonds,2), dtype=int)
+    geometry_table = np.zeros((num_bonds,3))
+    distances = np.zeros(num_bonds)
+    b = 0
+    for i in range(N):
+        for j in range(i+1,N):
+            sites[b,0] = i
+            sites[b,1] = j
+            geometry_table[b,0] = i
+            geometry_table[b,1] = j
+            if (j-i) <= N - (j-i):
+                distances[b] = j-i
+                geometry_table[b,2] = distances[b]
+            else:
+                distances[b] = N - (j-i)
+                geometry_table[b,2] = -distances[b]
+            b += 1
+
+    return sites, distances, geometry_table, N, num_bonds
+
+def geometry_2d_triangular_OBC(N_1, N_2):
 
     N = N_1 * N_2
     num_bonds = int(N*(N-1)/2)
@@ -60,6 +92,8 @@ def geometry_2d_triangular(N_1, N_2):
                         b += 1
 
     return sites, distances, geometry_table, N, num_bonds
+
+# TODO: Implement 2d triangular PBC geometry
 
 num_vertices = 6
 num_legs_per_vertex = 4
@@ -279,6 +313,18 @@ def get_J_ij_power_law(num_bonds, distances, alpha):
     J_ij_vector = np.zeros(num_bonds)
     for b in range(num_bonds):
         J_ij_vector[b] = 1.0/(distances[b])**alpha
+
+    return J_ij_vector
+
+def get_J_ij_exp(N, num_bonds, filepath):
+
+    J_ij_matrix = np.loadtxt(filepath, delimiter=',', skiprows=1)
+    J_ij_vector = np.zeros(num_bonds)
+    b = 0
+    for i in range(N):
+        for j in range(i+1,N):
+            J_ij_vector[b] = J_ij_matrix[i,j]
+            b += 1
 
     return J_ij_vector
 
@@ -586,10 +632,10 @@ def update_directed_loop_probs(vertex_enum, l_e, l_x, bond, transition_weight, v
 
     return prob_table
 
-def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, hamiltonian_type):
+def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, hamiltonian_type, boundary):
 
     out_dir = "ProbabilityDensities"
-    sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type)
+    sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type, boundary)
     num_bonds = int(N*(N-1)/2.0)
     h_B = h/(J*(N-1))
 
@@ -624,7 +670,7 @@ def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, lo
     if (hamiltonian_type != 2):
         raise Exception("This function requires the hamiltonian type to 2\n")
 
-    file_prefix = "N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}_dist_dep_offset_{}".format(N, hamiltonian_type, Delta, h, alpha, gamma, ksi, J, dist_dep_offset)
+    file_prefix = "N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}_dist_dep_offset_{}_boundary_{}".format(N, hamiltonian_type, Delta, h, alpha, gamma, ksi, J, dist_dep_offset, boundary)
 
     geometry_file_name = os.path.join(out_dir, "N_{}_geometry.csv".format(N))
     diag_file_name = os.path.join(out_dir, file_prefix + "_diag_probs.csv")
@@ -640,13 +686,27 @@ def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, lo
 
     return 0
 
-def write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, hamiltonian_type):
+def write_prob_tables_deterministic(N_1, N_2, lattice_type, J_ij_type, J_ij_file_path, alpha, J, hamiltonian_type, boundary, mu):
 
     out_dir = "ProbabilityDensities"
-    sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type)
+    sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type, boundary)
     num_bonds = int(N*(N-1)/2.0)
 
-    J_ij_vector = get_J_ij_power_law(num_bonds, distances, alpha)
+    if J_ij_type == 1:
+        if alpha != None or J != None:
+            raise Exception("alpha and J should be None if J_ij_type is 1\n")
+        if J_ij_file_path == None:
+            raise Exception("No file path for J_ij matrix provided\n")
+        alpha = "exp_mu_{}".format(mu)
+        J = "exp"
+        J_ij_vector = get_J_ij_exp(N, num_bonds, J_ij_file_path)
+    elif J_ij_type == 0:
+        if J_ij_file_path != None:
+            raise Exception("No file path for J_ij matrix should be provided if J_ij_type is 0\n")
+        if alpha == None or J == None:
+            raise Exception("Need to provide alpha and J if J_ij_type is 0\n")
+        J_ij_vector = get_J_ij_power_law(num_bonds, distances, alpha)
+
     prob_tables = compute_probability_tables_deterministic(num_bonds, J_ij_vector, hamiltonian_type)
 
     max_over_states = prob_tables[0]
@@ -654,9 +714,9 @@ def write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, hamiltonia
     spectrum_offset = prob_tables[2]
     Delta = prob_tables[3]
 
-    file_prefix = "N_{}_hamiltonian_type_{}_Delta_{}_h_0.0_alpha_{}_gamma_0.0_ksi_0.0_J_{}_dist_dep_offset_0".format(N, hamiltonian_type, Delta, alpha, J)
+    file_prefix = "N_{}_hamiltonian_type_{}_Delta_{}_h_0.0_alpha_{}_gamma_0.0_ksi_0.0_J_{}_dist_dep_offset_0_boundary_{}".format(N, hamiltonian_type, Delta, alpha, J, boundary)
 
-    geometry_file_name = os.path.join(out_dir, "N_{}_geometry.csv".format(N))
+    geometry_file_name = os.path.join(out_dir, "N_{}_geometry_boundary_{}.csv".format(N, boundary))
     max_over_states_file_name = os.path.join(out_dir, file_prefix + "_max_over_states.csv")
 
     np.savetxt(geometry_file_name, geometry_table, delimiter=",", fmt="%d", header="N={}, NumBonds={}".format(N, num_bonds))
@@ -671,31 +731,50 @@ if __name__=="__main__":
     #Delta_list = [-3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0]
     Delta_list = [-20.0,-19.0,-18.0,-17.0,-11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-10.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0, 11.0, 12.0, 13.0, 14.0, 15.0]
     #Delta_list = [-3.0]
-    Delta_list = [-2.0,-1.0, 0.0, 1.0,2.0,3.0,4.0]
+    Delta_list = [-1.0, 0.0, 1.0]
 
     h_list = [0.0]
-    N_1 = 3
+    N_1 = 20
     N_2 = 0
     alpha = 1.0
     ksi = 0.0
     J = 1.0
     loop_update_type = "directed_loops"
     lattice_type = "1d"
-    dist_dep_gamma = True
+    dist_dep_gamma = False
+    alpha_list=[4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5.0]
 
-    for Delta in Delta_list:
-        gamma = 0.0
-        for h in h_list:
-            write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, 2)
-    
+    '''
+    for alpha in alpha_list:
+        for Delta in Delta_list:
+            gamma = 0.1
+            for h in h_list:
+                write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, 2, 1, 0.0)
+    '''
 
-    alpha_list = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0]
-
-    N_1 = 3
+    N_list = [3]
+    #N_list=[11]
     N_2 = 0
     J = 1.0
+    #J = None
+    #alpha_list = [2.50, 2.55, 2.60, 2.65, 2.70, 2.75, 2.80, 2.85, 2.90, 2.95, 3.00]
+    alpha_list = [10.0]
+    #alpha_list = [None]
     lattice_type = "1d"
-    for alpha in alpha_list:
-        write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, 1)
-        write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, -1)
-        write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, 0)
+    boundary = 0
+    J_ij_type = 0
+    #mu_list = [1.41]
+
+    for N_1 in N_list:
+        for alpha in alpha_list:
+            #write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, 1, boundary)
+            #write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, -1, boundary)
+            write_prob_tables_deterministic(N_1, N_2, lattice_type, J_ij_type, None, alpha, J, 0, boundary, None)
+    
+
+    '''
+    for N_1 in N_list:
+        for mu in mu_list:
+            J_ij_file_path = "/Users/shaeermoeed/Github/oqd-trical/Experimental_J_ij_mu_{}.csv".format(mu)
+            write_prob_tables_deterministic(N_1, N_2, lattice_type, J_ij_type, J_ij_file_path, None, None, 0, boundary, mu)
+    '''

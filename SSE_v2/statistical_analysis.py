@@ -1,14 +1,28 @@
 import numpy as np
 import math
 
-def statistics_binning(arr, auto_corr_drop, eq_drop):
+def combine_different_runs(data_1, data_2, drop_samples_1, drop_samples_2):
+
+    data_3 = []
+    data_1 = data_1[drop_samples_1:]
+    data_2 = data_2[drop_samples_2:]
+
+    for i in range(len(data_1)):
+        data_3.append(data_1[i])
+
+    for i in range(len(data_2)):
+        data_3.append(data_2[i])
+
+    return data_3
+
+def statistics_binning(arr, auto_corr_drop, eq_drop, datatype=np.float64):
     # Average and standard error using the binning method
     arr2 = arr[eq_drop:]
     arr3 = arr2[0::auto_corr_drop]
     workingNdim  = int(math.log(len(arr3))/math.log(2))
     trunc = int(len(arr3)-2**workingNdim)
     mean = np.mean(arr3)
-    standardError = max_error_binning(arr3, workingNdim-6)
+    standardError = max_error_binning(arr3, workingNdim-6, datatype)
     return mean, standardError
 
 def error_propagation(data):
@@ -16,16 +30,16 @@ def error_propagation(data):
     error = np.std(data,ddof=0)/np.sqrt(ndim)
     return error
 
-def max_error_binning(data, workingNdim):
+def max_error_binning(data, workingNdim, datatype):
     if(workingNdim<=1):
         raise Exception('Not enough points MC steps were used for the binning method, please increase the number of MC steps')
-    error = np.zeros(workingNdim)
+    error = np.zeros(workingNdim, dtype=datatype)
     i = 0
     error[0] = error_propagation(data)
 
     for i in range(1,workingNdim):
         ndim = int(len(data)/2)
-        data1 = np.zeros(ndim)
+        data1 = np.zeros(ndim, dtype=datatype)
 
         for j in range(ndim):
             data1[j] = 0.5*(data[2*j]+data[2*j+1])

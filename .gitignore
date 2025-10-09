@@ -6,3 +6,8 @@ scratch/
 /ProbabilityDensities
 /SSE_v2/.idea
 SSE_v2/__pycache__
+.vscode/settings.json
+*.pdf
+*.png
+*.csv
+*.ipynb

@@ -2,7 +2,8 @@
 
 void Estimators::updateAllPropertiesProbabilistic(const int &int_step_n, const std::vector<int> &spin_configs,
                                      const SimulationParameters &sim_params, const double &spectrum_offset,
-                                     const int &winding, const bool &skip_loop_update_step) {
+                                     const double &winding, const bool &skip_loop_update_step,
+                                     const std::vector<std::vector<int>> &lattice_sites) {
 
     if (!skip_loop_update_step){
         step_energy.push_back(-int_step_n/sim_params.beta + spectrum_offset);
@@ -12,13 +13,23 @@ void Estimators::updateAllPropertiesProbabilistic(const int &int_step_n, const s
         }
         M_z *= 0.5/(double)sim_params.N;
         step_magnetization.push_back(M_z);
-        step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
+        step_spin_stiffness.push_back(pow((double)winding,2)/(sim_params.beta * sim_params.N));
+
+        double S_k_pi = 0.0;
+        for (int b=0; b<sim_params.num_bonds; b++) {
+            int i_b = lattice_sites.at(b).at(0);
+            int j_b = lattice_sites.at(b).at(1);
+            double pair_correlation = 0.25 * spin_configs.at(i_b) * spin_configs.at(j_b);
+            S_k_pi += pair_correlation;
+        }
+        step_S_k_pi.push_back(S_k_pi/((double)sim_params.N));
     }
 }
 
 void Estimators::updateAllPropertiesDeterministic(const int &int_step_n, const std::vector<int> &spin_configs,
                                                   const SimulationParameters &sim_params, const double &spectrum_offset,
-                                                  const int &winding) {
+                                                  const double &winding,
+                                                  const std::vector<std::vector<int>> &lattice_sites) {
 
     step_energy.push_back(-int_step_n/sim_params.beta + spectrum_offset);
     double M_z = 0.0;
@@ -27,7 +38,16 @@ void Estimators::updateAllPropertiesDeterministic(const int &int_step_n, const s
     }
     M_z *= 0.5/(double)sim_params.N;
     step_magnetization.push_back(M_z);
-    step_spin_stiffness.push_back(pow((double)winding,2) * 1.5/(sim_params.beta * sim_params.N));
+    step_spin_stiffness.push_back(pow((double)winding,2)/(sim_params.beta * sim_params.N));
+
+    double S_k_pi = 0.0;
+    for (int b=0; b<sim_params.num_bonds; b++) {
+        int i_b = lattice_sites.at(b).at(0);
+        int j_b = lattice_sites.at(b).at(1);
+        double pair_correlation = 0.25 * spin_configs.at(i_b) * spin_configs.at(j_b);
+        S_k_pi += pair_correlation;
+    }
+    step_S_k_pi.push_back(S_k_pi/((double)sim_params.N));
 }
 
 Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in) {
@@ -45,7 +65,7 @@ void Estimators::outputStepData(const SimulationParameters &sim_params) const {
 
     std::string filePath = out_folder_path + "/" + "MC Step Outputs.csv";
     std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
-    header += "MC Step, Energy, Magnetization, Spin Stiffness\n";
+    header += "MC Step, Energy, Magnetization, Spin Stiffness, S(pi)\n";
     std::ofstream ofs(filePath);
     ofs << header;
     for (int i = 0; i < step_energy.size(); i++){
@@ -53,11 +73,33 @@ void Estimators::outputStepData(const SimulationParameters &sim_params) const {
             << "," << std::to_string(step_energy.at(i))
             << "," << std::to_string(step_magnetization.at(i))
             << "," << std::to_string(step_spin_stiffness.at(i))
-            << "\n";
+            << "," << std::to_string(step_S_k_pi.at(i)) << "\n";
     }
     ofs.close();
 
 }
+
+/*
+void Estimators::outputPairCorrelations(const SimulationParameters &sim_params) const {
+
+    std::string filePath = out_folder_path + "/" + "Pair Correlation Outputs.csv";
+    std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "_" + "pair correlations" + "\n";
+    header += "MC Step, bond";
+    for (int i = 0; i < sim_params.num_bonds; i++) {
+        header += std::to_string(i);
+    }
+    std::ofstream ofs(filePath);
+    ofs << header << "\n";
+    for (int i = 0; i < step_energy.size(); i++){
+        ofs << std::to_string(i+1);
+        for (int j = 0; j< sim_params.num_bonds; j++) {
+            ofs << "," << step_pair_correlations.at(i).at(j);
+        }
+        ofs << "\n";
+    }
+    ofs.close();
+}
+ */
 
 /*
 void Estimators::outputClusterHistogram(const SimulationParameters &sim_params, const std::vector<int> &cluster_probs) const {
@@ -82,8 +124,8 @@ void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const
     std::string header = sim_params.out_dir_subfolder + "\n";
     header += "Spin Configurations\n";
     std::ofstream ofs(filePath);
-    ofs << header;
-    for (int i = 0; i < step_energy.size(); i++){
+    ofs << header << "\n";
+    for (int i = 0; i < step_spin_configs.size(); i++){
         ofs << std::to_string(step_spin_configs.at(i).at(0));
         for (int j = 1; j < sim_params.N; j++){
             ofs << "," << std::to_string(step_spin_configs.at(i).at(j));

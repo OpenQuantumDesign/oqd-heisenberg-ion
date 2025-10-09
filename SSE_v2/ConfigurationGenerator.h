@@ -48,6 +48,7 @@ private:
     int max_loop_size;
     int count_non_skipped_loop_updates;
     int N;
+    int N_over_2;
     int num_free_spins;
     int num_bonds;
 
@@ -68,6 +69,7 @@ private:
     std::mt19937_64 metropolis_generator_1;
     std::mt19937_64 metropolis_generator_2;
     std::mt19937_64 metropolis_generator_3;
+    std::mt19937_64 twist_generator;
     //std::mt19937_64 cluster_start_pos_generator;
     //std::mt19937_64 metropolis_generator_4;
 
@@ -79,6 +81,7 @@ private:
     int metropolis_seed_1 = 6;
     int metropolis_seed_2 = 7;
     int metropolis_seed_3 = 8;
+    int twist_seed = 9;
     //int cluster_start_pos_generator_seed = 9;
     //int metropolis_seed_4 = 10;
 
@@ -117,7 +120,10 @@ private:
 
     void populateLinkedList(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
-    void mapVerticesToOperatorLocations(const VertexTypes &vertex_types);
+    void getNewOperatorLocations(const int &num_fill_zeros);
+
+    void mapVerticesToOperatorLocations(const VertexTypes &vertex_types,
+                                        const ProbabilityTables &prob_tables);
 
     void initializeOffDiagonalUpdates();
 
@@ -134,7 +140,7 @@ private:
 public:
     std::vector<int> spin_configuration;
     std::vector<int> operator_locations;
-    int num_winding;
+    double num_winding;
     int M;
     int n;
 

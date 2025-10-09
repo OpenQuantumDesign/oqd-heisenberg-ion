@@ -5,6 +5,7 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
 
     init_config_index = sim_params.init_config_index;
     hamiltonian_type = sim_params.hamiltonian_type;
+    a_parameter = sim_params.new_M_multiplier;
 
     // Will be set during equilibration
     if (hamiltonian_type == 2) {
@@ -13,7 +14,6 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         N_l = 1;
         count_non_skipped_loop_updates = 0;
         skip_loop_update = true;
-        a_parameter = sim_params.new_M_multiplier;
         loop_start_pos_generator.seed(loop_start_pos_seed);
     }
     //num_clusters = 1;
@@ -24,6 +24,12 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     beta = sim_params.beta;
 
     N = sim_params.N;
+    if (N % 2 == 0){
+        N_over_2 = N/2;
+    }
+    else {
+        N_over_2 = 0;
+    }
 
     equilibration_steps = sim_params.equilibration_steps;
     mc_steps = sim_params.simulation_steps;
@@ -34,6 +40,7 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     metropolis_generator_1.seed(metropolis_seed_1);
     metropolis_generator_2.seed(metropolis_seed_2);
     metropolis_generator_3.seed(metropolis_seed_3);
+    twist_generator.seed(twist_seed);
 
     if (hamiltonian_type == 0 or hamiltonian_type == 2){
         off_diagonal_update_generator.seed(off_diagonal_update_seed);
@@ -52,11 +59,12 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         num_winding = sim_params.winding;
     }
     else {
-        init_M = (int)(2 * sim_params.beta * prob_tables.max_diagonal_norm);
+        init_M = std::max((int)(2 * sim_params.beta * prob_tables.max_diagonal_norm), 50);
+        //init_M = 100;
         M = init_M;
         n=0;
         ConfigurationGenerator::populateOperatorLocations(M);
-        num_winding = 0;
+        num_winding = 0.0;
     }
 
     /*
@@ -74,6 +82,13 @@ void ConfigurationGenerator::populateOperatorLocations(const int &num_fill_zeros
         p_list[i] = i;
     }
     operator_locations = operator_locations_new;
+    for (int i=0; i<num_fill_zeros; i++){
+        operator_locations.push_back(0);
+    }
+}
+
+void ConfigurationGenerator::getNewOperatorLocations(const int &num_fill_zeros) {
+
     for (int i=0; i<num_fill_zeros; i++){
         operator_locations.push_back(0);
     }
@@ -636,7 +651,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXXZh(const ProbabilityTables &pro
 
         num_free_spins = 0;
         if (!skip_loop_update) {
-            mapVerticesToOperatorLocations(vertex_types);
+            mapVerticesToOperatorLocations(vertex_types, prob_tables);
         }
         else {
             for (int i=0; i<N; i++) {
@@ -696,7 +711,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
             }
         }
         connected_legs.clear();
-        mapVerticesToOperatorLocations(vertex_types);
+        mapVerticesToOperatorLocations(vertex_types, prob_tables);
     }
 }
 
@@ -745,20 +760,22 @@ void ConfigurationGenerator::offDiagonalUpdatesIsotropic(const ProbabilityTables
             }
         }
         connected_legs.clear();
-        mapVerticesToOperatorLocations(vertex_types);
+        mapVerticesToOperatorLocations(vertex_types, prob_tables);
     }
 
 }
 
-void ConfigurationGenerator::mapVerticesToOperatorLocations(const VertexTypes &vertex_types){
+void ConfigurationGenerator::mapVerticesToOperatorLocations(const VertexTypes &vertex_types,
+                                                            const ProbabilityTables &prob_tables){
 
     count_non_skipped_loop_updates++;
-    num_winding = 0;
+    num_winding = 0.0;
     for (int p = 0; p < n; p++) {
         int t = p_list.at(p);
         int b = b_list.at(p);
         operator_locations.at(t) = 2 * b + vertex_types.is_off_diag.at(vertex_configuration.at(p));
-        num_winding += vertex_types.twist_mapping.at(vertex_configuration.at(p));
+        int signed_distance = prob_tables.lattice_sites.at(b-1).at(2);
+        num_winding += vertex_types.twist_mapping.at(vertex_configuration.at(p)) * signed_distance;
     }
     for (int i = 0; i < N; i++) {
         if (first_vertex_leg.at(i) == -1) {
@@ -839,7 +856,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
 
         estimators.updateAllPropertiesProbabilistic(n, spin_configuration, sim_params,
-                                       prob_tables.spectrum_offset, num_winding, skip_loop_update);
+                                       prob_tables.spectrum_offset, num_winding,
+                                       skip_loop_update, prob_tables.lattice_sites);
     }
 
     estimators.outputStepData(sim_params);
@@ -1067,7 +1085,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         estimators.updateAllPropertiesProbabilistic(n, spin_configuration, sim_params,
                                        prob_tables.spectrum_offset, num_winding,
-                                       skip_loop_update);
+                                       skip_loop_update, prob_tables.lattice_sites);
 
         //ConfigurationGenerator::flipAllSpins();
 
@@ -1106,19 +1124,26 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
 
         avg_n_d = n_sum / ((double) step + 1.0);
 
-        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        M_new = std::max((int)std::round(1.25 * max_n), M);
+        //M_new = std::max((int)std::round(1.25 * max_n), M);
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+        ///M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
         ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
         M = M_new;
 
         ConfigurationGenerator::offDiagonalUpdatesIsotropic(prob_tables, vertex_types);
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        if (step % 1000 == 0) {
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
     }
 
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
-    //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
-    M_new = std::max((int)std::round(1.25 * max_n), M);
+    //M_new = std::max((int)std::round(1.25 * max_n), M);
+    M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+    //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
     ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
     M = M_new;
 
@@ -1132,14 +1157,20 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int) avg_num_samples) + n) / avg_num_samples;
         n_list.push_back(n);
 
-        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        M_new = std::max((int)std::round(1.25 * max_n), M);
+        //M_new = std::max((int)std::round(1.25 * max_n), M);
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
         ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
         M = M_new;
 
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
 
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        if (step % 1000 == 0) {
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
     }
 
     for (int step=0; step<mc_steps; step++){
@@ -1149,9 +1180,19 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesIsotropic(prob_tables, vertex_types);
 
         estimators.updateAllPropertiesDeterministic(n, spin_configuration, sim_params,
-                                                    prob_tables.spectrum_offset, num_winding);
+                                                    prob_tables.spectrum_offset, num_winding,
+                                                    prob_tables.lattice_sites);
 
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        estimators.updateAllPropertiesDeterministic(n, spin_configuration, sim_params,
+                                                    prob_tables.spectrum_offset, num_winding,
+                                                    prob_tables.lattice_sites);
+
+        if (step % 1000 == 0) {
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
     }
 }
 
@@ -1170,7 +1211,7 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
     int avg_num_samples = 1000;
     int M_new;
 
-    for (int step=0; step<avg_num_samples; step++) {
+    for (int step=0; step<1000; step++) {
         ConfigurationGenerator::diagonalUpdatesXY(prob_tables, vertex_types);
         if (n > max_n) {
             max_n = n;
@@ -1180,21 +1221,38 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
 
         avg_n_d = n_sum / ((double) step + 1.0);
 
-        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        M_new = std::max((int)std::round(1.25 * max_n), M);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        //ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        //M = M_new;
+
+        M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+
         ConfigurationGenerator::offDiagonalUpdatesXY(prob_tables, vertex_types);
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        if (step % avg_num_samples == 0) {
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
     }
 
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
-    //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
-    M_new = std::max((int)std::round(1.25 * max_n), M);
-    ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+    M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
+    ConfigurationGenerator::getNewOperatorLocations(M_new-M);
     M = M_new;
+
+    //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+    //ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+    //M = M_new;
+
+    //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+    //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
 
     for (int step=0; step<equilibration_steps; step++) {
         ConfigurationGenerator::diagonalUpdatesXY(prob_tables, vertex_types);
@@ -1203,17 +1261,36 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
             max_n = n;
         }
 
-        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int) avg_num_samples) + n) / avg_num_samples;
+        avg_n_d = ((avg_n_d * avg_num_samples) - (double)n_list.at(n_list.size() - (int)avg_num_samples) + (double)n) / avg_num_samples;
         n_list.push_back(n);
 
-        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        M_new = std::max((int)std::round(1.25 * max_n), M);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        //M = M_new;
+
+        M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
+
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        //ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        //M = M_new;
 
         ConfigurationGenerator::offDiagonalUpdatesXY(prob_tables, vertex_types);
 
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        if (step % avg_num_samples == 0) {
+            //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+            //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+            //ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+            //M = M_new;
+            //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+            //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
     }
 
     for (int step=0; step<mc_steps; step++){
@@ -1223,9 +1300,21 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         ConfigurationGenerator::offDiagonalUpdatesXY(prob_tables, vertex_types);
 
         estimators.updateAllPropertiesDeterministic(n, spin_configuration, sim_params,
-                                                    prob_tables.spectrum_offset, num_winding);
+                                                    prob_tables.spectrum_offset, num_winding,
+                                                    prob_tables.lattice_sites);
 
-        ConfigurationGenerator::randomSpinFlipsXXZ();
+        ConfigurationGenerator::flipAllSpins();
+
+        estimators.updateAllPropertiesDeterministic(n, spin_configuration, sim_params,
+                                                    prob_tables.spectrum_offset, num_winding,
+                                                    prob_tables.lattice_sites);
+
+        if (step % 1000 == 0) {
+            std::cout << "n = " << n << "\n";
+            std::cout << "step = " << step << "\n";
+        }
+
+        estimators.trackSpinConfigs(spin_configuration);
     }
 }
 

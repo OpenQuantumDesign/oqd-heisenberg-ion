@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
+#include <sstream>
+#include <map>
 
 class SimulationParameters {
 
@@ -20,9 +23,9 @@ public:
     int num_bonds;
 
     int hamiltonian_type;
+    std::string interaction_type;
 
-    std::string file_prefix;
-    std::string out_dir_subfolder;
+    std::string simulation_subfolder;
     std::string root_folder;
 
     int simulation_steps;
@@ -30,7 +33,7 @@ public:
     double new_M_multiplier;
 
     std::string loop_type;
-    std::string distance_dep_offset;
+    bool distance_dep_offset;
 
     //int init_M;
     int init_config_index;
@@ -39,44 +42,51 @@ public:
     int init_M;
     int init_n;
 
-    int boundary_conditions;
+    std::string boundary_conditions;
 
-    SimulationParameters(const std::string &num_spins, const std::string &Delta_in, const std::string &h_in,
-                         const std::string &alpha_in, const std::string &gamma_in, const bool &dist_dep_offset,
-                         const std::string &ksi_in,const std::string &J_in, const std::string &temperature_in,
-                         const std::string &loop_type_in,const int &simulation_steps_in, const int &eq_steps_in,
-                         const double &new_M_multiplier_in, const int &init_config_in,
-                         const std::string &root_folder_in, const std::vector<int> &input_spin_config,
-                         const int &init_M, const int &init_n, const std::vector<int> &init_op_locs,
-                         const double &winding_in,const int &initial_start_config_index, const int &hamiltonian_type_in,
-                         const std::string &boundary_conditions_in);
+    bool track_spin_configs;
+    bool write_final_SSE_configs;
 
-    SimulationParameters(const std::string &num_spins, const std::string &Delta_in,
-                         const std::string &h_in, const std::string &alpha_in,
-                         const std::string &gamma_in, const bool &dist_dep_offset,
-                         const std::string &ksi_in,const std::string &J_in,
-                         const std::string &temperature_in, const std::string &loop_type_in,
-                         const int &simulation_steps_in, const int &eq_steps_in,
-                         const double &new_M_multiplier_in, const int &init_config_in,
-                         const std::string &root_folder_in, const int &hamiltonian_type_in,
-                         const std::string &boundary_conditions_in);
+    std::string uuid;
 
-    SimulationParameters(const std::string &num_spins, const std::string &alpha_in,
-                       const std::string &J_in, const std::string &temperature_in,
-                       const int &simulation_steps_in, const int &eq_steps_in,
-                       const int &init_config_in, const std::string &root_folder_in,
-                       const double &new_M_multiplier_in, const int &hamiltonian_type_in,
-                       const std::string &boundary_conditions_in);
-
-    void setInitialConfigurationsFromInput(const std::vector<int> &input_spin_config, const int &init_M_in,
-                                      const int &init_n_in, const std::vector<int> &init_op_locs,
-                                      const double &winding_in, const int &initial_start_config_index);
-
-    void setJAndAlpha(const std::string &alpha_in, const std::string &J_in);
+    std::string init_config_file_path;
 
     std::vector<int> init_spin_config;
     std::vector<int> init_operator_locations;
     double winding;
+
+    explicit SimulationParameters(std::map<std::string, std::string> &input_key_vals);
+
+    static void extractIntegerEntry(const std::string &key_str, const std::string &val_str, int &member_var,
+                             const bool &enforce_minimum, const int &min_val=0);
+
+    static void extractDoubleEntry(const std::string &key_str, const std::string &val_str, double &member_var,
+                            const bool &enforce_minimum, const double &min_val=0.0);
+
+    static void extractBoolEntry(const std::string &key_str, const std::string &val_str, bool &member_var);
+
+    static void extractStringEntry(const std::string &key_str, const std::string &val_str, std::string &member_var);
+
+    static void extractListInts(const std::string &key_str, const std::string &val_str, std::vector<int> &member_var,
+                         const int &list_size, const bool &enforce_minimum, const int &min_val=0);
+
+    void extractHamiltonianType(const std::string &key_str, const std::string &val_str);
+
+    void extractBoundaryConditions(const std::string &key_str, const std::string &val_str);
+
+    void extractLoopType(const std::string &key_str, const std::string &val_str);
+
+    void extractInteractionType(const std::string &key_str, const std::string &val_str);
+
+    void extractInitialConditionsFromFile(std::string &file_path);
+
+    static void writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream);
+
+    static void writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream);
+
+    static void writeStringEntry(const std::string &key_str, const std::string &val, std::ofstream &file_stream);
+
+    static void writeBoolEntry(const std::string &key_str, const bool &val, std::ofstream &file_stream);
 
 };
 

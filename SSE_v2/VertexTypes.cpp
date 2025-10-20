@@ -3,27 +3,6 @@
 // Can implement more constructors here for special cases as necessary
 VertexTypes::VertexTypes(const int &hamiltonian_type){
 
-    /*
-    num_vertices = 6;
-    num_legs_per_vertex = 4;
-    num_composte_leg_indices = 16;
-
-    std::vector<int> config_1 = {1, 1, 1, 1};
-    std::vector<int> config_2 = {1, -1, 1, -1};
-    std::vector<int> config_3 = {-1, 1, -1, 1};
-    std::vector<int> config_4 = {-1, -1, -1, -1};
-    std::vector<int> config_5 = {1, -1, -1, 1};
-    std::vector<int> config_6 = {-1, 1, 1, -1};
-
-    config_to_index_mapping = { {15,0}, {5,1}, {-5,2},
-                                {-15,3}, {3,4}, {-3,5}};
-
-    is_off_diag = {0,0,0,0,1,1};
-    twist_mapping = {0,0,0,0,-1,1};
-
-    index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
-    */
-
     num_legs_per_vertex = 4;
     num_composite_leg_indices = 16;
 
@@ -39,14 +18,10 @@ VertexTypes::VertexTypes(const int &hamiltonian_type){
         setVertexMappingsIsotropicFM();
         allowed_exit_legs = {1, 0, 3, 2};
     }
-    else if (hamiltonian_type == 2) {
+    else if (hamiltonian_type == 2 || hamiltonian_type == 3) {
         setVertexMappings();
         populateAllowedExitLegs();
     }
-
-    //flip_left_half_vertex_map = {2, 3, 0, 1};
-    //flip_right_half_vertex_map = {1, 0, 3, 2};
-    //flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
 }
 
 int VertexTypes::getVertexTypeIndex(const std::vector<int> &config) const {
@@ -74,10 +49,6 @@ void VertexTypes::setVertexMappings() {
 
     index_to_config_mapping = {config_1, config_2, config_3, config_4, config_5, config_6};
 
-    //flip_left_half_vertex_map = {2, 3, 0, 1};
-    //flip_right_half_vertex_map = {1, 0, 3, 2};
-    //flip_full_vertex_map = {0, 2, 1, 3, 5, 4};
-
 }
 
 void VertexTypes::setVertexMappingsIsotropicAFM() {
@@ -85,8 +56,6 @@ void VertexTypes::setVertexMappingsIsotropicAFM() {
     num_vertices = 4;
 
     std::vector<int> config_1 = {1, 1, 1, 1};
-    //std::vector<int> config_2 = {1, -1, 1, -1};
-    //std::vector<int> config_3 = {-1, 1, -1, 1};
     std::vector<int> config_4 = {-1, -1, -1, -1};
     std::vector<int> config_5 = {1, -1, -1, 1};
     std::vector<int> config_6 = {-1, 1, 1, -1};
@@ -104,10 +73,8 @@ void VertexTypes::setVertexMappingsIsotropicFM() {
 
     num_vertices = 4;
 
-    //std::vector<int> config_1 = {1, 1, 1, 1};
     std::vector<int> config_2 = {1, -1, 1, -1};
     std::vector<int> config_3 = {-1, 1, -1, 1};
-    //std::vector<int> config_4 = {-1, -1, -1, -1};
     std::vector<int> config_5 = {1, -1, -1, 1};
     std::vector<int> config_6 = {-1, 1, 1, -1};
 
@@ -135,7 +102,8 @@ int VertexTypes::getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, cons
     return new_index;
 }
 
-std::vector<int> VertexTypes::flipInputOutputLegs(const int &l_e, const int &l_x, const std::vector<int> &old_config) const {
+std::vector<int> VertexTypes::flipInputOutputLegs(const int &l_e, const int &l_x,
+                                                  const std::vector<int> &old_config) const {
 
 
     std::vector<int> new_config = {old_config.at(0), old_config.at(1),

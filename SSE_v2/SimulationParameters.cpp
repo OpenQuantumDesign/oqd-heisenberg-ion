@@ -1,238 +1,335 @@
 #include "SimulationParameters.h"
 
-SimulationParameters::SimulationParameters(const std::string &num_spins, const std::string &Delta_in,
-                                           const std::string &h_in, const std::string &alpha_in,
-                                           const std::string &gamma_in, const bool &dist_dep_offset,
-                                           const std::string &ksi_in,const std::string &J_in,
-                                           const std::string &temperature_in, const std::string &loop_type_in,
-                                           const int &simulation_steps_in, const int &eq_steps_in,
-                                           const double &new_M_multiplier_in, const int &init_config_in,
-                                           const std::string &root_folder_in, const std::vector<int> &input_spin_config,
-                                           const int &init_M_in, const int &init_n_in, const std::vector<int> &init_op_locs,
-                                           const double &winding_in, const int &initial_start_config_index,
-                                           const int &hamiltonian_type_in, const std::string &boundary_conditions_in) {
+SimulationParameters::SimulationParameters(std::map<std::string, std::string> &input_key_vals) {
 
-    N = std::stoi(num_spins);
+    extractStringEntry("Root Folder", input_key_vals["Root Folder"], root_folder);
+    extractStringEntry("UUID", input_key_vals["UUID"], uuid);
+    simulation_subfolder = root_folder + "/" + uuid + "/";
+
+    std::string file_path = simulation_subfolder + "/" + "Simulation Specs.txt";
+    std::ofstream ofs(file_path);
+
+    writeStringEntry("Output Folder", simulation_subfolder, ofs);
+
+    extractIntegerEntry("N", input_key_vals["N"], N, true, 1);
+    writeNumericEntry("N", N, ofs);
+
     num_bonds = (int)(((double)N * ((double)N-1.0))/2.0);
 
-    Delta = std::stod(Delta_in);
-    h = std::stod(h_in);
-    h_B = h/(J * ((double)N - 1.0));
+    extractLoopType("Loop Type", input_key_vals["Loop Type"]);
+    writeStringEntry("Loop Type", loop_type, ofs);
 
-    gamma = std::stod(gamma_in);
-    ksi = std::stod(ksi_in);
+    extractHamiltonianType("Hamiltonian Type", input_key_vals["Hamiltonian Type"]);
+    writeNumericEntry("Hamiltonian Type", hamiltonian_type, ofs);
 
-    setJAndAlpha(alpha_in, J_in);
+    extractBoundaryConditions("Boundary Conditions", input_key_vals["Boundary Conditions"]);
+    writeStringEntry("Boundary Conditions", boundary_conditions, ofs);
 
-    hamiltonian_type = hamiltonian_type_in;
-
-    boundary_conditions = std::stoi(boundary_conditions_in);
-
-    if (hamiltonian_type != 2) {
-        throw std::runtime_error("This constructor is for probabilistic loops (hamiltonian type = 2)\n");
+    if (loop_type == "directed_loops") {
+        extractDoubleEntry("gamma", input_key_vals["gamma"], gamma,
+                           true,0.0);
+        writeNumericEntry("gamma", gamma, ofs);
+        extractDoubleEntry("ksi", input_key_vals["ksi"], ksi,
+                           true, 0.0);
+        writeNumericEntry("ksi", ksi, ofs);
+        extractBoolEntry("Distance Dependent Offset", input_key_vals["Distance Dependent Offset"],
+                         distance_dep_offset);
+        writeBoolEntry("Distance Dependent Offset", distance_dep_offset, ofs);
     }
 
-    loop_type = loop_type_in;
-    simulation_steps = simulation_steps_in;
-    equilibration_steps = eq_steps_in;
-    //init_M = init_M_in;
-
-    new_M_multiplier = new_M_multiplier_in;
-
-    T = std::stod(temperature_in);
-    beta = J/T;
-
-    if (dist_dep_offset){
-        distance_dep_offset = "1";
+    if (hamiltonian_type == 2 || hamiltonian_type == 3) {
+        extractDoubleEntry("Delta", input_key_vals["Delta"], Delta, false);
     }
     else {
-        distance_dep_offset = "0";
+        Delta = (double)hamiltonian_type;
     }
+    writeNumericEntry("Delta", Delta, ofs);
 
-    init_config_index = init_config_in;
-    if (init_config_index != -2) {
-        throw std::runtime_error("init_config_index should be -2 for this constructor\n");
-    }
-    SimulationParameters::setInitialConfigurationsFromInput(input_spin_config, init_M_in, init_n_in, init_op_locs,
-                                                            winding_in, initial_start_config_index);
-
-    file_prefix = "N_" + num_spins + "_hamiltonian_type_" + std::to_string(hamiltonian_type_in)
-                  + "_Delta_" + Delta_in + "_h_" + h_in + "_alpha_" + alpha_in + "_gamma_" +
-                  gamma_in + "_ksi_" + ksi_in + "_J_" + J_in + "_dist_dep_offset_" + distance_dep_offset +
-                  "_boundary_" + boundary_conditions_in;
-
-    out_dir_subfolder = "/Results/SSE/" + file_prefix + "_" + "T" + "_" + temperature_in + "_" + loop_type +
-            "_input_config_" + std::to_string(init_config_in) +
-            "_initial_input_config_" + std::to_string(initial_start_config_index);
-
-    root_folder = root_folder_in;
-}
-
-SimulationParameters::SimulationParameters(const std::string &num_spins, const std::string &Delta_in,
-                                           const std::string &h_in, const std::string &alpha_in,
-                                           const std::string &gamma_in, const bool &dist_dep_offset,
-                                           const std::string &ksi_in,const std::string &J_in,
-                                           const std::string &temperature_in, const std::string &loop_type_in,
-                                           const int &simulation_steps_in, const int &eq_steps_in,
-                                           const double &new_M_multiplier_in, const int &init_config_in,
-                                           const std::string &root_folder_in, const int &hamiltonian_type_in,
-                                           const std::string &boundary_conditions_in) {
-
-    N = std::stoi(num_spins);
-    num_bonds = (int)(((double)N * ((double)N-1.0))/2.0);
-
-    Delta = std::stod(Delta_in);
-    h = std::stod(h_in);
-    h_B = h/(J * ((double)N - 1.0));
-    gamma = std::stod(gamma_in);
-    ksi = std::stod(ksi_in);
-    hamiltonian_type = hamiltonian_type_in;
-
-    setJAndAlpha(alpha_in, J_in);
-
-    boundary_conditions = std::stoi(boundary_conditions_in);
-
-    if (hamiltonian_type != 2) {
-        throw std::runtime_error("This constructor is for probabilistic loops (hamiltonian type = 2)\n");
-    }
-
-    loop_type = loop_type_in;
-    simulation_steps = simulation_steps_in;
-    equilibration_steps = eq_steps_in;
-    //init_M = init_M_in;
-
-    new_M_multiplier = new_M_multiplier_in;
-
-    T = std::stod(temperature_in);
-    beta = J/T;
-
-    if (dist_dep_offset){
-        distance_dep_offset = "1";
+    if (hamiltonian_type == 3) {
+        extractDoubleEntry("h", input_key_vals["h"], h,
+                           true, 0.0);
+        h_B = h/(J * ((double)N - 1.0));
     }
     else {
-        distance_dep_offset = "0";
+        h = 0.0;
+        h_B = 0.0;
     }
+    writeNumericEntry("h", h, ofs);
 
-    init_config_index = init_config_in;
+    extractInteractionType("Interaction Type", input_key_vals["Interaction Type"]);
+    writeStringEntry("Interaction Type", interaction_type, ofs);
+    if (interaction_type == "Power-Law") {
+        extractDoubleEntry("alpha", input_key_vals["alpha"], alpha,
+                           true, 0.0);
+        writeNumericEntry("alpha", alpha, ofs);
+    }
+    extractDoubleEntry("J", input_key_vals["J"], J,
+                       true, 0.0);
+    writeNumericEntry("J", J, ofs);
+
+    extractIntegerEntry("Simulation Steps", input_key_vals["Simulation Steps"],
+                        simulation_steps, true, 1);
+    writeNumericEntry("Simulation Steps", simulation_steps, ofs);
+
+    extractIntegerEntry("Equilibration Steps", input_key_vals["Equilibration Steps"],
+                        simulation_steps, true, 1);
+    writeNumericEntry("Equilibration Steps", equilibration_steps, ofs);
+
+    extractDoubleEntry("Operator List Update Multiplier",
+                       input_key_vals["Operator List Update Multiplier"],
+                       new_M_multiplier, true, 1.0);
+    writeNumericEntry("Operator List Update Multiplier", new_M_multiplier, ofs);
+
+    extractDoubleEntry("T", input_key_vals["T"], T, true, 0.0);
+    writeNumericEntry("T", T, ofs);
+    beta = J/T;
+
+    extractBoolEntry("Track Spin Configurations", input_key_vals["Track Spin Configurations"],
+                     track_spin_configs);
+    writeBoolEntry("Track Spin Configurations", track_spin_configs, ofs);
+
+    extractBoolEntry("Write Final Spin Configurations",
+                     input_key_vals["Write Final Spin Configurations"], write_final_SSE_configs);
+    writeBoolEntry("Write Final Spin Configurations", write_final_SSE_configs, ofs);
+
+    extractIntegerEntry("Initial Configuration Index", input_key_vals["Initial Configuration Index"],
+                        init_config_index, true, -2);
+    writeNumericEntry("Initial Configuration Index", init_config_index, ofs);
+
+    extractIntegerEntry("Initial Operator List Size", input_key_vals["Initial Configuration Index"],
+                        init_M, true, -1);
+    if (init_M == -1) { init_M = 50; }
+    writeNumericEntry("Initial Operator List Size", init_M, ofs);
+
     if (init_config_index == -2) {
-        throw std::runtime_error("init_config_index should not be -2 for this constructor\n");
+        extractStringEntry("Initial Configurations File Path",
+                           input_key_vals["Initial Configuration Index"], init_config_file_path);
+        extractInitialConditionsFromFile(init_config_file_path);
+        writeStringEntry("Initial Configurations File Path", init_config_file_path, ofs);
     }
-    initial_init_config_index = init_config_in;
 
-    file_prefix = "N_" + num_spins + "_hamiltonian_type_" + std::to_string(hamiltonian_type_in)
-                  + "_Delta_" + Delta_in + "_h_" + h_in + "_alpha_" + alpha_in + "_gamma_" +
-                  gamma_in + "_ksi_" + ksi_in + "_J_" + J_in + "_dist_dep_offset_" + distance_dep_offset +
-                  "_boundary_" + boundary_conditions_in;
+    ofs.close();
+}
 
-    out_dir_subfolder = "/Results/SSE/" + file_prefix + "_" + "T" + "_" + temperature_in + "_" + loop_type +
-                        "_input_config_" + std::to_string(init_config_in) +
-                        "_initial_input_config_" + std::to_string(initial_init_config_index);
+void SimulationParameters::extractIntegerEntry(const std::string &key_str, const std::string &val_str,
+                                                      int &member_var, const bool &enforce_minimum,
+                                                      const int &min_val) {
 
-    root_folder = root_folder_in;
+    if (val_str.empty()) {
+        throw std::runtime_error("No value found for key: " + key_str + ".\n");
+    }
+
+    size_t pos;
+    member_var = std::stoi(val_str, &pos);
+    if (pos != val_str.length()){
+        throw std::runtime_error("Value could not be converted to an integer for key: " + key_str + ".\n");
+    }
+
+    if (enforce_minimum && member_var < min_val){
+        throw std::runtime_error("Value for key: " + key_str + " is below the expected minimum: " +
+        std::to_string(min_val) + ".\n");
+    }
 
 }
 
-SimulationParameters::SimulationParameters(const std::string &num_spins, const std::string &alpha_in,
-                                           const std::string &J_in, const std::string &temperature_in,
-                                           const int &simulation_steps_in, const int &eq_steps_in,
-                                           const int &init_config_in, const std::string &root_folder_in,
-                                           const double &new_M_multiplier_in, const int &hamiltonian_type_in,
-                                           const std::string &boundary_conditions_in) {
+void SimulationParameters::extractDoubleEntry(const std::string &key_str, const std::string &val_str,
+                                              double &member_var, const bool &enforce_minimum,
+                                              const double &min_val) {
 
-    N = std::stoi(num_spins);
-    num_bonds = (int)(((double)N * ((double)N-1.0))/2.0);
-
-    h = 0.0;
-    h_B = 0.0;
-    gamma = 0.0;
-    ksi = 0.0;
-
-    setJAndAlpha(alpha_in, J_in);
-
-    hamiltonian_type = hamiltonian_type_in;
-
-    boundary_conditions = std::stoi(boundary_conditions_in);
-
-    std::string Delta_in;
-    if (hamiltonian_type == 1) {
-        Delta = 1.0;
-        Delta_in = "1.0";
+    if (val_str.empty()) {
+        throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
-    else if (hamiltonian_type == -1) {
-        Delta = -1.0;
-        Delta_in = "-1.0";
+
+    size_t pos;
+    member_var = std::stod(val_str, &pos);
+    if (pos != val_str.length()){
+        throw std::runtime_error("Value could not be converted to a double for key: " + key_str + ".\n");
     }
-    else if (hamiltonian_type == 0) {
-        Delta = 0.0;
-        Delta_in = "0.0";
+
+    if (enforce_minimum && member_var < min_val){
+        throw std::runtime_error("Value for key: " + key_str + " is below the expected minimum: " +
+                                 std::to_string(min_val) + ".\n");
+    }
+}
+
+void SimulationParameters::extractBoolEntry(const std::string &key_str, const std::string &val_str,
+                                            bool &member_var) {
+
+    if (val_str.empty()) {
+        throw std::runtime_error("No value found for key: " + key_str + ".\n");
+    }
+
+    if (val_str == "True") {
+        member_var = true;
+    }
+    else if (val_str == "False") {
+        member_var = false;
     }
     else {
-        throw std::runtime_error("This constructor requires the hamiltonian type to be either 0, -1 or 1\n");
+        throw std::runtime_error("Value could not be converted to a bool for key: " + key_str + ".\n");
     }
 
-    new_M_multiplier = new_M_multiplier_in;
-
-    loop_type = "deterministic";
-    simulation_steps = simulation_steps_in;
-    equilibration_steps = eq_steps_in;
-
-    T = std::stod(temperature_in);
-    beta = J/T;
-
-    distance_dep_offset = "0";
-
-    file_prefix = "N_" + num_spins + "_hamiltonian_type_" + std::to_string(hamiltonian_type_in)
-            + "_Delta_" + Delta_in + "_h_0.0" + "_alpha_" + alpha_in +
-            "_gamma_0.0_ksi_0.0" + "_J_" + J_in + "_dist_dep_offset_" + distance_dep_offset +
-            "_boundary_" + boundary_conditions_in;
-
-    init_config_index = init_config_in;
-    if (init_config_index == -2) {
-        throw std::runtime_error("init_config_index should not be -2 for this constructor\n");
-    }
-    initial_init_config_index = init_config_in;
-
-    out_dir_subfolder = "/Results/SSE/" + file_prefix + "_" + "T" + "_" + temperature_in + "_" + loop_type +
-                        "_input_config_" + std::to_string(init_config_in) +
-                        "_initial_input_config_" + std::to_string(initial_init_config_index);
-
-    root_folder = root_folder_in;
 }
 
-void SimulationParameters::setJAndAlpha(const std::string &alpha_in, const std::string &J_in){
+void SimulationParameters::extractStringEntry(const std::string &key_str, const std::string &val_str,
+                                              std::string &member_var) {
 
-    if (alpha_in.substr(0,3) == "exp"){
-        if (J_in != "exp"){
-            throw std::runtime_error("Either both J and alpha need to be exp or neither\n");
-        }
-        alpha = -1.0;
-        J = 1.0;
-    }
-    else if (J_in == "exp"){
-        if (alpha_in.substr(0,3) != "exp"){
-            throw std::runtime_error("Either both J and alpha need to be exp or neither\n");
-        }
-        alpha = -1.0;
-        J = 1.0;
+    if (val_str.empty()) {
+        throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
     else {
-        J = std::stod(J_in);
-        alpha = std::stod(alpha_in);
+        member_var = val_str;
     }
 
 }
 
-void SimulationParameters::setInitialConfigurationsFromInput(const std::vector<int> &input_spin_config,
-                                                             const int &init_M_in, const int &init_n_in,
-                                                             const std::vector<int> &init_op_locs,
-                                                             const double &winding_in,
-                                                             const int &initial_start_config_index) {
+void SimulationParameters::extractListInts(const std::string &key_str, const std::string &val_str,
+                                           std::vector<int> &member_var, const int &list_size,
+                                           const bool &enforce_minimum, const int &min_val) {
 
-    init_spin_config = input_spin_config;
-    init_M = init_M_in;
-    init_n = init_n_in;
-    init_operator_locations = init_op_locs;
-    winding = winding_in;
-    initial_init_config_index = initial_start_config_index;
+    if (val_str.empty()) {
+        throw std::runtime_error("No value found for key: " + key_str + ".\n");
+    }
 
+    std::istringstream list_stream(val_str);
+    std::string list_val_str;
+    int list_val;
+    int entry_count = 0;
+    while (std::getline(list_stream, list_val_str, ',')) {
+        extractIntegerEntry(key_str + " Index " + std::to_string(entry_count), list_val_str,
+                            list_val, enforce_minimum, min_val);
+        entry_count++;
+        member_var.push_back(list_val);
+    }
+
+    if (entry_count+1 != list_size) {
+        throw std::runtime_error("Expected size for " + key_str + " does not match length of list\n");
+    }
+
+}
+
+void SimulationParameters::extractLoopType(const std::string &key_str, const std::string &val_str) {
+
+    extractStringEntry(key_str, val_str, loop_type);
+
+    if (loop_type != "deterministic" && loop_type != "heat_bath" && loop_type != "directed_loops") {
+        throw std::runtime_error("Loop Type must be 'deterministic', heat_bath or directed_loops\n");
+    }
+}
+
+void SimulationParameters::extractHamiltonianType(const std::string &key_str, const std::string &val_str) {
+
+    extractIntegerEntry(key_str, val_str, hamiltonian_type, false);
+
+    if (hamiltonian_type > 3 || hamiltonian_type < -1) {
+        throw std::runtime_error("Hamiltonian type can only be -1, 0, 1, 2 or 3\n");
+    }
+
+    if (loop_type == "deterministic") {
+        if (hamiltonian_type != -1 && hamiltonian_type != 0 && hamiltonian_type != 1) {
+            throw std::runtime_error("deterministic loops are only compatible with Hamiltonian types -1, 0 and 1\n");
+        }
+    }
+
+    if (loop_type == "directed_loops" || loop_type == "heat_bath") {
+        if (hamiltonian_type != 2 && hamiltonian_type != 3) {
+            throw std::runtime_error("directed loops and heat bath probabilities are only compatible with Hamiltonian "
+                                     "types 2 and 3\n");
+        }
+    }
+}
+
+void SimulationParameters::extractInteractionType(const std::string &key_str, const std::string &val_str) {
+
+    extractStringEntry(key_str, val_str, interaction_type);
+
+    if (interaction_type != "Power-Law" && interaction_type != "Matrix-Input") {
+        throw std::runtime_error("Supported interaction types are: 'Power-Law' and 'Matrix-Input'\n");
+    }
+}
+
+void SimulationParameters::extractBoundaryConditions(const std::string &key_str, const std::string &val_str) {
+
+    extractStringEntry(key_str, val_str, boundary_conditions);
+
+    if (boundary_conditions != "Open" && boundary_conditions != "Periodic") {
+        throw std::runtime_error("Boundary conditions can either be 'Open' or 'Periodic'\n");
+    }
+
+}
+
+void SimulationParameters::extractInitialConditionsFromFile(std::string &file_path) {
+
+    std::ifstream file_stream(file_path);
+    std::map<std::string, std::string> input_kev_val_pairs;
+
+    if (!file_stream.good())
+        throw std::runtime_error("Could not open file with path: " + file_path);
+
+    std::string line;
+    int line_count = 0;
+
+    while (std::getline(file_stream, line)) {
+
+        if (line.empty() || line.at(0) == '#') {
+            continue;
+        }
+
+        line_count += 1;
+
+        std::stringstream row_stream(line);
+        std::string line_key;
+        std::string line_val;
+
+        std::getline(row_stream, line_key, '\t');
+        std::getline(row_stream, line_val, '\t');
+
+        input_kev_val_pairs[line_key] = line_val;
+    }
+
+    file_stream.close();
+
+    if (input_kev_val_pairs["N"] != std::to_string(N)) {
+        throw std::runtime_error("Number of sites in SSE configuration inputs do not equal expected number of sites\n");
+    }
+
+    extractIntegerEntry("M", input_kev_val_pairs["M"], init_M, true, 1);
+    extractIntegerEntry("n", input_kev_val_pairs["n"], init_n, true, 0);
+    extractDoubleEntry("W", input_kev_val_pairs["W"], winding, false);
+
+    extractListInts("Operator Locations List", input_kev_val_pairs["Operator Locations List"],
+                    init_operator_locations,init_M, false);
+
+    extractListInts("Spin Configurations List", input_kev_val_pairs["Spin Configurations List"],
+                    init_spin_config,N, false);
+}
+
+void SimulationParameters::writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream) {
+
+    file_stream << key_str << "\t" << std::to_string(val) << "\n";
+
+}
+
+void SimulationParameters::writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream) {
+
+    file_stream << key_str << "\t" << std::to_string(val) << "\n";
+
+}
+
+void SimulationParameters::writeStringEntry(const std::string &key_str, const std::string &val,
+                                            std::ofstream &file_stream) {
+
+    file_stream << key_str << "\t" << val << "\n";
+
+}
+
+void SimulationParameters::writeBoolEntry(const std::string &key_str, const bool &val,
+                                            std::ofstream &file_stream) {
+
+    if (val) {
+        file_stream << key_str << "\t" << "True" << "\n";
+    }
+    else {
+        file_stream << key_str << "\t" << "False" << "\n";
+    }
 }

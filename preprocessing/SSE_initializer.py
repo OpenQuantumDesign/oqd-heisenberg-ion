@@ -725,7 +725,6 @@ def write_prob_tables_deterministic(N_1, N_2, lattice_type, J_ij_type, J_ij_file
     return 0
 
 if __name__=="__main__":
-
     
     #Delta_list = [-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0]
     #Delta_list = [-3.0,-4.0,-5.0,-6.0,-7.0,-8.0,-9.0,-2.0,-1.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0]
@@ -770,7 +769,6 @@ if __name__=="__main__":
             #write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, 1, boundary)
             #write_prob_tables_deterministic(N_1, N_2, lattice_type, alpha, J, -1, boundary)
             write_prob_tables_deterministic(N_1, N_2, lattice_type, J_ij_type, None, alpha, J, 0, boundary, None)
-    
 
     '''
     for N_1 in N_list:

@@ -17,17 +17,8 @@ private:
 
     std::vector<int> p_list;
     std::vector<int> b_list;
-    //std::vector<int> id_list;
-    //std::vector<int> diag_op_p_list;
-    //std::vector<int> diag_order_op_p_list;
-    //std::vector<int> diag_disorder_op_p_list;
-    //std::vector<int> off_diag_op_p_list;
-    //std::vector<double> cluster_bond_prob_list;
-    //std::unordered_set<int> sliced_by_cluster;
 
     std::unordered_set<int> connected_legs;
-
-    //int count_p = 0;
 
     std::vector<int> first_vertex_leg;
     std::vector<int> last_vertex_leg;
@@ -44,7 +35,6 @@ private:
     int init_M;
 
     int N_l;
-    //int num_clusters;
     int max_loop_size;
     int count_non_skipped_loop_updates;
     int N;
@@ -57,9 +47,6 @@ private:
     std::vector<int> cumulative_cluster_size_list;
     int average_cumulative_loop_size;
 
-    //int cluster_affected_spin_count;
-    //int count_non_skipped_cluster_updates;
-
     std::mt19937_64 initial_config_generator;
     std::mt19937_64 diagonal_update_generator;
     std::mt19937_64 off_diagonal_update_generator;
@@ -70,8 +57,6 @@ private:
     std::mt19937_64 metropolis_generator_2;
     std::mt19937_64 metropolis_generator_3;
     std::mt19937_64 twist_generator;
-    //std::mt19937_64 cluster_start_pos_generator;
-    //std::mt19937_64 metropolis_generator_4;
 
     int init_config_seed= 1;
     int diagonal_update_seed= 2;
@@ -82,14 +67,13 @@ private:
     int metropolis_seed_2 = 7;
     int metropolis_seed_3 = 8;
     int twist_seed = 9;
-    //int cluster_start_pos_generator_seed = 9;
-    //int metropolis_seed_4 = 10;
 
-    std::uniform_real_distribution<double> metropolis_acceptance_distribution = std::uniform_real_distribution<double>(0.0,1.0);
+    std::uniform_real_distribution<double> metropolis_acceptance_distribution =
+            std::uniform_real_distribution<double>(0.0,1.0);
+
     std::uniform_int_distribution<> binary_dist = std::uniform_int_distribution<>(0, 1);
     std::uniform_int_distribution<> loop_start_pos_dist;
 
-    //int num_free_flips;
     int equilibration_steps;
     int mc_steps;
     double a_parameter;
@@ -104,19 +88,15 @@ private:
 
     void diagonalUpdatesXXZh(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
-    void diagonalUpdatesXY(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
+    void diagonalUpdatesXY(const ProbabilityTables &prob_tables);
 
-    void diagonalUpdatesIsotropic(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
+    void diagonalUpdatesIsotropic(const ProbabilityTables &prob_tables);
 
     void offDiagonalUpdatesXXZh(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
     void offDiagonalUpdatesXY(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
     void offDiagonalUpdatesIsotropic(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
-
-    /*
-    void multiBranchClusterUpdate(const ProbabilityTables &prob_tables, const VertexTypes &vertexTypes);
-    */
 
     void populateLinkedList(const ProbabilityTables &prob_tables, const VertexTypes &vertex_types);
 
@@ -137,6 +117,18 @@ private:
 
     static double computeAverage(std::vector<int> &vector_entries, const double &num_samples_in);
 
+    void simulateProbabilisticLoopsXXZh(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                        const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+
+    void simulateDeterministicIsotropic(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                        const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+
+    void simulateDeterministicXY(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                 const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+
+    void simulateProbabilisticLoopsXXZ(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                       const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+
 public:
     std::vector<int> spin_configuration;
     std::vector<int> operator_locations;
@@ -144,21 +136,12 @@ public:
     int M;
     int n;
 
-    //std::vector<int> cluster_spin_probs;
-
     ConfigurationGenerator(const SimulationParameters &sim_params, const ProbabilityTables &prob_tables);
 
-    void simulateProbabilisticLoopsXXZh(const ProbabilityTables &prob_tables, Estimators &estimators,
-                                        const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+    void generateConfigurations(const ProbabilityTables &prob_tables, Estimators &estimators,
+                                const SimulationParameters &sim_params, const VertexTypes &vertex_types);
 
-    void simulateDeterministicIsotropic(const ProbabilityTables &prob_tables, Estimators &estimators,
-                          const SimulationParameters &sim_params, const VertexTypes &vertex_types);
-
-    void simulateDeterministicXY(const ProbabilityTables &prob_tables, Estimators &estimators,
-                                        const SimulationParameters &sim_params, const VertexTypes &vertex_types);
-
-    void simulateProbabilisticLoopsXXZ(const ProbabilityTables &prob_tables, Estimators &estimators,
-                                       const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+    void writeFinalConfigurations(const SimulationParameters &sim_params);
 };
 
 

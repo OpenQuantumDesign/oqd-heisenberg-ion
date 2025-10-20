@@ -54,7 +54,7 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 
     simulation_steps = sim_params.simulation_steps;
     track_spin_configs = track_spin_configs_in;
-    out_folder_path = sim_params.root_folder + sim_params.out_dir_subfolder + "/";
+    out_folder_path = sim_params.simulation_subfolder + "/QMC_Output/";
 
     if (not std::filesystem::is_directory(out_folder_path)){
         std::filesystem::create_directory(out_folder_path);
@@ -63,10 +63,11 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 
 void Estimators::outputStepData(const SimulationParameters &sim_params) const {
 
-    std::string filePath = out_folder_path + "/" + "MC Step Outputs.csv";
-    std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
+    std::string file_path = out_folder_path + "/" + "MC Step Outputs.csv";
+    //std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
+    std::string header = "# MC Step Outputs\n";
     header += "MC Step, Energy, Magnetization, Spin Stiffness, S(pi)\n";
-    std::ofstream ofs(filePath);
+    std::ofstream ofs(file_path);
     ofs << header;
     for (int i = 0; i < step_energy.size(); i++){
         ofs << std::to_string(i+1)
@@ -101,29 +102,11 @@ void Estimators::outputPairCorrelations(const SimulationParameters &sim_params) 
 }
  */
 
-/*
-void Estimators::outputClusterHistogram(const SimulationParameters &sim_params, const std::vector<int> &cluster_probs) const {
-
-    std::string filePath = out_folder_path + "/" + "Cluster Histogram.csv";
-    std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
-    header += "Site, Cluster Probability\n";
-    std::ofstream ofs(filePath);
-    ofs << header;
-    for (int i = 0; i < sim_params.N; i++){
-        ofs << std::to_string(i+1)
-            << "," << std::to_string(cluster_probs.at(i))
-            << "\n";
-    }
-    ofs.close();
-}
- */
-
 void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const {
 
-    std::string filePath = out_folder_path + "/" + "MC Spin Configurations.csv";
-    std::string header = sim_params.out_dir_subfolder + "\n";
-    header += "Spin Configurations\n";
-    std::ofstream ofs(filePath);
+    std::string file_path = out_folder_path + "/" + "MC Spin Configurations.csv";
+    std::string header = "# Spin Configurations\n";
+    std::ofstream ofs(file_path);
     ofs << header << "\n";
     for (int i = 0; i < step_spin_configs.size(); i++){
         ofs << std::to_string(step_spin_configs.at(i).at(0));

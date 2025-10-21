@@ -1,94 +1,169 @@
 import numpy as np
 
-def geometry(N_1, N_2, geometry_type, boundary_conditions):
+class Geometry:
+
+    def __init__(self):
+
+        self.spatial_dimension = None
+
+        self.boundary_type = None
+        
+        self.N_config = None
+        self.N = None
+        self.num_bonds = None
+
+        self.sites = None
+        self.distances = None
+        self.geometry_table = None
+
+        return 0
+
+    def initialize_tables(self):
+
+        self.geometry_table = np.zeros((self.num_bonds,3))
+        self.distances = np.zeros(self.num_bonds)
+        self.sites = np.zeros((self.num_bonds,2), dtype=int)
+
+        return 0
+
+    def build(self):
+        pass
+
+
+class LongRangeOpenChain(Geometry):
+
+    def __init__(self, N):
+
+        super.__init__()
+
+        self.spatial_dimension = 1
+
+        self.boundary_type = "Open"
+
+        self.N = N
+        self.N_config = (N)
+        self.num_bonds = int(self.N*(self.N-1)/2)
+
+        self.initialize_tables()
+
+        return 0
+
+    def initialize_tables(self):
+        return super().initialize_tables()
+
+    def build(self):
+
+        b = 0
+        for i in range(self.N):
+            for j in range(i+1,self.N):
+
+                self.sites[b,0] = i
+                self.sites[b,1] = j
+
+                self.distances[b] = j-i
+
+                self.geometry_table[b,0] = i
+                self.geometry_table[b,1] = j
+                self.geometry_table[b,2] = self.distances[b]
+
+                b += 1
+        
+        return 0
+
+
+class LongRangePeriodicChain(Geometry):
+
+    def __init__(self, N):
+
+        super.__init__()
+
+        self.spatial_dimension = 1
+
+        self.boundary_type = "Periodic"
+
+        self.N = N
+        self.N_config = (N)
+        self.num_bonds = int(self.N*(self.N-1)/2)
+
+        self.initialize_tables()
+
+        return 0
+
+    def initialize_tables(self):
+        return super().initialize_tables()
     
-    if geometry_type == "1d":
-        if N_2 == 0:
-            if boundary_conditions == 0:
-                sites, distances, geometry_table, N, num_bonds = geometry_1d_OBC(N_1)
-            elif boundary_conditions == 1: 
-                sites, distances, geometry_table, N, num_bonds = geometry_1d_PBC(N_1)
-            else: 
-                raise Exception("Boundary conditions for 1d need to be either 0 (OBC) or 1 (PBC).")
-        else: 
-            raise Exception("Geometry type is 1d but N_2 is non-zero.")
-    elif geometry_type == "2d_triangular":
-        if boundary_conditions == 0:
-            sites, distances, geometry_table, N, num_bonds = geometry_2d_triangular_OBC(N_1, N_2)
-        else:
-            raise Exception("Boundary conditions for 2d need to be 0 (OBC).")
-    else:
-        raise Exception("Geometry type: {} is not implemented. Valid possible choices are: {} and {}.".format(geometry_type, "1d", "2d_triangular"))
+    def build(self):
 
-    return sites, distances, geometry_table, N, num_bonds
+        b = 0
+        for i in range(self.N):
+            for j in range(i+1,self.N):
 
-def geometry_1d_OBC(N):
+                self.sites[b,0] = i
+                self.sites[b,1] = j
 
-    num_bonds = int(N*(N-1)/2)
-    sites = np.zeros((num_bonds,2), dtype=int)
-    geometry_table = np.zeros((num_bonds,3))
-    distances = np.zeros(num_bonds)
-    b = 0
-    for i in range(N):
-        for j in range(i+1,N):
-            sites[b,0] = i
-            sites[b,1] = j
-            distances[b] = j-i
-            geometry_table[b,0] = i
-            geometry_table[b,1] = j
-            geometry_table[b,2] = distances[b]
-            b += 1
+                self.geometry_table[b,0] = i
+                self.geometry_table[b,1] = j
 
-    return sites, distances, geometry_table, N, num_bonds
+                if (j-i) <= self.N - (j-i):
+                    self.distances[b] = j-i
+                    self.geometry_table[b,2] = self.distances[b]
+                else:
+                    self.distances[b] = N - (j-i)
+                    self.geometry_table[b,2] = -self.distances[b]
 
-def geometry_1d_PBC(N):
+                b += 1
 
-    num_bonds = int(N*(N-1)/2)
-    sites = np.zeros((num_bonds,2), dtype=int)
-    geometry_table = np.zeros((num_bonds,3))
-    distances = np.zeros(num_bonds)
-    b = 0
-    for i in range(N):
-        for j in range(i+1,N):
-            sites[b,0] = i
-            sites[b,1] = j
-            geometry_table[b,0] = i
-            geometry_table[b,1] = j
-            if (j-i) <= N - (j-i):
-                distances[b] = j-i
-                geometry_table[b,2] = distances[b]
-            else:
-                distances[b] = N - (j-i)
-                geometry_table[b,2] = -distances[b]
-            b += 1
+        return 0
 
-    return sites, distances, geometry_table, N, num_bonds
 
-def geometry_2d_triangular_OBC(N_1, N_2):
+class LongRangeOpenTriangular(Geometry):
 
-    N = N_1 * N_2
-    num_bonds = int(N*(N-1)/2)
-    sites = np.zeros((num_bonds,2), dtype=int)
-    distances = np.zeros(num_bonds)
-    geometry_table = np.zeros(num_bonds,3)
-    b = 0
-    a_1 = np.array([1.0,0.0])
-    a_2 = np.array([-0.5, np.sqrt(3.0)/2.0])
-    for i1 in range(N_1):
-        for i2 in range(N_2):
-            i = i1*N_2 + i2
-            for j1 in range(N_1):
-                for j2 in range(N_2):
-                    j = j1*N_2 + j2
-                    if j > i:
-                        sites[b,0] = i
-                        sites[b,1] = j
-                        distances[b] = np.norm((j1-i1)*a_1 + (j2-i2)*a_2)
-                        geometry_table[b,0] = i
-                        geometry_table[b,1] = j
-                        geometry_table[b,2] = distances[b]
-                        b += 1
+    def __init__(self, N_1, N_2):
 
-    return sites, distances, geometry_table, N, num_bonds
+        super.__init__()
 
-# TODO: Implement 2d triangular PBC geometry
+        self.spatial_dimension = 2
+
+        self.boundary_type = "Periodic"
+
+        self.N = N_1 * N_2
+        self.N_config = (N_1, N_2)
+        self.num_bonds = int(self.N*(self.N-1)/2)
+
+        self.initialize_tables()
+
+        return 0
+
+    def initialize_tables(self):
+        return super().initialize_tables()
+    
+    def build(self):
+
+        a_1 = np.array([1.0,0.0])
+        a_2 = np.array([-0.5, np.sqrt(3.0)/2.0])
+        
+        N_1 = self.N_config[0]
+        N_2 = self.N_config[1]
+
+        for i1 in range(N_1):
+            for i2 in range(N_2):
+                i = i1*N_2 + i2
+
+                for j1 in range(N_1):
+                    for j2 in range(N_2):
+                        j = j1*N_2 + j2
+
+                        if j > i:
+                            self.sites[b,0] = i
+                            self.sites[b,1] = j
+
+                            self.distances[b] = np.norm((j1-i1)*a_1 + (j2-i2)*a_2)
+
+                            self.geometry_table[b,0] = i
+                            self.geometry_table[b,1] = j
+                            self.geometry_table[b,2] = self.distances[b]
+
+                            b += 1
+
+        return 0
+    

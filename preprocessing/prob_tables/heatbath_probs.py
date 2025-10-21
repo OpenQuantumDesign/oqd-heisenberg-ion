@@ -1,10 +1,6 @@
 import numpy as np
-from utils import set_probability
-from vertex_props import num_vertices
-from vertex_props import num_legs_indices
-from vertex_props import num_diagonal_vertices
-from vertex_props import num_legs_per_vertex
-from vertex_props import new_vertex_map
+from preprocessing.prob_tables.utils.math_utils import *
+from preprocessing.prob_tables.utils.vertex_utils import *
 
 def compute_offset(gamma, Delta, J_ij, h_B):
 

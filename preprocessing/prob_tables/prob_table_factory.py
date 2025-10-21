@@ -1,13 +1,13 @@
 import os
 import numpy as np
-from coupling_strengths import get_J_ij_exp
-from coupling_strengths import get_J_ij_power_law
-from geometry import geometry
+from preprocessing.system.interactions import get_J_ij_exp
+from preprocessing.system.interactions import get_J_ij_power_law
+from system.geometry import geometry
 from heatbath_probs import compute_prob_tables_heat_bath
 from directed_loop_probs import compute_prob_tables_directed_loops
 from deterministic_probs import compute_probability_tables_deterministic
 
-def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, hamiltonian_type, boundary):
+def write_prob_tables_probabilistic(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, loop_update_type, dist_dep_gamma, hamiltonian_type, boundary):
 
     out_dir = "ProbabilityDensities"
     sites, distances, geometry_table, N, num_bonds = geometry(N_1, N_2, lattice_type, boundary)
@@ -42,8 +42,8 @@ def write_prob_tables(gamma, Delta, h, N_1, N_2, lattice_type, alpha, ksi, J, lo
     else:
         dist_dep_offset = 0
     
-    if (hamiltonian_type != 2):
-        raise Exception("This function requires the hamiltonian type to 2\n")
+    if (hamiltonian_type != 2 and hamiltonian_type != 3):
+        raise Exception("This function requires the hamiltonian type to 2 or 3\n")
 
     file_prefix = "N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_{}_J_{}_dist_dep_offset_{}_boundary_{}".format(N, hamiltonian_type, Delta, h, alpha, gamma, ksi, J, dist_dep_offset, boundary)
 

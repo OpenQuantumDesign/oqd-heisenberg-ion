@@ -1,14 +1,6 @@
 import numpy as np
-from utils import set_probability
-from vertex_props import num_vertices
-from vertex_props import num_legs_indices
-from vertex_props import num_diagonal_vertices
-from vertex_props import num_legs_per_vertex
-from vertex_props import vertex_map
-from vertex_props import leg_spin
-from vertex_props import vertical_swap_mapping
-from vertex_props import horizontal_swap_mapping
-from vertex_props import composed_swaps_mapping
+from preprocessing.prob_tables.utils.math_utils import *
+from preprocessing.prob_tables.utils.vertex_utils import *
 
 def compute_transition_weights(gamma, Delta, J_ij, h_B, ksi, dist_dep_gamma):
 

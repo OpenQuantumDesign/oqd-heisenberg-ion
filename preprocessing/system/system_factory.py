@@ -1,0 +1,1 @@
+# TODO: Implement a System class that combines interaction vector and geometry based on inputs

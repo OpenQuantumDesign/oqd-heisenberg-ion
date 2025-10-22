@@ -1,12 +1,17 @@
 import numpy as np
 
+# ---------------------------------- Base Geometry Class  ----------------------------------
 class Geometry:
+
+    registry = {}
 
     def __init__(self):
 
         self.spatial_dimension = None
 
         self.boundary_type = None
+        self.interaction_range = None
+        self.lattice_type = None
         
         self.N_config = None
         self.N = None
@@ -29,7 +34,23 @@ class Geometry:
     def build(self):
         pass
 
+    def register(cls, name, subclass):
 
+        cls.registry[name] = subclass
+
+    def create(cls, name, **kwargs):
+
+        if name not in cls.registry:
+            raise ValueError(f"Geometry implementation not found for geometry name: {name}")
+        else:
+            return cls.registry[name](**kwargs)
+
+# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically by System
+Geometry.register = classmethod(Geometry.register)
+Geometry.create = classmethod(Geometry.create)
+
+
+# ---------------------------------- Long Range 1d Chain With Open Boundaries  ----------------------------------
 class LongRangeOpenChain(Geometry):
 
     def __init__(self, N):
@@ -39,6 +60,8 @@ class LongRangeOpenChain(Geometry):
         self.spatial_dimension = 1
 
         self.boundary_type = "Open"
+        self.interaction_range = "LongRange"
+        self.lattice_type = "Chain"
 
         self.N = N
         self.N_config = (N)
@@ -71,6 +94,7 @@ class LongRangeOpenChain(Geometry):
         return 0
 
 
+# ---------------------------------- Long Range 1d Chain With Periodic Boundaries  ----------------------------------
 class LongRangePeriodicChain(Geometry):
 
     def __init__(self, N):
@@ -80,6 +104,8 @@ class LongRangePeriodicChain(Geometry):
         self.spatial_dimension = 1
 
         self.boundary_type = "Periodic"
+        self.interaction_range = "LongRange"
+        self.lattice_type = "Chain"
 
         self.N = N
         self.N_config = (N)
@@ -116,6 +142,7 @@ class LongRangePeriodicChain(Geometry):
         return 0
 
 
+# ---------------------------------- Long Range 2d Triangular Lattice With Open Boundaries  ----------------------------------
 class LongRangeOpenTriangular(Geometry):
 
     def __init__(self, N_1, N_2):
@@ -125,6 +152,8 @@ class LongRangeOpenTriangular(Geometry):
         self.spatial_dimension = 2
 
         self.boundary_type = "Periodic"
+        self.interaction_range = "LongRange"
+        self.lattice_type = "Chain"
 
         self.N = N_1 * N_2
         self.N_config = (N_1, N_2)
@@ -166,4 +195,8 @@ class LongRangeOpenTriangular(Geometry):
                             b += 1
 
         return 0
-    
+
+# Register all implemented geometries in the base geometry class
+Geometry.register("LongRangeOpen1dChain", LongRangeOpenChain)
+Geometry.register("LongRangePeriodic1dChain", LongRangePeriodicChain)
+Geometry.register("LongRangeOpen1dTriangular", LongRangeOpenTriangular)

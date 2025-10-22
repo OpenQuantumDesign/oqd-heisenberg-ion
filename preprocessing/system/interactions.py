@@ -8,9 +8,9 @@ def get_J_ij_power_law(num_bonds, distances, alpha):
 
     return J_ij_vector
 
-def get_J_ij_exp(N, num_bonds, filepath):
+def get_J_ij_from_matrix(N, num_bonds, J_ij_file):
 
-    J_ij_matrix = np.loadtxt(filepath, delimiter=',', skiprows=1)
+    J_ij_matrix = np.loadtxt(J_ij_file, delimiter=',', skiprows=1)
     J_ij_vector = np.zeros(num_bonds)
     b = 0
     for i in range(N):

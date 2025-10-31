@@ -13,6 +13,7 @@ alpha_list_2 = [0.0 + i*0.1 for i in range(51)]
 alpha_list += alpha_list_2
 alpha_list_3 = [1.0 + i*0.1 for i in range(41)]
 #alpha_list.append(10.0)
+alpha_list = alpha_list_3
 print(alpha_list)
 J = 1.0
 T_1 = 0.005
@@ -79,9 +80,12 @@ for i in range(len(alpha_list)):
     gamma_0_0 = (-J/2) * (gamma_phi - gamma_0)/(theta**2)
     '''
     
+    '''
     norm = 0.0
     for r in range(1, int((N+1)/2)):
         norm += 1.0/(r**(alpha-2))
+    '''
+    norm = 1.0
 
     if alpha >= 0.0 and alpha <= 5.0:
         folder = "SSE"
@@ -255,13 +259,13 @@ ax1.plot(alpha_list, [1/np.pi] * len(alpha_list), color='green', linestyle='dash
 #plt.plot(alpha_list, lsw_stiffness, color='C3', label='LSW')
 ax1.legend(prop={'size': 12})
 drop_from_top = 14
-#left,bottom,width,height = [0.39, 0.28, 0.49, 0.37]
-left,bottom,width,height = [1.1, 0.0, 0.8, 0.8]
+left,bottom,width,height = [0.39, 0.28, 0.49, 0.37]
+#left,bottom,width,height = [1.1, 0.0, 0.8, 0.8]
 ax2 = fig.add_axes([left, bottom, width, height])
-ax2.scatter(alpha_list[drop_from_top+10:], np.array(stiffness_SSE_3_list)[drop_from_top:], color='black', label=r'SSE ($\beta={}$)'.format(beta_3), s=25)
-ax2.errorbar(alpha_list[drop_from_top+10:], np.array(stiffness_SSE_3_list)[drop_from_top:], np.array(stiffness_SSE_3_err_list)[drop_from_top:], fmt='None', capsize=5, color='black')
-ax2.scatter(alpha_list[drop_from_top+10:], np.array(stiffness_SSE_2_list)[drop_from_top:], color='C3', label=r'SSE ($\beta={}$)'.format(int(beta_2)), s=25)
-ax2.errorbar(alpha_list[drop_from_top+10:], np.array(stiffness_SSE_2_list)[drop_from_top:], np.array(stiffness_SSE_2_err_list)[drop_from_top:], fmt='None', capsize=5, color='C3')
+ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_3_list)[drop_from_top:], color='black', label=r'SSE ($\beta={}$)'.format(beta_3), s=25)
+ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_3_list)[drop_from_top:], np.array(stiffness_SSE_3_err_list)[drop_from_top:], fmt='None', capsize=5, color='black')
+ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_2_list)[drop_from_top:], color='C3', label=r'SSE ($\beta={}$)'.format(int(beta_2)), s=25)
+ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_2_list)[drop_from_top:], np.array(stiffness_SSE_2_err_list)[drop_from_top:], fmt='None', capsize=5, color='C3')
 ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_1_list)[drop_from_top:], color='C0', label=r'SSE ($\beta={}$)'.format(int(beta_1)), s=25)
 ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_1_list)[drop_from_top:], np.array(stiffness_SSE_1_err_list)[drop_from_top:], fmt='None', capsize=5)
 ax2.plot(alpha_list[drop_from_top:], [1/np.pi] * len(alpha_list[drop_from_top:]), color='green', linestyle='dashed')

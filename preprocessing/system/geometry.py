@@ -68,6 +68,7 @@ class LongRangeOpenChain(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
 
         self.initialize_tables()
+        self.build()
 
         return 0
 
@@ -112,6 +113,7 @@ class LongRangePeriodicChain(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
 
         self.initialize_tables()
+        self.build()
 
         return 0
 
@@ -142,7 +144,7 @@ class LongRangePeriodicChain(Geometry):
         return 0
 
 
-# ---------------------------------- Long Range 2d Triangular Lattice With Open Boundaries  ----------------------------------
+# ------------------------------- Long Range 2d Triangular Lattice With Open Boundaries  -------------------------------
 class LongRangeOpenTriangular(Geometry):
 
     def __init__(self, N_1, N_2):
@@ -160,6 +162,7 @@ class LongRangeOpenTriangular(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
 
         self.initialize_tables()
+        self.build()
 
         return 0
 

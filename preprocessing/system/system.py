@@ -1,21 +1,30 @@
 # TODO: Implement a System class that combines interaction vector and geometry based on inputs
 from geometry import Geometry
-from interactions import *
+from hamiltonian import HamiltonianParameters
+import interactions
 
 class System:
 
-    def __init__(self, geometry_type, geometry_args, interaction_type, interaction_args):
-        
-        self.geometry_type = geometry_type
-        self.geometry = Geometry.create(geometry_type, **geometry_args)
+    def __init__(self, hamiltonian_args, geometry_args, interaction_args):
 
-        self.interaction_type = interaction_type
-        if interaction_type == "Power-Law":
-            self.J_ij_vector = get_J_ij_power_law(self.geometry.num_bonds, self.geometry.distances, **interaction_args)
-        elif interaction_type == "Input-Matrix":
-            self.J_ij_vector = get_J_ij_from_matrix(self.geometry.N, self.geometry.num_bonds, **interaction_args)
-        else:
-            raise ValueError("Interaction type: {} not recognized. Available types are 'Power-Law' and 'Input-Matrix'".format(interaction_type))
+        self.model_name = hamiltonian_args["Type"]
+        self.hamiltonian_parameters = HamiltonianParameters.create(self.model_name, **hamiltonian_args)
+        
+        self.geometry_type = geometry_args["Type"]
+        self.geometry = Geometry.create(self.geometry_type, **geometry_args)
+
+        self.interaction_type = interaction_args["Type"]
+        self.J_ij_vector = interactions.get_J_ij_vector(self.interaction_type, self.geometry, **interaction_args)
 
         return 0
+    
+    def compute_h_B(self):
+
+        h = self.hamiltonian_parameters.h
+        N = self.geometry.N
+        J = self.hamiltonian_parameters.J
+
+        return h/(J*(N-1))
+
+        
 

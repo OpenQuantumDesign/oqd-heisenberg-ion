@@ -19,3 +19,15 @@ def get_J_ij_from_matrix(N, num_bonds, J_ij_file):
             b += 1
 
     return J_ij_vector
+
+def get_J_ij_vector(interaction_type, geometry, **interaction_args):
+
+    if interaction_type == "Power-Law":
+        J_ij_vector = get_J_ij_power_law(geometry.num_bonds, geometry.distances, **interaction_args)
+    elif interaction_type == "Input-Matrix":
+        J_ij_vector = get_J_ij_from_matrix(geometry.N, geometry.num_bonds, **interaction_args)
+    else:
+        raise ValueError("Interaction type: {} not recognized. Available types are 'Power-Law' and" \
+        " 'Input-Matrix'".format(interaction_type))
+    
+    return J_ij_vector

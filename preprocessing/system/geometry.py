@@ -21,7 +21,6 @@ class Geometry:
         self.distances = None
         self.geometry_table = None
 
-        return 0
 
     def initialize_tables(self):
 
@@ -70,7 +69,6 @@ class LongRangeOpenChain(Geometry):
         self.initialize_tables()
         self.build()
 
-        return 0
 
     def initialize_tables(self):
         return super().initialize_tables()
@@ -115,7 +113,6 @@ class LongRangePeriodicChain(Geometry):
         self.initialize_tables()
         self.build()
 
-        return 0
 
     def initialize_tables(self):
         return super().initialize_tables()
@@ -164,7 +161,6 @@ class LongRangeOpenTriangular(Geometry):
         self.initialize_tables()
         self.build()
 
-        return 0
 
     def initialize_tables(self):
         return super().initialize_tables()

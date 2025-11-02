@@ -1,16 +1,20 @@
 class ProbabilityTable:
 
-    def __init__(self):
+    def __init__(self, system, **sampling_params):
 
-        self.system = None
+        self.system = system
+
+        self.sampling_params = sampling_params
 
         self.spectrum_offset = None
         self.max_diag_norm = None
         self.max_over_states = None
 
-        return 0
     
     def build(self):
+        pass
+
+    def write_to_files(self):
         pass
 
     def register(cls, name, subclass):

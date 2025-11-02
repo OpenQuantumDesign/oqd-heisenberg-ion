@@ -5,9 +5,7 @@ class Deterministic(ProbabilityTable):
 
     def __init__(self, system):
 
-        super.__init__()
-
-        self.system = system
+        super.__init__(system)
 
         self.build()
 
@@ -51,3 +49,5 @@ class Deterministic(ProbabilityTable):
             "Allowed types are -1, 0 and 1".format(hamiltonian_type))
         
         return 0
+    
+ProbabilityTable.register(Deterministic, "Deterministic")

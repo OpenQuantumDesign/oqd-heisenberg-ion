@@ -16,7 +16,6 @@ class System:
         self.interaction_type = interaction_args["Type"]
         self.J_ij_vector = interactions.get_J_ij_vector(self.interaction_type, self.geometry, **interaction_args)
 
-        return 0
     
     def compute_h_B(self):
 
@@ -25,6 +24,3 @@ class System:
         J = self.hamiltonian_parameters.J
 
         return h/(J*(N-1))
-
-        
-

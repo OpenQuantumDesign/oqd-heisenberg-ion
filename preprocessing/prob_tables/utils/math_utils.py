@@ -10,3 +10,11 @@ def set_probability(val):
             print("invalid probability encountered: ", val)
     else:
         return val
+    
+def enforce_positive(table):
+
+    size = np.shape(table)[0]
+    for i in range(size):
+        table[i] = set_probability(table[i])
+
+    return 0

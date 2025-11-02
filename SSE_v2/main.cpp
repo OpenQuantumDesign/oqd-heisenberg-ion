@@ -175,8 +175,8 @@ void gatherParameterSets(std::map<std::string, bool> &specify_iterables,
 
     for (int i = 0; i < extra_sets; i ++) {
         std::vector<std::map<std::string, std::string>> thread_parameter_sets;
-        gatherThreadParameterSets(num_sets_per_thread + 1, specify_iterables, input_settings,
-                                  thread_parameter_sets);
+        gatherThreadParameterSets(num_sets_per_thread + 1, specify_iterables,
+                                  input_settings,thread_parameter_sets);
         parameter_sets.push_back(thread_parameter_sets);
     }
 

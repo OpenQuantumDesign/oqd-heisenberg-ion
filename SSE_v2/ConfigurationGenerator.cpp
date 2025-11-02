@@ -391,19 +391,22 @@ void ConfigurationGenerator::offDiagonalUpdatesXXZh(const ProbabilityTables &pro
 
                 int composite_leg_index = num_legs_per_vertex*l_e;
                 int row_index = num_composite_leg_indices*vertex_type + composite_leg_index;
-                int loc_index = num_legs_per_vertex*(num_legs_per_vertex-1)*vertex_type + (num_legs_per_vertex-1)*l_e;
+                int loc_index = num_legs_per_vertex*(num_legs_per_vertex-1)*vertex_type
+                        + (num_legs_per_vertex-1)*l_e;
 
                 out_leg_probs.clear();
                 for (int k=0; k<num_legs_per_vertex-1; k++){
                     int l_k = vertex_types.allowed_exit_legs.at(loc_index + k);
-                    double prob_l_k = prob_tables.loop_update_probabilities.at(row_index + l_k).at(b_list.at(p)-1);
+                    double prob_l_k = prob_tables.loop_update_probabilities.at(
+                            row_index + l_k).at(b_list.at(p)-1);
                     out_leg_probs.push_back(prob_l_k);
                 }
 
                 std::discrete_distribution<int> exit_leg_dist(out_leg_probs.begin(),out_leg_probs.end());
                 int l_x_index = exit_leg_dist(off_diagonal_update_generator);
                 int l_x = vertex_types.allowed_exit_legs.at(loc_index + l_x_index);
-                vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,vertex_type);
+                vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
+                                                                                     vertex_type);
 
                 j_current = num_legs_per_vertex*p + l_x;
                 if (l_e != l_x) {
@@ -478,7 +481,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
 
                     if (flip_spins == 1) {
                         vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
-                                                                                         vertex_type);
+                                                                                 vertex_type);
                     }
 
                     j = num_legs_per_vertex*p + l_x;
@@ -527,7 +530,7 @@ void ConfigurationGenerator::offDiagonalUpdatesIsotropic(const ProbabilityTables
 
                     if (flip_spins == 1) {
                         vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
-                                                                                         vertex_type);
+                                                                                 vertex_type);
                     }
 
                     j = num_legs_per_vertex*p + l_x;
@@ -713,7 +716,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
             max_n = n;
         }
 
-        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int)avg_num_samples) + n)/avg_num_samples;
+        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int)avg_num_samples)
+                + n)/avg_num_samples;
         avg_n = (int)std::round(avg_n_d);
         n_list.push_back(n);
 
@@ -727,8 +731,10 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         ConfigurationGenerator::randomSpinFlipsXXZ();
 
         avg_cumul_loop_size_d = ((avg_cumul_loop_size_d * avg_num_samples)
-                                 - cumulative_loop_size_list.at(cumulative_loop_size_list.size() - (int)avg_num_samples)
+                                 - cumulative_loop_size_list.at(cumulative_loop_size_list.size()
+                                 - (int)avg_num_samples)
                                  + cumulative_loop_size)/avg_num_samples;
+
         average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
         cumulative_loop_size_list.push_back(cumulative_loop_size);
         prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)step+1.0);
@@ -740,7 +746,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     max_loop_size = std::max(10000*avg_n,1);
 
     avg_cumul_loop_size_d = ((avg_cumul_loop_size_d * avg_num_samples)
-                             - cumulative_loop_size_list.at(cumulative_loop_size_list.size() - (int)avg_num_samples)
+                             - cumulative_loop_size_list.at(cumulative_loop_size_list.size()
+                             - (int)avg_num_samples)
                              + cumulative_loop_size)/avg_num_samples;
     average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
     cumulative_loop_size_list.push_back(cumulative_loop_size);
@@ -820,7 +827,8 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
             max_n = n;
         }
 
-        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int) avg_num_samples) + n) / avg_num_samples;
+        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int) avg_num_samples) + n)
+                / avg_num_samples;
         n_list.push_back(n);
 
         //M_new = std::max((int)std::round(1.25 * max_n), M);
@@ -926,7 +934,8 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
             max_n = n;
         }
 
-        avg_n_d = ((avg_n_d * avg_num_samples) - (double)n_list.at(n_list.size() - (int)avg_num_samples) + (double)n) / avg_num_samples;
+        avg_n_d = ((avg_n_d * avg_num_samples) - (double)n_list.at(n_list.size()
+                - (int)avg_num_samples) + (double)n) / avg_num_samples;
         n_list.push_back(n);
 
         //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);

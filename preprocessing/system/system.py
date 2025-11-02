@@ -1,6 +1,6 @@
 from geometry import Geometry
 from hamiltonian import HamiltonianParameters
-from interactions import Interactions 
+from interactions import Interactions
 
 class System:
 

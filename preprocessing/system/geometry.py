@@ -133,7 +133,7 @@ class LongRangePeriodicChain(Geometry):
                     self.distances[b] = j-i
                     self.geometry_table[b,2] = self.distances[b]
                 else:
-                    self.distances[b] = N - (j-i)
+                    self.distances[b] = self.N - (j-i)
                     self.geometry_table[b,2] = -self.distances[b]
 
                 b += 1

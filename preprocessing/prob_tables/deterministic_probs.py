@@ -49,10 +49,9 @@ class Deterministic(ProbabilityTable):
 
         return 0
     
-
     def write_to_files(self, out_dir):
 
-        super.write_to_files(out_dir)
+        super().write_to_files(out_dir)
 
         geometry_file_name = os.path.join(out_dir, "geometry.csv")
         max_over_states_file_name = os.path.join(out_dir, "max_over_states.csv")
@@ -68,6 +67,8 @@ class Deterministic(ProbabilityTable):
             self.spectrum_offset, "Deterministic")
         
         np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
+
+        return 0
 
 
 ProbabilityTable.register(Deterministic, "Deterministic")

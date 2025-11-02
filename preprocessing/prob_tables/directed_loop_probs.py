@@ -188,6 +188,8 @@ class DirectedLoops(ProbabilityTable):
     
     def write_to_files(self, out_dir):
 
+        super().write_to_files(out_dir)
+
         geometry_file_name = os.path.join(out_dir, "geometry.csv")
         diag_file_name = os.path.join(out_dir, "diag_probs.csv")
         max_over_states_file_name = os.path.join(out_dir, "max_over_states.csv")
@@ -195,8 +197,9 @@ class DirectedLoops(ProbabilityTable):
         vertex_weights_file_name = os.path.join(out_dir, "vertex_weights.csv")
 
         geometry_table = self.system.geometry.geometry_table
+        num_bonds = self.system.geometry.num_bonds
         np.savetxt(geometry_file_name, geometry_table, delimiter=",", 
-            fmt="%d", header="NumBonds={}".format(self.num_bonds))
+            fmt="%d", header="NumBonds={}".format(num_bonds))
 
         header="norm={},spectrum_offset={},loop_update_type={}".format(self.max_diag_norm, 
             self.spectrum_offset, "DirectedLoops")

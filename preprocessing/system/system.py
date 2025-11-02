@@ -1,7 +1,6 @@
-# TODO: Implement a System class that combines interaction vector and geometry based on inputs
 from geometry import Geometry
 from hamiltonian import HamiltonianParameters
-import interactions
+from interactions import Interactions 
 
 class System:
 
@@ -14,7 +13,7 @@ class System:
         self.geometry = Geometry.create(self.geometry_type, **geometry_args)
 
         self.interaction_type = interaction_args["Type"]
-        self.J_ij_vector = interactions.get_J_ij_vector(self.interaction_type, self.geometry, **interaction_args)
+        self.interactions = Interactions(self.interaction_type, self.geometry, **interaction_args)
 
     
     def compute_h_B(self):

@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from preprocessing.prob_tables.utils.math_utils import *
 from preprocessing.prob_tables.utils.vertex_utils import *
 from probability_tables import ProbabilityTable
@@ -22,7 +23,7 @@ class Heatbath(ProbabilityTable):
 
         num_bonds = self.system.geometry.num_bonds
         sites = self.system.geometry.sites
-        J_ij_vector = self.system.J_ij_vector
+        J_ij_vector = self.system.interactions.J_ij_vector
         gamma = self.gamma
         h_B = self.h_B
         Delta = self.system.hamiltonian_parameters.Delta
@@ -46,6 +47,28 @@ class Heatbath(ProbabilityTable):
         self.max_diag_norm = 0.0
 
         return 0
+    
+
+    # Helper function used by compute_prob_tables_heat_bath
+    def compute_offset(self, gamma, Delta, J_ij, h_B):
+
+        if h_B < 0.0:
+            raise Exception("h_B needs to be greater than or equal to 0")
+        else:
+            Delta_over_four_J_ij = (Delta/4.0) * J_ij
+            
+            if Delta_over_four_J_ij > h_B:
+                offset_b = Delta_over_four_J_ij
+
+            elif Delta < 0.0:
+                offset_b = h_B - Delta_over_four_J_ij
+            
+            else:
+                offset_b = h_B
+
+            offset_b += gamma
+
+            return offset_b
     
 
     def update_heat_bath_probs(self, bond):
@@ -109,27 +132,30 @@ class Heatbath(ProbabilityTable):
 
         return 0
     
-    
-    # Helper function used by compute_prob_tables_heat_bath
-    def compute_offset(self, gamma, Delta, J_ij, h_B):
+    def write_to_files(self, out_dir):
 
-        if h_B < 0.0:
-            raise Exception("h_B needs to be greater than or equal to 0")
-        else:
-            Delta_over_four_J_ij = (Delta/4.0) * J_ij
-            
-            if Delta_over_four_J_ij > h_B:
-                offset_b = Delta_over_four_J_ij
+        super().write_to_files(out_dir)
 
-            elif Delta < 0.0:
-                offset_b = h_B - Delta_over_four_J_ij
-            
-            else:
-                offset_b = h_B
+        geometry_file_name = os.path.join(out_dir, "geometry.csv")
+        diag_file_name = os.path.join(out_dir, "diag_probs.csv")
+        max_over_states_file_name = os.path.join(out_dir, "max_over_states.csv")
+        loop_update_table_file_name = os.path.join(out_dir, "off_diag_table.csv")
+        vertex_weights_file_name = os.path.join(out_dir, "vertex_weights.csv")
 
-            offset_b += gamma
+        geometry_table = self.system.geometry.geometry_table
+        num_bonds = self.system.geometry.num_bonds
+        np.savetxt(geometry_file_name, geometry_table, delimiter=",", 
+            fmt="%d", header="NumBonds={}".format(num_bonds))
 
-            return offset_b
+        header="norm={},spectrum_offset={},loop_update_type={}".format(self.max_diag_norm, 
+            self.spectrum_offset, "HeatBath")
+
+        np.savetxt(diag_file_name, self.diag_prob_table, delimiter=",", header=header)
+        np.savetxt(vertex_weights_file_name, self.vertex_weights, delimiter=",", header=header)
+        np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
+        np.savetxt(loop_update_table_file_name, self.loop_update_prob_table, delimiter=",", header=header)
+
+        return 0
         
-        
+
 ProbabilityTable.register(Heatbath, "Heatbath")

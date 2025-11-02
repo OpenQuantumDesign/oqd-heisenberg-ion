@@ -14,8 +14,10 @@ class ProbabilityTable:
     def build(self):
         pass
 
-    def write_to_files(self):
-        pass
+    def write_to_files(self, out_dir):
+
+        self.out_dir = out_dir
+        return 0
 
     def register(cls, name, subclass):
 
@@ -28,6 +30,6 @@ class ProbabilityTable:
         else:
             return cls.registry[name](**kwargs)
         
-# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically by ProbabilityTable
+# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 ProbabilityTable.register = classmethod(ProbabilityTable.register)
 ProbabilityTable.create = classmethod(ProbabilityTable.create)

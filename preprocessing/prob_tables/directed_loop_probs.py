@@ -2,6 +2,7 @@ import numpy as np
 from preprocessing.prob_tables.utils.math_utils import *
 from preprocessing.prob_tables.utils.vertex_utils import *
 from probability_tables import ProbabilityTable
+import os
 
 class DirectedLoops(ProbabilityTable):
 
@@ -27,7 +28,7 @@ class DirectedLoops(ProbabilityTable):
         self.initialize_tables(num_bonds)
         self.set_vertex_enum_transition_weights_map()
 
-        J_ij_vector = self.system.J_ij_vector
+        J_ij_vector = self.system.interactions.J_ij_vector
 
         Delta = self.system.hamiltonian_parameters.Delta
         h_B = self.h_B
@@ -183,6 +184,30 @@ class DirectedLoops(ProbabilityTable):
         self.max_over_states[:] /= self.max_diag_norm
 
         return 0
+    
+    
+    def write_to_files(self, out_dir):
+
+        geometry_file_name = os.path.join(out_dir, "geometry.csv")
+        diag_file_name = os.path.join(out_dir, "diag_probs.csv")
+        max_over_states_file_name = os.path.join(out_dir, "max_over_states.csv")
+        loop_update_table_file_name = os.path.join(out_dir, "off_diag_table.csv")
+        vertex_weights_file_name = os.path.join(out_dir, "vertex_weights.csv")
+
+        geometry_table = self.system.geometry.geometry_table
+        np.savetxt(geometry_file_name, geometry_table, delimiter=",", 
+            fmt="%d", header="NumBonds={}".format(self.num_bonds))
+
+        header="norm={},spectrum_offset={},loop_update_type={}".format(self.max_diag_norm, 
+            self.spectrum_offset, "DirectedLoops")
+
+        np.savetxt(diag_file_name, self.diag_prob_table, delimiter=",", header=header)
+        np.savetxt(vertex_weights_file_name, self.vertex_weights, delimiter=",", header=header)
+        np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
+        np.savetxt(loop_update_table_file_name, self.directed_loop_prob_table, delimiter=",", header=header)
+
+        return 0
+
     
 class LoopTransitionWeights:
 
@@ -416,5 +441,6 @@ class LoopTransitionWeights:
             self.transition_weights_large_field(Delta_positive, Delta_negative, J_ij)
             
         return 0
-    
+
+
 ProbabilityTable.register(DirectedLoops, "DirectedLoops")

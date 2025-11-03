@@ -1,14 +1,14 @@
 import numpy as np
-from preprocessing.prob_tables.utils.math_utils import *
-from preprocessing.prob_tables.utils.vertex_utils import *
-from probability_tables import ProbabilityTable
+from preprocessing.probability_table.utils.math_utils import *
+from preprocessing.probability_table.utils.vertex_utils import *
+from preprocessing.probability_table.base import ProbabilityTable
 import os
 
 class DirectedLoops(ProbabilityTable):
 
-    def __init__(self, system, gamma, ksi, dist_dep_gamma):
+    def __init__(self, system, write_table, gamma, ksi, dist_dep_gamma):
 
-        super.__init__(system, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
+        super.__init__(system, write_table, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
 
         self.system = system
 
@@ -446,4 +446,4 @@ class LoopTransitionWeights:
         return 0
 
 
-ProbabilityTable.register(DirectedLoops, "DirectedLoops")
+ProbabilityTable.register("DirectedLoops", DirectedLoops)

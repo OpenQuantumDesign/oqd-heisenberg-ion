@@ -1,10 +1,10 @@
 class ProbabilityTable:
 
-    def __init__(self, system, **sampling_params):
+    registry = {}
 
-        self.system = system
+    def __init__(self, **sampling_args):
 
-        self.sampling_params = sampling_params
+        self.sampling_parameters = sampling_args
 
         self.spectrum_offset = None
         self.max_diag_norm = None

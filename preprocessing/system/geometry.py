@@ -16,6 +16,7 @@ class Geometry:
         self.N_config = None
         self.N = None
         self.num_bonds = None
+        self.num_neighbors_per_site = None
 
         self.sites = None
         self.distances = None
@@ -44,7 +45,7 @@ class Geometry:
         else:
             return cls.registry[name](**kwargs)
 
-# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically by System
+# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 Geometry.register = classmethod(Geometry.register)
 Geometry.create = classmethod(Geometry.create)
 
@@ -65,6 +66,7 @@ class LongRangeOpenChain(Geometry):
         self.N = N
         self.N_config = (N)
         self.num_bonds = int(self.N*(self.N-1)/2)
+        self.num_neighbors_per_site = N-1
 
         self.initialize_tables()
         self.build()
@@ -109,6 +111,7 @@ class LongRangePeriodicChain(Geometry):
         self.N = N
         self.N_config = (N)
         self.num_bonds = int(self.N*(self.N-1)/2)
+        self.num_neighbors_per_site = N-1
 
         self.initialize_tables()
         self.build()
@@ -157,6 +160,7 @@ class LongRangeOpenTriangular(Geometry):
         self.N = N_1 * N_2
         self.N_config = (N_1, N_2)
         self.num_bonds = int(self.N*(self.N-1)/2)
+        self.num_neighbors_per_site = self.N-1
 
         self.initialize_tables()
         self.build()
@@ -198,4 +202,4 @@ class LongRangeOpenTriangular(Geometry):
 # Register all implemented geometries in the base geometry class
 Geometry.register("LongRangeOpen1dChain", LongRangeOpenChain)
 Geometry.register("LongRangePeriodic1dChain", LongRangePeriodicChain)
-Geometry.register("LongRangeOpen1dTriangular", LongRangeOpenTriangular)
+Geometry.register("LongRangeOpen2dTriangular", LongRangeOpenTriangular)

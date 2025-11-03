@@ -1,14 +1,14 @@
 import numpy as np
 import os
-from preprocessing.prob_tables.utils.math_utils import *
-from preprocessing.prob_tables.utils.vertex_utils import *
-from probability_tables import ProbabilityTable
+from preprocessing.probability_table.utils.math_utils import *
+from preprocessing.probability_table.utils.vertex_utils import *
+from preprocessing.probability_table.base import ProbabilityTable
 
 class Heatbath(ProbabilityTable):
 
     def __init__(self, system, gamma):
 
-        super.__init__(system, gamma=gamma)
+        super.__init__(gamma=gamma)
 
         self.system = system
 
@@ -158,4 +158,4 @@ class Heatbath(ProbabilityTable):
         return 0
         
 
-ProbabilityTable.register(Heatbath, "Heatbath")
+ProbabilityTable.register("Heatbath", Heatbath)

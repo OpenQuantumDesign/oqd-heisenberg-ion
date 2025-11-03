@@ -1,12 +1,14 @@
 import numpy as np
 import os
-from probability_tables import ProbabilityTable
+from preprocessing.probability_table.base import ProbabilityTable
 
 class Deterministic(ProbabilityTable):
 
     def __init__(self, system):
 
-        super.__init__(system)
+        super.__init__()
+
+        self.system = system
 
         self.build()
     
@@ -71,4 +73,4 @@ class Deterministic(ProbabilityTable):
         return 0
 
 
-ProbabilityTable.register(Deterministic, "Deterministic")
+ProbabilityTable.register("Deterministic", Deterministic)

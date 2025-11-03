@@ -1,5 +1,7 @@
 class HamiltonianParameters:
 
+    registry = {}
+
     def __init__(self):
 
         self.hamiltonian_type = None
@@ -18,7 +20,7 @@ class HamiltonianParameters:
         else:
             return cls.registry[name](**kwargs)
         
-# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically by HamiltonianParameters
+# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 HamiltonianParameters.register = classmethod(HamiltonianParameters.register)
 HamiltonianParameters.create = classmethod(HamiltonianParameters.create)
         

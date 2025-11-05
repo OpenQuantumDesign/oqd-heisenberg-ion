@@ -3,7 +3,7 @@ import numpy as np
 # ---------------------------------- Base Geometry Class  ----------------------------------
 class Geometry:
 
-    registry = {}
+    args = {}
 
     def __init__(self):
 
@@ -34,9 +34,21 @@ class Geometry:
     def build(self):
         pass
 
+
+# Make register and create factory classmethods so subclasses can be added to the registry and instantiated agnostically
+class GeometryFactory:
+
     def register(cls, name, subclass):
 
         cls.registry[name] = subclass
+
+    def extract_args(cls, name, **kwargs):
+
+        args = {}
+        for key, arg_dtype in cls.registry[name].items():
+            args[key] = arg_dtype(kwargs[key])
+
+        return args
 
     def create(cls, name, **kwargs):
 
@@ -44,14 +56,14 @@ class Geometry:
             raise ValueError(f"Geometry implementation not found for geometry name: {name}")
         else:
             return cls.registry[name](**kwargs)
-
-# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
-Geometry.register = classmethod(Geometry.register)
-Geometry.create = classmethod(Geometry.create)
-
+    
+GeometryFactory.register = classmethod(Geometry.register)
+GeometryFactory.create = classmethod(Geometry.create)
 
 # ---------------------------------- Long Range 1d Chain With Open Boundaries  ----------------------------------
 class LongRangeOpenChain(Geometry):
+
+    args = {"N": int}
 
     def __init__(self, N):
 
@@ -97,6 +109,8 @@ class LongRangeOpenChain(Geometry):
 
 # ---------------------------------- Long Range 1d Chain With Periodic Boundaries  ----------------------------------
 class LongRangePeriodicChain(Geometry):
+
+    args = {"N" : int}
 
     def __init__(self, N):
 
@@ -147,7 +161,9 @@ class LongRangePeriodicChain(Geometry):
 # ------------------------------- Long Range 2d Triangular Lattice With Open Boundaries  -------------------------------
 class LongRangeOpenTriangular(Geometry):
 
-    def __init__(self, N_1, N_2):
+    args = {"N1": int, "N2": int}
+
+    def __init__(self, N1, N2):
 
         super.__init__()
 
@@ -157,8 +173,8 @@ class LongRangeOpenTriangular(Geometry):
         self.interaction_range = "LongRange"
         self.lattice_type = "Chain"
 
-        self.N = N_1 * N_2
-        self.N_config = (N_1, N_2)
+        self.N = N1 * N2
+        self.N_config = (N1, N2)
         self.num_bonds = int(self.N*(self.N-1)/2)
         self.num_neighbors_per_site = self.N-1
 
@@ -199,7 +215,7 @@ class LongRangeOpenTriangular(Geometry):
 
         return 0
 
-# Register all implemented geometries in the base geometry class
-Geometry.register("LongRangeOpen1dChain", LongRangeOpenChain)
-Geometry.register("LongRangePeriodic1dChain", LongRangePeriodicChain)
-Geometry.register("LongRangeOpen2dTriangular", LongRangeOpenTriangular)
+# Register all implemented geometries in the geometry factory
+GeometryFactory.register("LongRangeOpen1dChain", LongRangeOpenChain)
+GeometryFactory.register("LongRangePeriodic1dChain", LongRangePeriodicChain)
+GeometryFactory.register("LongRangeOpen2dTriangular", LongRangeOpenTriangular)

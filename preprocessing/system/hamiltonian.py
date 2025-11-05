@@ -1,6 +1,6 @@
 class HamiltonianParameters:
 
-    registry = {}
+    args = {}
 
     def __init__(self):
 
@@ -9,9 +9,21 @@ class HamiltonianParameters:
         self.h = None
         self.J = None
 
+class HamiltonianFactory:
+
+    registry = {}
+
     def register(cls, name, subclass):
 
         cls.registry[name] = subclass
+
+    def extract_args(cls, name, **kwargs):
+
+        args = {}
+        for key, arg_dtype in cls.registry[name].items():
+            args[key] = arg_dtype(kwargs[key])
+
+        return args
 
     def create(cls, name, **kwargs):
 
@@ -21,10 +33,12 @@ class HamiltonianParameters:
             return cls.registry[name](**kwargs)
         
 # Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
-HamiltonianParameters.register = classmethod(HamiltonianParameters.register)
-HamiltonianParameters.create = classmethod(HamiltonianParameters.create)
+HamiltonianFactory.register = classmethod(HamiltonianFactory.register)
+HamiltonianFactory.create = classmethod(HamiltonianFactory.create)
         
 class XY(HamiltonianParameters):
+
+    args = {"hamiltonian_type" : int, "J" : float}
 
     def __init__(self, hamiltonian_type, J):
 
@@ -40,6 +54,8 @@ class XY(HamiltonianParameters):
 
 class Heisenberg(HamiltonianParameters):
 
+    args = {"hamiltonian_type" : int, "J" : float}
+
     def __init__(self, hamiltonian_type, J):
 
         super.__init__()
@@ -54,6 +70,8 @@ class Heisenberg(HamiltonianParameters):
 
 class XXZ(HamiltonianParameters):
 
+    args = {"hamiltonian_type" : int, "Delta": float, "J" : float}
+
     def __init__(self, hamiltonian_type, Delta, J):
 
         super.__init__()
@@ -67,6 +85,8 @@ class XXZ(HamiltonianParameters):
 
 class XXZh(HamiltonianParameters):
 
+    args = {"hamiltonian_type" : int, "Delta": float, "h": float, "J" : float}
+
     def __init__(self, hamiltonian_type, Delta, h, J):
 
         super.__init__()
@@ -79,7 +99,7 @@ class XXZh(HamiltonianParameters):
         self.J = J
 
 # Register all implemented Hamiltonian parameter types in the base HamiltonianParameters class
-HamiltonianParameters.register("XY", XY)
-HamiltonianParameters.register("XXZ", XXZ)
-HamiltonianParameters.register("XXZh", XXZh)
-HamiltonianParameters.register("Heisenberg", Heisenberg)
+HamiltonianFactory.register("XY", XY)
+HamiltonianFactory.register("XXZ", XXZ)
+HamiltonianFactory.register("XXZh", XXZh)
+HamiltonianFactory.register("Heisenberg", Heisenberg)

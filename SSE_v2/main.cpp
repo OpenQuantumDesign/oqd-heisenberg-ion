@@ -104,17 +104,13 @@ void readInputFile(const std::string &input_file_path, std::map<std::string, std
 
         if (count_entries == 1){
             is_parameter_iterable[line_key] = false;
-            continue;
         }
         else {
             if (num_parameter_sets == 1){
                 num_parameter_sets = count_entries;
                 line_num_param_sets_identified = line_count;
             }
-            else if (num_parameter_sets == count_entries){
-                continue;
-            }
-            else {
+            else if (num_parameter_sets != count_entries) {
                 throw std::runtime_error("Inconsistent numbers of entries in line numbers: " +
                                          std::to_string(line_num_param_sets_identified) +
                                          " and " + std::to_string(line_count) + "\n");

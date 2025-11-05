@@ -4,12 +4,12 @@ class Interactions:
 
     def __init__(self, interaction_type, geometry, **interaction_args):
 
-        if interaction_type == "Power-Law":
+        if interaction_type == "PowerLaw":
 
             self.alpha = interaction_args["alpha"]
             self.get_J_ij_power_law(geometry.num_bonds, geometry.distances, self.alpha)
 
-        elif interaction_type == "Input-Matrix":
+        elif interaction_type == "InputMatrix":
             
             self.file_path = interaction_args["J_ij_File"]
             self.get_J_ij_from_matrix(geometry.N, geometry.num_bonds, self.file_path)

@@ -2,7 +2,7 @@
 # Each input field can be specified by a list of values or a single value. 
 # If a list is provided for any system or simulation parameter, as many runs as the length of the list will be started. 
 # If a single value is provided for any parameter, that value will be assumed to be constant across the list of requested simulations. 
-# If two lists are provided with different sizes, the SSE program will error out. 
+# If any two lists have different lengths, the SSE program will error out. 
 
 Hamiltonian Type    0   # Can be 0 (XY), 1 (Isotropic Ferromagnetic), -1 (Isotropic Anti-ferromagnetic), 2 (XXZ model without a field) or 3 (XXZ model with a field)
 Boundary Conditions Periodic   # Open or Periodic

@@ -3,14 +3,15 @@ import os
 from preprocessing.probability_table.utils.math_utils import *
 from preprocessing.probability_table.utils.vertex_utils import *
 from preprocessing.probability_table.base import ProbabilityTable
+from preprocessing.system import base
 
 class Heatbath(ProbabilityTable):
 
+    args = {"gamma" : float}
+
     def __init__(self, system, gamma):
 
-        super.__init__(gamma=gamma)
-
-        self.system = system
+        super.__init__(system, gamma=gamma)
 
         self.gamma = gamma
 
@@ -156,6 +157,3 @@ class Heatbath(ProbabilityTable):
         np.savetxt(loop_update_table_file_name, self.loop_update_prob_table, delimiter=",", header=header)
 
         return 0
-        
-
-ProbabilityTable.register("Heatbath", Heatbath)

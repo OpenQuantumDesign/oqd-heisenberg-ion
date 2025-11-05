@@ -1,5 +1,5 @@
-from geometry import Geometry
-from hamiltonian import HamiltonianParameters
+from geometry import GeometryFactory
+from hamiltonian import HamiltonianFactory
 from interactions import Interactions
 
 class System:
@@ -8,11 +8,11 @@ class System:
 
         self.model_name = hamiltonian_args["model_name"]
         hamiltonian_args = self.extract_args(hamiltonian_args)
-        self.hamiltonian_parameters = HamiltonianParameters.create(self.model_name, **hamiltonian_args)
+        self.hamiltonian_parameters = HamiltonianFactory.create(self.model_name, **hamiltonian_args)
         
         self.geometry_name = geometry_args["geometry_name"]
         geometry_args = self.extract_args(geometry_args)
-        self.geometry = Geometry.create(self.geometry_name, **geometry_args)
+        self.geometry = GeometryFactory.create(self.geometry_name, **geometry_args)
 
         self.interaction_name = interaction_args["interaction_type"]
         interaction_args = self.extract_args(interaction_args)

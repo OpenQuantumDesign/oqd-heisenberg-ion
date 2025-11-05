@@ -4,11 +4,11 @@ from preprocessing.probability_table.base import ProbabilityTable
 
 class Deterministic(ProbabilityTable):
 
+    args = {}
+
     def __init__(self, system):
 
-        super.__init__()
-
-        self.system = system
+        super.__init__(system)
 
         self.build()
     
@@ -71,6 +71,3 @@ class Deterministic(ProbabilityTable):
         np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
 
         return 0
-
-
-ProbabilityTable.register("Deterministic", Deterministic)

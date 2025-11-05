@@ -6,11 +6,11 @@ import os
 
 class DirectedLoops(ProbabilityTable):
 
-    def __init__(self, system, write_table, gamma, ksi, dist_dep_gamma):
+    args = {"gamma": float, "ksi" : float, "dist_dep_gamma" : bool}
 
-        super.__init__(system, write_table, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
+    def __init__(self, system, gamma, ksi, dist_dep_gamma):
 
-        self.system = system
+        super.__init__(system, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
 
         self.gamma = gamma
         self.ksi = ksi
@@ -446,4 +446,3 @@ class LoopTransitionWeights:
         return 0
 
 
-ProbabilityTable.register("DirectedLoops", DirectedLoops)

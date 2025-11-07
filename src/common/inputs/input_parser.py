@@ -1,4 +1,4 @@
-from input_utils import standardize_string_format
+from utils import standardize_string_format
 
 input_schema = {
         "HamiltonianType" : {
@@ -31,6 +31,11 @@ input_schema = {
             "Categories": ["Rectangular", "Triangular"], 
             "ParameterType" : "System"
             },
+        "Simulator" : {
+            "DataType" : "Categorical", 
+            "Categories" : ["LongRangeQMC", "NearestNeighborQMC", "ExactDiagonalization"],
+            "ParameterType" : "Simulation"
+        },
 
         "N" : {"DataType" : int, "ParameterType" : "System"}, 
         "Delta" : {"DataType" : float, "ParameterType" : "System"}, 
@@ -58,6 +63,7 @@ input_schema = {
         "InitialConfigurationFilePath" : {"DataType" : str, "ParameterType" : "Simulation"},
         "InitialOperatorListSize" : {"DataType": int, "ParameterType" : "Simulation"}
         }
+
 
 class InputParser:
 
@@ -89,14 +95,17 @@ class InputParser:
         return standardize_string_format(config_settings[key])
     
     def extract_bool(self, config_settings, key):
-
-        if config_settings[key].capitalize() == "True":
-            return True
-        elif config_settings[key].capitalize() == "False":
-            return False
+        
+        if type(config_settings[key]) == bool:
+            return config_settings[key]
         else:
-            raise ValueError("Unrecognized entry for key {}, value provided: {}. "
-                            "Allowed values are 'True' or 'False'\n".format(key, config_settings[key]))
+            if config_settings[key].capitalize() == "True":
+                return True
+            elif config_settings[key].capitalize() == "False":
+                return False
+            else:
+                raise ValueError("Unrecognized entry for key {}, value provided: {}. "
+                                "Allowed values are 'True' or 'False'\n".format(key, config_settings[key]))
     
     def extract_categorical(self, config_settings, key):
 
@@ -111,9 +120,10 @@ class InputParser:
             raise ValueError("Unrecognized input for key: {}. Value provided: {}. " \
             "Allowed values: {}".format(key, val, allowed_vals))
 
+
     def build_input_config(self, config_settings):
 
-        for key, item in config_settings.item():
+        for key, item in config_settings.items():
             
             dtype = self.input_schema[key]["DataType"]
             param_type = self.input_schema[key]["ParameterType"]
@@ -124,6 +134,3 @@ class InputParser:
             self.simulation_config[param_type][key] = val
 
         return 0
-
-        
-            

@@ -1,48 +1,25 @@
+from src.common.preprocess.base import Preprocess
 from system.base import System
 from probability_table.factory import ProbabilityTableFactory
-from src.common.preprocess.base import Preprocess
+from common.inputs.input_parser import InputParser
 import uuid
 import os
 
 class LongRangeQMC(Preprocess):
 
-    def __init__(self):
+    def __init__(self, parameter_set_list):
 
-        self.num_parameter_sets = None
-        self.parameter_set_list = None
+        super.__init__(parameter_set_list)
 
         self.input_format = None
         self.bin_folder = None
         self.root_folder = None
         self.cpp_source_folder = None
 
-
-    def simulate(self):
-
-        cpp_driver = LongRangeQMC(self.root_folder, bin_dir=self.bin_folder, source_dir=self.cpp_source_folder)
-        cpp_driver.call_bin()
-
-        return 0
-
-
-    def build(self, **kwargs):
-
-        if "InputFile" in kwargs:
-            self.input_format = "InputFile"
-            self.build_from_input_file(self, kwargs["InputFile"])
-        else:
-            self.input_format = "keywordArguments"
-            self.build_from_parameters(**kwargs)
-
-        self.configure_simulation()
+        self.build()
     
 
-    def build_from_input_file(self, input_file_path):
-
-        self.file_inputs = InputFileReader(input_file_path)
-
-        self.num_parameter_sets = self.file_inputs.num_parameter_sets
-        self.parameter_set_list = self.file_inputs.parameter_set_list
+    def build(self):
 
         self.check_single_input("RootFolder")
         self.root_folder = self.parameter_set_list[0]["RootFolder"]
@@ -53,14 +30,7 @@ class LongRangeQMC(Preprocess):
 
         self.check_unique_uuids()
 
-
-    def build_from_parameters(self, **kwargs):
-
-        self.num_parameter_sets = 1
-        self.parameter_set_list = [kwargs]
-
-        self.root_folder = self.parameter_set_list[0]["RootFolder"]
-        self.extract_cli_requirements()
+        self.configure_simulation()
 
 
     def configure_simulation(self):
@@ -111,22 +81,16 @@ class LongRangeQMC(Preprocess):
                 f.write(text_line)
 
         return 0
-    
-
-    def check_unique_uuids(self):
-
-        if "Uuid" in self.file_inputs.is_param_iterable:
-            uuid_set = {self.parameter_set_list[i]["Uuid"] for i in range(self.num_parameter_sets)}
-            if len(uuid_set) != self.num_parameter_sets:
-                raise Exception("Specified uuids are not unique\n")
             
 
     def extract_cli_requirements(self):
 
-        self.bin_folder = self.extract_optional_input("BinFolder", True)
-        self.cpp_source_folder = self.extract_optional_input("CppSourceFolder", True)
-        if self.bin_folder == None and self.cpp_source_folder == None:
+        bin_folder = self.extract_optional_input("BinFolder", True)
+        cpp_source_folder = self.extract_optional_input("CppSourceFolder", True)
+        if bin_folder == None and cpp_source_folder == None:
             raise Exception("No cpp binaries or source directory provided\n")
+        else:
+            self.driver_inputs = {"BinFolder": bin_folder, "SourceFolder": cpp_source_folder}
             
 
     def extract_optional_input(self, key, unique=False):
@@ -141,13 +105,25 @@ class LongRangeQMC(Preprocess):
                 return self.parameter_set_list[0][key]
             else:
                 return None
+            
+
+    def check_unique_uuids(self):
+
+        input_provided = self.check_input_provided("Uuid", True)
+        if input_provided:
+            uuid_set = {self.parameter_set_list[i]["Uuid"] for i in range(self.num_parameter_sets)}
+            if len(uuid_set) != self.num_parameter_sets:
+                raise Exception("Specified uuids are not unique\n")
 
 
     def check_single_input(self, key, optional):
 
         input_provided = self.check_input_provided(key, optional)
-        if input_provided and self.file_inputs.is_param_iterable[key]:
-                raise Exception("There should only be one input for key: {}".format(key))
+        if input_provided:
+            val = self.parameter_set_list[0][key]
+            for i in range(self.num_parameter_sets):
+                if self.parameter_set_list[i][key] != val:
+                    raise Exception("There should only be one input for key: {}".format(key))
 
         return input_provided
     

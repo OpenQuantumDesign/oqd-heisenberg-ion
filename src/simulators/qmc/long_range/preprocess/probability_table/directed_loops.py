@@ -454,5 +454,3 @@ class LoopTransitionWeights:
             self.transition_weights_large_field(Delta_positive, Delta_negative, J_ij)
             
         return 0
-
-

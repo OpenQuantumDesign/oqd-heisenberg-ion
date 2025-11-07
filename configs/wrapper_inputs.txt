@@ -4,6 +4,7 @@
 # If a single value is provided for any parameter, that value will be assumed to be constant across the list of requested simulations. 
 # If any two lists have different lengths, the SSE program will error out. 
 
+Simulator   LongRangeQMC
 Hamiltonian Type    0   # Can be 0 (XY), 1 (Isotropic Ferromagnetic), -1 (Isotropic Anti-ferromagnetic), 2 (XXZ model without a field) or 3 (XXZ model with a field)
 Boundary Conditions Periodic   # Open or Periodic
 Interaction Range   Long Range  # Long Range or Nearest Neighbours

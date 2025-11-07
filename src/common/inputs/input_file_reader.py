@@ -13,6 +13,8 @@ class InputFileReader:
 
         self.extract_parameter_set_list(input_config)
 
+        self.simulator = self.parameter_set_list[0]["Simulator"]
+
     
     def extract_key_value_inputs(self):
 

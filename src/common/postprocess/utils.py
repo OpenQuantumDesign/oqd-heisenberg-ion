@@ -15,31 +15,34 @@ def combine_different_runs(data_1, data_2, drop_samples_1, drop_samples_2):
 
     return data_3
 
-def statistics_binning(arr, auto_corr_drop, eq_drop, datatype=np.float64):
-    # Average and standard error using the binning method
+def statistics_binning(arr, auto_corr_drop, eq_drop):
+
     arr2 = arr[eq_drop:]
     arr3 = arr2[0::auto_corr_drop]
     workingNdim  = int(math.log(len(arr3))/math.log(2))
     trunc = int(len(arr3)-2**workingNdim)
     mean = np.mean(arr3)
-    standardError = max_error_binning(arr3, workingNdim-6, datatype)
+    standardError = max_error_binning(arr3, workingNdim-6)
     return mean, standardError
 
 def error_propagation(data):
+
     ndim = len(data)
     error = np.std(data,ddof=0)/np.sqrt(ndim)
+
     return error
 
-def max_error_binning(data, dim, datatype):
+def max_error_binning(data, dim):
+
     if(dim<=1):
-        raise Exception('Not enough points MC steps were used for the binning method, please increase the number of MC steps')
-    error = np.zeros(dim, dtype=datatype)
-    i = 0
+        raise Exception('Not enough points MC steps were used for the binning method\n')
+    
+    error = np.zeros(dim)
     error[0] = error_propagation(data)
 
     for i in range(1,dim):
         bin_dim = int(len(data)/2)
-        data_bin = np.zeros(bin_dim, dtype=datatype)
+        data_bin = np.zeros(bin_dim)
 
         for j in range(bin_dim):
             data_bin[j] = 0.5*(data[2*j]+data[2*j+1])
@@ -57,7 +60,11 @@ def combine_dataset_stats(data_1, data_2):
     stats_2 = statistics_binning(data_2)
 
     data_mean = np.mean([stats_1[0], stats_2[0]])
-    data_error = np.sqrt((stats_1[1]*np.sqrt(num_data_size_1))**2 + (stats_2[1]*np.sqrt(num_data_size_2))**2)/(np.sqrt(num_data_size_1 + num_data_size_2))
+    numerator = np.sqrt((stats_1[1]*np.sqrt(num_data_size_1))**2 + 
+                        (stats_2[1]*np.sqrt(num_data_size_2))**2)
+    denominator = (np.sqrt(num_data_size_1 + num_data_size_2))
+    
+    data_error = numerator/denominator
 
     return data_mean, data_error
     

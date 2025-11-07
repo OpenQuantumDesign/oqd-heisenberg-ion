@@ -38,7 +38,7 @@ class LongRangeQMC(Driver):
             "Stack trace: {}".format(compile_results.returncode, compile_results.stderr))
 
 
-    def call_bin(self):
+    def simulate(self):
 
         copy_command = ["cp", "-r", self.bin_dir, self.build_dir]
         copy_results = subprocess.run(copy_command, check=True, capture_output=True)

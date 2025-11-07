@@ -1,0 +1,27 @@
+class ProbabilityTable:
+
+    args = {}
+
+    def __init__(self, system, **sampling_args):
+
+        self.system = system
+
+        self.sampling_parameters = sampling_args
+
+        self.spectrum_offset = None
+        self.max_diag_norm = None
+        self.max_over_states = None
+
+    
+    def validate_system(self):
+        pass
+
+    
+    def build(self):
+        pass
+
+
+    def write_to_files(self, out_dir):
+
+        self.out_dir = out_dir
+        return 0

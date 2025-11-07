@@ -1,0 +1,43 @@
+# All input parameters relevant for the SSE program are provided in this file in a tab-delimited format.
+# Each input field can be specified by a list of values or a single value. 
+# If a list is provided for any system or simulation parameter, as many runs as the length of the list will be started. 
+# If a single value is provided for any parameter, that value will be assumed to be constant across the list of requested simulations. 
+# If any two lists have different lengths, the SSE program will error out. 
+
+Hamiltonian Type    0   # Can be 0 (XY), 1 (Isotropic Ferromagnetic), -1 (Isotropic Anti-ferromagnetic), 2 (XXZ model without a field) or 3 (XXZ model with a field)
+Boundary Conditions Periodic   # Open or Periodic
+Interaction Range   Long Range  # Long Range or Nearest Neighbours
+Interaction Type    Power Law   # Power-Law or Input-Matrix
+Spatial Dimension   1d   # Only 1d is currently supported. The other option is 2d (for 2d triangular lattices) - still in testing
+Lattice Type    Rectangular   # Only 'Rectangular' is currently supported. The other type is 'Triangular' - still in testing
+
+# System Parameters
+N   11  # Number of sites - any positive integer
+Delta   0.0 # Anisotropy strength (coefficient of the Z_i Z_j term in the Hamiltonian). Can be any real number
+h   0.0 # External field in the z direction - any real number
+alpha   1.0 # Power law interaction strength exponent (alpha in 1/r^{alpha}). Can be any positive real number
+J   1.0 # Energy scale - any positive real number
+T   0.005   # Temperature - any positive real number
+
+# Simulation Parameters
+Equilibration Steps 100000  # Number of steps used for equilibration. Can be any positive integer
+Simulation Steps    100000  # Number of Monte Carlo steps used for computing observables after equilibration. Can be any positive integer 
+Operator List Update Multiplier 1.01    # Operator list size growth proportion after each equilibration step. Can be any real number greater than 1
+
+# SSE Loop Parameters
+Loop Type   deterministic # Can be 'deterministic', 'directed_loops' or 'heat_bath' depending on the type of the loops. The 'determininistic' loop type only applies to the XY and the Heisenberg models
+gamma   0.0 # Directed loop probability table parameter.
+ksi 0.0 # Directed loop probability table parameter.
+Distance Dependent Offset   False   # bool - Directed loop probability table parameter.
+
+# Misc.
+Root Folder /Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE_18_08_25/Test   # Folder containing inputs and outputs for the calculations
+UUID    123456789   #   Unique identifier for each run used to specify the folder name for each Monte Carlo simulation
+Number of Threads   -1  # Number of CPU threads to use. This parameter is optional. Setting it to 1 uses a single thread all simulations are executed serially. Setting it to a positive integers will divide 
+Track Spin Configurations   False   # bool - Determines whether shot data collected across Monte Carlo steps. 
+Write Final Spin Configurations False   # bool - Determines whether final SSE configurations need to be written to a file
+
+# Initial Configuration Parameters
+Initial Configuration Index 0   # 1 or -1 starts the simulation with all spins up or down respectively. 0 picks each spin randomly. -2 uses the configuration provided. Positive integers k > 1 correspond to lattice site i starting with spin up if i mod k = 0
+Initial Configurations File Path    None    # Only used if Initial Configuration Index = -2
+Initial Operator List Size  -1  # Can be set to any integer. Set it to -1 to use default values. Not used if Initial Configuration index is -2. 

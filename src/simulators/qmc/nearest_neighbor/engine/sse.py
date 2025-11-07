@@ -1,7 +1,18 @@
 import numpy as np
-from src.methods.qmc.nearest_neighbor.preprocess.initializer import *
-import statistical_analysis as sa
+from nearest_neighbor.preprocess.initializer import *
+from common.postprocess import utils as sa
 import estimators as est
+
+def update_diagonal_estimators(spin_array, magnetization, step, N):
+
+    M_z = 0.0
+    for i in range(N):
+        M_z += spin_array[i]
+        
+    M_z *= 0.5/N
+    magnetization[step] = M_z
+
+    return magnetization
 
 def populate_linked_list(Sm_array, spin_array, M, N, n, sites, vertex_map, total_num_legs):
 

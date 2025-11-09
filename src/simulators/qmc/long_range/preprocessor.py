@@ -1,11 +1,11 @@
-from src.common.preprocess.base import Preprocess
-from system.base import System
-from probability_table.factory import ProbabilityTableFactory
+from src.common.preprocessor.base import Preprocessor
+from preprocess.system.base import System
+from preprocess.probability_table.factory import ProbabilityTableFactory
 from common.inputs.input_parser import InputParser
 import uuid
 import os
 
-class LongRangeQMC(Preprocess):
+class LongRangeQMC(Preprocessor):
 
     def __init__(self, parameter_set_list):
 
@@ -13,7 +13,6 @@ class LongRangeQMC(Preprocess):
 
         self.input_format = None
         self.bin_folder = None
-        self.root_folder = None
         self.cpp_source_folder = None
 
         self.build()
@@ -149,7 +148,7 @@ class LongRangeQMC(Preprocess):
 
     def create_run_folder(self, misc_args):
 
-        root_folder = misc_args["RootFolder"]
+        root_folder = misc_args['RootFolder']
         run_id = misc_args['Uuid']
         run_folder = os.path.join(root_folder, run_id)
         os.mkdir(run_folder)

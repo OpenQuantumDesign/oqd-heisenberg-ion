@@ -1,9 +1,9 @@
 from utils import standardize_string_format
 
 input_schema = {
-        "HamiltonianType" : {
+        "HamiltonianName" : {
             "DataType": "categorical",
-            "Categories" : ["HeisenbergAFM", "XY", "HeisenbergFM", "XXZ", "XXZh"],
+            "Categories" : ["FMHeisenbergAFMZ", "XY", "FMHeisenbergFMZ", "XXZ", "XXZh", "AFMHeisenbergFMZ"],
             "ParameterType" : "System"
             },
         "LoopType" : {

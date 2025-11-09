@@ -26,6 +26,8 @@ M_z_MC_List = np.zeros(len(beta_list))
 M_z_err_List = np.zeros(len(beta_list))
 M_z_ED_list = np.zeros(len(beta_list))
 
+boundary_map = {"OBC": 0, "PBC": 1}
+
 out_dir = "Results"
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
@@ -41,7 +43,7 @@ with open(out_file, 'w') as f:
 
         sites = SSE_init.geometry(N, boundary_conditions, interaction_type)
 
-        boundary_index = SSE_init.boundary_map[boundary_conditions]
+        boundary_index = boundary_map[boundary_conditions]
         interaction_type_index = SSE_init.isotropic_interaction_type_map[interaction_type]
         '''
         if N == 2:

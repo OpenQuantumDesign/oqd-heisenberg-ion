@@ -1,6 +1,6 @@
-from common.preprocess.base import Preprocess
+from common.preprocessor.base import Preprocessor
 
-class ExactDiagonalization(Preprocess):
+class ExactDiagonalization(Preprocessor):
 
     def __init__(self):
 

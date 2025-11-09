@@ -28,6 +28,8 @@ M_z_MC_List = np.zeros(len(beta_list))
 M_z_err_List = np.zeros(len(beta_list))
 M_z_ED_list = np.zeros(len(beta_list))
 
+boundary_map = {"OBC": 0, "PBC": 1}
+
 out_dir = "Results"
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
@@ -38,7 +40,7 @@ with open(out_file, 'w') as f:
     f.write("T, beta, E0 ED, E0 SSE, E0 SSE Error, M_z ED, M_z SSE, M_z SSE Error\n")
     for i1 in range(len(T_list)):
         
-        boundary_index = SSE_init.boundary_map[boundary_conditions]
+        boundary_index = boundary_map[boundary_conditions]
         interaction_type_index = SSE_init.isotropic_interaction_type_map[interaction_type]
 
         '''

@@ -21,7 +21,7 @@ class ProbabilityTableFactory:
     def create(cls, name, system, **kwargs):
 
         if name not in cls.registry:
-            raise ValueError(f"ProbabilityTable implementation not found for name: {name}")
+            raise ValueError(f"Probability Table implementation not found for name: {name}")
         else:
             return cls.registry[name](system, **kwargs)
         
@@ -29,7 +29,7 @@ class ProbabilityTableFactory:
 # Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 ProbabilityTableFactory.register = classmethod(ProbabilityTableFactory.register)
 ProbabilityTableFactory.create = classmethod(ProbabilityTableFactory.create)
-
+ProbabilityTableFactory.extract_args = classmethod(ProbabilityTableFactory.extract_args)
 
 ProbabilityTableFactory.register("Deterministic", Deterministic)
 ProbabilityTableFactory.register("Heatbath", Heatbath)

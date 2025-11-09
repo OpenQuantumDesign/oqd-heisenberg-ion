@@ -1,24 +1,5 @@
 import numpy as np
 
-def geometry(N, boundary_conditions, interaction_type):
-
-    if boundary_conditions == "PBC" and N % 2 != 0 and interaction_type == "Anti-ferromagnetic":
-        raise Exception("Odd number of sites with perodic boundary conditions yields a non-bipartitie lattice. " \
-        "This leads to the sign problem in the presence of anti-ferromagnetic interactions.")
-
-    num_bonds = get_number_of_bonds(N, boundary_conditions)
-    
-    sites = np.zeros((num_bonds,2), dtype=int)
-    for i in range(N-1):
-        sites[i,0] = i
-        sites[i,1] = i+1
-
-    if boundary_conditions == "PBC":
-        sites[N-1,0] = 0
-        sites[N-1,1] = N-1
-
-    return sites
-
 num_vertices_isotropic = 4
 num_vertices_general = 6
 
@@ -105,14 +86,3 @@ isotropic_vertex_map = [ferro_vertex_map, anti_ferro_vertex_map]
 isotropic_leg_spin = [ferro_leg_spin, anti_ferro_leg_spin]
 
 isotropic_interaction_type_map = {"Ferromagnetic": 0, "Anti-ferromagnetic": 1}
-
-boundary_map = {"OBC": 0, "PBC": 1}
-
-def get_number_of_bonds(N, boundary_conditions):
-
-    if boundary_conditions == "OBC":
-        return N-1
-    elif boundary_conditions == "PBC":
-        return N
-    else:
-        raise Exception("Boundary conditions must be either PBC or OBC")

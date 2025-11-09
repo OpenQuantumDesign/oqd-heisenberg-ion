@@ -4,6 +4,7 @@ class HamiltonianParameters:
 
     def __init__(self):
 
+        self.hamiltonian_name = None
         self.hamiltonian_type = None
         self.Delta = None
         self.h = None
@@ -35,71 +36,95 @@ class HamiltonianFactory:
 # Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 HamiltonianFactory.register = classmethod(HamiltonianFactory.register)
 HamiltonianFactory.create = classmethod(HamiltonianFactory.create)
-        
-class XY(HamiltonianParameters):
+HamiltonianFactory.extract_args = classmethod(HamiltonianFactory.extract_args)
 
-    args = {"hamiltonian_type" : int, "J" : float}
 
-    def __init__(self, hamiltonian_type, J):
+class FMHeisenbergAFMZ(HamiltonianParameters):
+
+    args = {"J" : float}
+
+    def __init__(self, J):
 
         super.__init__()
 
-        if hamiltonian_type != 0:
-            raise ValueError("hamiltonian_type must be 0 for the XY model")
+        self.hamiltonian_name = "FMHeisenbergAFMZ"
+        self.hamiltonian_type = -1
+        self.Delta = -1.0
+        self.h = 0.0
+        self.J = J
+        
+class XY(HamiltonianParameters):
 
+    args = {"J" : float}
+
+    def __init__(self, J):
+
+        super.__init__()
+
+        self.hamiltonian_name = "XY"
         self.hamiltonian_type = 0
         self.Delta = 0.0
         self.h = 0.0
         self.J = J
 
-class Heisenberg(HamiltonianParameters):
+class FMHeisenbergFMZ(HamiltonianParameters):
 
-    args = {"hamiltonian_type" : int, "J" : float}
+    args = {"J" : float}
 
-    def __init__(self, hamiltonian_type, J):
+    def __init__(self, J):
 
         super.__init__()
 
-        if hamiltonian_type != 1 or hamiltonian_type != -1:
-            raise ValueError("hamiltonian_type must be 1 or -1 for the Heisenberg model")
-
-        self.hamiltonian_type = hamiltonian_type
-        self.Delta = -1.0
+        self.hamiltonian_name = "FMHeisenbergFMZ"
+        self.hamiltonian_type = 1
+        self.Delta = 1.0
         self.h = 0.0
         self.J = J
 
 class XXZ(HamiltonianParameters):
 
-    args = {"hamiltonian_type" : int, "Delta": float, "J" : float}
+    args = {"Delta": float, "J" : float}
 
-    def __init__(self, hamiltonian_type, Delta, J):
+    def __init__(self, Delta, J):
 
         super.__init__()
-
-        if hamiltonian_type != 2:
-            raise ValueError("hamiltonian_type must be 2 for the XXZ model")
         
         self.Delta = Delta
+        self.hamiltonian_type = 2
         self.h = 0.0
         self.J = J
 
 class XXZh(HamiltonianParameters):
 
-    args = {"hamiltonian_type" : int, "Delta": float, "h": float, "J" : float}
+    args = {"Delta": float, "h": float, "J" : float}
 
-    def __init__(self, hamiltonian_type, Delta, h, J):
+    def __init__(self, Delta, h, J):
 
         super.__init__()
 
-        if hamiltonian_type != 3:
-            raise ValueError("hamiltonian_type must be 3 for the XXZh model")
-
         self.Delta = Delta
+        self.hamiltonian_type = 3
         self.h = h
+        self.J = J
+
+class AFMHeisenbergFMZ(HamiltonianParameters):
+
+    args = {"J" : float}
+
+    def __init__(self, J):
+
+        super.__init__()
+
+        self.hamiltonian_name = "AFMHeisenbergFMZ"
+        self.hamiltonian_type = 4
+        self.Delta = 1.0
+        self.h = 0.0
         self.J = J
 
 # Register all implemented Hamiltonian parameter types in the base HamiltonianParameters class
 HamiltonianFactory.register("XY", XY)
 HamiltonianFactory.register("XXZ", XXZ)
 HamiltonianFactory.register("XXZh", XXZh)
-HamiltonianFactory.register("Heisenberg", Heisenberg)
+HamiltonianFactory.register("FMHeisenbergFMZ", FMHeisenbergFMZ)
+HamiltonianFactory.register("FMHeisenbergAFMZ", FMHeisenbergAFMZ)
+HamiltonianFactory.register("AFMHeisenbergFMZ", AFMHeisenbergFMZ)

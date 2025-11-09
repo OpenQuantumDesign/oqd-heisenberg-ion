@@ -17,31 +17,31 @@ class Deterministic(ProbabilityTable):
     
     def validate_system(self):
 
-        hamiltonian_type = self.system.hamiltonian_parameter.hamiltonian_type
-        allowed_hamiltonian_types = ["XY", "HeisenbergAFM", "HeisenbergFM"]
+        hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
+        self.allowed_hamiltonians = ["XY", "FMHeisenbergAFMZ", "FMHeisenbergFMZ"]
 
-        if hamiltonian_type not in allowed_hamiltonian_types:
+        if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Deterministic probability tables " \
-            "only support the following types: {}".format(allowed_hamiltonian_types))
+            "only support the following types: {}".format(self.allowed_hamiltonians))
     
     
     def build(self):
 
         self.compute_max_over_states(self.system.geometry.num_bonds, self.system.interactions.J_ij_vector)
-        self.compute_spectrum_offset(self.system.hamiltonian_parameters.hamiltonian_type)
+        self.compute_spectrum_offset(self.system.hamiltonian_parameters.hamiltonian_name)
 
         return 0
     
 
-    def compute_spectrum_offset(self, hamiltonian_type):
+    def compute_spectrum_offset(self, hamiltonian_name):
 
-        if hamiltonian_type == 0:
+        if hamiltonian_name == "XY":
             self.spectrum_offset = self.max_diag_norm
-        elif hamiltonian_type == 1 or hamiltonian_type == -1:
+        elif hamiltonian_name == "FMHeisenbergAFMZ" or hamiltonian_name == "FMHeisenbergFMZ":
             self.spectrum_offset = 0.5*self.max_diag_norm
         else:
             raise ValueError("Invalid Hamiltonian type: {} provided for deterministic probability tables. " \
-            "Allowed types are -1, 0 and 1".format(hamiltonian_type))
+            "Allowed types are {}".format(hamiltonian_name, self.allowed_hamiltonians))
         
         return 0
     

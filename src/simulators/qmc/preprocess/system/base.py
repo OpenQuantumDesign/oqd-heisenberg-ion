@@ -1,0 +1,46 @@
+from geometry import GeometryFactory
+from hamiltonian import HamiltonianFactory
+from interactions import InteractionsFactory
+
+class System:
+
+    def __init__(self, **kwargs):
+
+        self.model_name = kwargs["HamiltonianType"]
+        hamiltonian_args = HamiltonianFactory.extract_args(self.model_name, **kwargs)
+        self.hamiltonian_parameters = HamiltonianFactory.create(self.model_name, **hamiltonian_args)
+        
+        self.geometry_name = kwargs["InteractionRange"] + kwargs["BoundaryType"] \
+            + kwargs["SpatialDimension"] + kwargs["GeometryType"]
+        geometry_args = GeometryFactory.extract_args(self.geometry_name, **kwargs)
+        self.geometry = GeometryFactory.create(self.geometry_name, **geometry_args)
+
+        self.interaction_range = kwargs["InteractionRange"]
+        self.interaction_name = self.get_interaction_name(kwargs)
+        self.interaction_args = InteractionsFactory.extract_args(self.interaction_name, **kwargs)
+        self.interactions = InteractionsFactory.create(self.interaction_name, self.geometry, **kwargs)
+
+
+    def get_interaction_name(self, kwarg_dict):
+
+        if self.interaction_range == "LongRange":
+            return kwarg_dict["InteractionType"]
+        else:
+            return self.interaction_range
+        
+    
+    def compute_h_B(self):
+
+        h = self.hamiltonian_parameters.h
+        J = self.hamiltonian_parameters.J
+        num_neighbors = self.goemetry.num_neighbors_per_site
+
+        return h/(J*num_neighbors)
+    
+
+    def validate_system(self):
+
+        if self.model_name == "AFMHeisenbergFMZ":
+            if not self.geometry.bipartite:
+                raise Exception("AFMHeisenbergFMZ Hamiltonian type requires a bipartite lattice\n")
+

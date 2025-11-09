@@ -1,7 +1,6 @@
 import numpy as np
 from nearest_neighbor.preprocess.initializer import *
 from common.postprocess import utils as sa
-import estimators as est
 
 def update_diagonal_estimators(spin_array, magnetization, step, N):
 
@@ -97,7 +96,8 @@ def update_operators_and_spins(Sm_array, spin_array, M, N, leg_spin, vertex_arra
 
     return Sm_array, spin_array
 
-def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotropic_exit_leg_map, vertex_map, new_vertex_map, leg_spin):
+def off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, isotropic_exit_leg_map, 
+                                   vertex_map, new_vertex_map, leg_spin):
 
     # For a discussion of the algorithm, see Appendix A of: https://arxiv.org/pdf/cond-mat/0202316
 
@@ -274,7 +274,7 @@ def diagonal_updates_XY(Sm_array, spin_array, sites, M, n, beta, num_bonds):
 
 def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interaction_type, boundary_conditions, a=1.25):
 
-    # Ferro => 0, Anti-ferro => 1 
+    # Ferro => 0, Anti-ferro => 1
     interaction_type_index = isotropic_interaction_type_map[interaction_type]
     exit_leg_map = isotropic_exit_leg_maps[interaction_type_index]
     diagonal_update_condition = (-1)**interaction_type_index
@@ -321,7 +321,7 @@ def simulate_isotropic(N, M, equilibration_steps, mc_steps, sites, beta, interac
         n, Sm_array, spin_array = diagonal_updates_isotropic(Sm_array, spin_array, sites, M, n, beta, num_bonds, diagonal_update_condition)
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_isotropic(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
-        est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
+        update_diagonal_estimators(spin_array, magnetization_array, step, N)
         step_spin[step, :] = spin_array
 
         n_array[step] = n
@@ -380,7 +380,7 @@ def simulate_XY(N, M, equilibration_steps, mc_steps, sites, beta, boundary_condi
         n, Sm_array, spin_array = diagonal_updates_XY(Sm_array, spin_array, sites, M, n, beta, num_bonds)
         # off-diagonal updates
         Sm_array, spin_array = off_diagonal_updates_XY(Sm_array, spin_array, M, N, n, sites, exit_leg_map, vertex_mapping, new_vertex_types, leg_spin)
-        est.update_diagonal_estimators(spin_array, magnetization_array, step, N)
+        update_diagonal_estimators(spin_array, magnetization_array, step, N)
         step_spin[step, :] = spin_array
 
         n_array[step] = n

@@ -1,8 +1,11 @@
-from common.preprocess.base import Preprocess
+from common.preprocessor.base import Preprocessor
 
-class NearestNeighborQMC(Preprocess):
+class NearestNeighborQMC(Preprocessor):
 
-    def __init__(self):
+    def __init__(self, parameter_set_list):
 
-        pass
+        super.__init__(parameter_set_list)
+
+        
+
     

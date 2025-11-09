@@ -23,12 +23,12 @@ class Heatbath(ProbabilityTable):
     
     def validate_system(self):
 
-        hamiltonian_type = self.system.hamiltonian_parameter.hamiltonian_type
-        allowed_hamiltonian_types = ["XXZ", "XXZh"]
+        hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
+        self.allowed_hamiltonians = ["XXZ", "XXZh"]
 
-        if hamiltonian_type not in allowed_hamiltonian_types:
+        if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Heatbath probability tables " \
-            "only support the following types: {}".format(allowed_hamiltonian_types))
+            "only support the following types: {}".format(self.allowed_hamiltonians))
     
 
     def build(self):

@@ -22,6 +22,8 @@ class Geometry:
         self.distances = None
         self.geometry_table = None
 
+        self.bipartite = False
+
 
     def initialize_tables(self):
 
@@ -57,8 +59,9 @@ class GeometryFactory:
         else:
             return cls.registry[name](**kwargs)
     
-GeometryFactory.register = classmethod(Geometry.register)
-GeometryFactory.create = classmethod(Geometry.create)
+GeometryFactory.register = classmethod(GeometryFactory.register)
+GeometryFactory.create = classmethod(GeometryFactory.create)
+GeometryFactory.extract_args = classmethod(GeometryFactory.extract_args)
 
 # ---------------------------------- Long Range 1d Chain With Open Boundaries  ----------------------------------
 class LongRangeOpenChain(Geometry):
@@ -214,8 +217,87 @@ class LongRangeOpenTriangular(Geometry):
                             b += 1
 
         return 0
+    
+
+class NearestNeighborPeriodicChain(Geometry):
+
+    args = {"N", float}
+
+    def __init__(self, N):
+
+        self.spatial_dimension = 1
+
+        self.boundary_type = "Periodic"
+        self.interaction_range = "NearestNeighbor"
+        self.lattice_type = "Chain"
+        
+        self.N_config = (N)
+        self.N = N
+        self.num_bonds = N
+        self.num_neighbors_per_site = 2
+
+        if self.N % 2 == 0:
+            self.bipartite = True
+
+        self.initialize_tables()
+        self.build()
+
+
+    def initialize_tables(self):
+        return super().initialize_tables()
+
+
+    def build(self):
+        
+        self.sites = np.zeros((self.num_bonds,2), dtype=int)
+
+        for i in range(self.N-1):
+            self.sites[i,0] = i
+            self.sites[i,1] = i+1
+        
+        self.sites[self.N-1,0] = 0
+        self.sites[self.N-1,1] = self.N-1
+
+
+class NearestNeighborOpenChain(Geometry):
+
+    args = {"N", float}
+
+    def __init__(self, N):
+
+        self.spatial_dimension = 1
+
+        self.boundary_type = "Periodic"
+        self.interaction_range = "NearestNeighbor"
+        self.lattice_type = "Chain"
+        
+        self.N_config = (N)
+        self.N = N
+        self.num_bonds = N
+        self.num_neighbors_per_site = 2
+
+        self.bipartite = True
+
+        self.initialize_tables()
+        self.build()
+
+
+    def initialize_tables(self):
+        return super().initialize_tables()
+
+
+    def build(self):
+        
+        self.sites = np.zeros((self.num_bonds,2), dtype=int)
+
+        for i in range(self.N-1):
+            self.sites[i,0] = i
+            self.sites[i,1] = i+1
+
 
 # Register all implemented geometries in the geometry factory
-GeometryFactory.register("LongRangeOpen1dChain", LongRangeOpenChain)
-GeometryFactory.register("LongRangePeriodic1dChain", LongRangePeriodicChain)
+GeometryFactory.register("LongRangeOpen1dRectangular", LongRangeOpenChain)
+GeometryFactory.register("LongRangePeriodic1dRectangular", LongRangePeriodicChain)
 GeometryFactory.register("LongRangeOpen2dTriangular", LongRangeOpenTriangular)
+GeometryFactory.register("NearestNeighborPeriodic1dRectangular", NearestNeighborPeriodicChain)
+GeometryFactory.register("NearestNeighborOpen1dRectangular", NearestNeighborOpenChain)

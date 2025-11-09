@@ -1,8 +1,8 @@
-from simulators.qmc.long_range.preprocess.preprocessor import LongRangeQMC
+from src.simulators.qmc.long_range.preprocessor import LongRangeQMC
 from simulators.qmc.nearest_neighbor.preprocessor import NearestNeighborQMC
 from simulators.ed.preprocessor import ExactDiagonalization
 
-class PreprocessFactory:
+class PreprocessorFactory:
 
     registry = {}
 
@@ -18,9 +18,9 @@ class PreprocessFactory:
             return cls.registry[name](parameter_set_list)
         
 
-PreprocessFactory.create = classmethod(PreprocessFactory.create)
-PreprocessFactory.register = classmethod(PreprocessFactory.register)
+PreprocessorFactory.create = classmethod(PreprocessorFactory.create)
+PreprocessorFactory.register = classmethod(PreprocessorFactory.register)
 
-PreprocessFactory.register("LongRangeQMC", LongRangeQMC)
-PreprocessFactory.register("NearestNeighborQMC", NearestNeighborQMC)
-PreprocessFactory.register("ExactDiagonalization", ExactDiagonalization)
+PreprocessorFactory.register("LongRangeQMC", LongRangeQMC)
+PreprocessorFactory.register("NearestNeighborQMC", NearestNeighborQMC)
+PreprocessorFactory.register("ExactDiagonalization", ExactDiagonalization)

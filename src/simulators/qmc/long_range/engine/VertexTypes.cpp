@@ -11,11 +11,11 @@ VertexTypes::VertexTypes(const int &hamiltonian_type){
         populateAllowedExitLegsXY();
     }
     else if (hamiltonian_type == 1) {
-        setVertexMappingsIsotropicAFM();
+        setVertexMappingsIsotropicFM();
         allowed_exit_legs = {3, 2, 1, 0};
     }
     else if (hamiltonian_type == -1) {
-        setVertexMappingsIsotropicFM();
+        setVertexMappingsIsotropicAFM();
         allowed_exit_legs = {1, 0, 3, 2};
     }
     else if (hamiltonian_type == 2 || hamiltonian_type == 3) {
@@ -51,7 +51,7 @@ void VertexTypes::setVertexMappings() {
 
 }
 
-void VertexTypes::setVertexMappingsIsotropicAFM() {
+void VertexTypes::setVertexMappingsIsotropicFM() {
 
     num_vertices = 4;
 
@@ -69,7 +69,7 @@ void VertexTypes::setVertexMappingsIsotropicAFM() {
 
 }
 
-void VertexTypes::setVertexMappingsIsotropicFM() {
+void VertexTypes::setVertexMappingsIsotropicAFM() {
 
     num_vertices = 4;
 

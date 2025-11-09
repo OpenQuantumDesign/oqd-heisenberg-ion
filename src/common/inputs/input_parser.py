@@ -8,7 +8,7 @@ input_schema = {
             },
         "LoopType" : {
             "DataType": "categorical", 
-            "Categories": ["Determinisitic", "HeatBath", "DirectedLoop"],
+            "Categories": ["Determinisitic", "Heatbath", "DirectedLoop"],
             "ParameterType" : "Sampling"
             },
         "BoundaryCondition": {

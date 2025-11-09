@@ -2,39 +2,39 @@
 
 SimulationParameters::SimulationParameters(std::map<std::string, std::string> &input_key_vals) {
 
-    extractStringEntry("Root Folder", input_key_vals["Root Folder"], root_folder);
-    extractStringEntry("UUID", input_key_vals["UUID"], uuid);
+    extractStringEntry("RootFolder", input_key_vals["RootFolder"], root_folder);
+    extractStringEntry("Uuid", input_key_vals["Uuid"], uuid);
     simulation_subfolder = root_folder + "/" + uuid + "/";
 
     std::string file_path = simulation_subfolder + "/" + "Simulation Specs.txt";
     std::ofstream ofs(file_path);
 
-    writeStringEntry("Output Folder", simulation_subfolder, ofs);
+    writeStringEntry("OutputFolder", simulation_subfolder, ofs);
 
     extractIntegerEntry("N", input_key_vals["N"], N, true, 1);
     writeNumericEntry("N", N, ofs);
 
     num_bonds = (int)(((double)N * ((double)N-1.0))/2.0);
 
-    extractLoopType("Loop Type", input_key_vals["Loop Type"]);
-    writeStringEntry("Loop Type", loop_type, ofs);
+    extractLoopType("LoopType", input_key_vals["LoopType"]);
+    writeStringEntry("LoopType", loop_type, ofs);
 
-    extractHamiltonianType("Hamiltonian Type", input_key_vals["Hamiltonian Type"]);
-    writeNumericEntry("Hamiltonian Type", hamiltonian_type, ofs);
+    extractHamiltonianType("HamiltonianType", input_key_vals["Hamiltonian Type"]);
+    writeNumericEntry("HamiltonianType", hamiltonian_type, ofs);
 
-    extractBoundaryConditions("Boundary Conditions", input_key_vals["Boundary Conditions"]);
-    writeStringEntry("Boundary Conditions", boundary_conditions, ofs);
+    extractBoundaryConditions("BoundaryConditions", input_key_vals["Boundary Conditions"]);
+    writeStringEntry("BoundaryConditions", boundary_conditions, ofs);
 
-    if (loop_type == "directed_loops") {
-        extractDoubleEntry("gamma", input_key_vals["gamma"], gamma,
+    if (loop_type == "DirectedLoop") {
+        extractDoubleEntry("Gamma", input_key_vals["Gamma"], gamma,
                            true,0.0);
-        writeNumericEntry("gamma", gamma, ofs);
-        extractDoubleEntry("ksi", input_key_vals["ksi"], ksi,
+        writeNumericEntry("Gamma", gamma, ofs);
+        extractDoubleEntry("Ksi", input_key_vals["Ksi"], ksi,
                            true, 0.0);
-        writeNumericEntry("ksi", ksi, ofs);
-        extractBoolEntry("Distance Dependent Offset", input_key_vals["Distance Dependent Offset"],
+        writeNumericEntry("Ksi", ksi, ofs);
+        extractBoolEntry("DistanceDependentOffset", input_key_vals["DistanceDependentOffset"],
                          distance_dep_offset);
-        writeBoolEntry("Distance Dependent Offset", distance_dep_offset, ofs);
+        writeBoolEntry("DistanceDependentOffset", distance_dep_offset, ofs);
     }
 
     if (hamiltonian_type == 2 || hamiltonian_type == 3) {
@@ -46,7 +46,7 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
     writeNumericEntry("Delta", Delta, ofs);
 
     if (hamiltonian_type == 3) {
-        extractDoubleEntry("h", input_key_vals["h"], h,
+        extractDoubleEntry("H", input_key_vals["H"], h,
                            true, 0.0);
         h_B = h/(J * ((double)N - 1.0));
     }
@@ -54,58 +54,58 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
         h = 0.0;
         h_B = 0.0;
     }
-    writeNumericEntry("h", h, ofs);
+    writeNumericEntry("H", h, ofs);
 
-    extractInteractionType("Interaction Type", input_key_vals["Interaction Type"]);
-    writeStringEntry("Interaction Type", interaction_type, ofs);
-    if (interaction_type == "Power-Law") {
-        extractDoubleEntry("alpha", input_key_vals["alpha"], alpha,
+    extractInteractionType("InteractionType", input_key_vals["InteractionType"]);
+    writeStringEntry("InteractionType", interaction_type, ofs);
+    if (interaction_type == "PowerLaw") {
+        extractDoubleEntry("Alpha", input_key_vals["Alpha"], alpha,
                            true, 0.0);
-        writeNumericEntry("alpha", alpha, ofs);
+        writeNumericEntry("Alpha", alpha, ofs);
     }
     extractDoubleEntry("J", input_key_vals["J"], J,
                        true, 0.0);
     writeNumericEntry("J", J, ofs);
 
-    extractIntegerEntry("Simulation Steps", input_key_vals["Simulation Steps"],
+    extractIntegerEntry("SimulationSteps", input_key_vals["SimulationSteps"],
                         simulation_steps, true, 1);
-    writeNumericEntry("Simulation Steps", simulation_steps, ofs);
+    writeNumericEntry("SimulationSteps", simulation_steps, ofs);
 
-    extractIntegerEntry("Equilibration Steps", input_key_vals["Equilibration Steps"],
+    extractIntegerEntry("EquilibrationSteps", input_key_vals["EquilibrationSteps"],
                         simulation_steps, true, 1);
-    writeNumericEntry("Equilibration Steps", equilibration_steps, ofs);
+    writeNumericEntry("EquilibrationSteps", equilibration_steps, ofs);
 
-    extractDoubleEntry("Operator List Update Multiplier",
-                       input_key_vals["Operator List Update Multiplier"],
+    extractDoubleEntry("OperatorListUpdateMultiplier",
+                       input_key_vals["OperatorListUpdateMultiplier"],
                        new_M_multiplier, true, 1.0);
-    writeNumericEntry("Operator List Update Multiplier", new_M_multiplier, ofs);
+    writeNumericEntry("OperatorListUpdateMultiplier", new_M_multiplier, ofs);
 
     extractDoubleEntry("T", input_key_vals["T"], T, true, 0.0);
     writeNumericEntry("T", T, ofs);
     beta = J/T;
 
-    extractBoolEntry("Track Spin Configurations", input_key_vals["Track Spin Configurations"],
+    extractBoolEntry("TrackSpinConfigurations", input_key_vals["TrackSpinConfigurations"],
                      track_spin_configs);
-    writeBoolEntry("Track Spin Configurations", track_spin_configs, ofs);
+    writeBoolEntry("TrackSpinConfigurations", track_spin_configs, ofs);
 
-    extractBoolEntry("Write Final Spin Configurations",
-                     input_key_vals["Write Final Spin Configurations"], write_final_SSE_configs);
-    writeBoolEntry("Write Final Spin Configurations", write_final_SSE_configs, ofs);
+    extractBoolEntry("WriteFinalSpinConfigurations",
+                     input_key_vals["WriteFinalSpinConfigurations"], write_final_SSE_configs);
+    writeBoolEntry("WriteFinalSpinConfigurations", write_final_SSE_configs, ofs);
 
-    extractIntegerEntry("Initial Configuration Index", input_key_vals["Initial Configuration Index"],
+    extractIntegerEntry("InitialConfigurationIndex", input_key_vals["InitialConfigurationIndex"],
                         init_config_index, true, -2);
-    writeNumericEntry("Initial Configuration Index", init_config_index, ofs);
+    writeNumericEntry("InitialConfigurationIndex", init_config_index, ofs);
 
-    extractIntegerEntry("Initial Operator List Size", input_key_vals["Initial Configuration Index"],
+    extractIntegerEntry("InitialOperatorListSize", input_key_vals["InitialConfigurationIndex"],
                         init_M, true, -1);
     if (init_M == -1) { init_M = 50; }
-    writeNumericEntry("Initial Operator List Size", init_M, ofs);
+    writeNumericEntry("InitialOperatorListSize", init_M, ofs);
 
     if (init_config_index == -2) {
-        extractStringEntry("Initial Configurations File Path",
-                           input_key_vals["Initial Configuration Index"], init_config_file_path);
+        extractStringEntry("InitialConfigurationsFilePath",
+                           input_key_vals["InitialConfigurationIndex"], init_config_file_path);
         extractInitialConditionsFromFile(init_config_file_path);
-        writeStringEntry("Initial Configurations File Path", init_config_file_path, ofs);
+        writeStringEntry("InitialConfigurationsFilePath", init_config_file_path, ofs);
     }
 
     ofs.close();
@@ -212,7 +212,7 @@ void SimulationParameters::extractLoopType(const std::string &key_str, const std
 
     extractStringEntry(key_str, val_str, loop_type);
 
-    if (loop_type != "deterministic" && loop_type != "heat_bath" && loop_type != "directed_loops") {
+    if (loop_type != "Deterministic" && loop_type != "Heatbath" && loop_type != "DirectedLoop") {
         throw std::runtime_error("Loop Type must be 'deterministic', heat_bath or directed_loops\n");
     }
 }
@@ -222,16 +222,16 @@ void SimulationParameters::extractHamiltonianType(const std::string &key_str, co
     extractIntegerEntry(key_str, val_str, hamiltonian_type, false);
 
     if (hamiltonian_type > 3 || hamiltonian_type < -1) {
-        throw std::runtime_error("Hamiltonian type can only be -1, 0, 1, 2 or 3\n");
+        throw std::runtime_error("Hamiltonian type can only be -1, 0, 1, 2 or 3 for long range interactions\n");
     }
 
-    if (loop_type == "deterministic") {
+    if (loop_type == "Deterministic") {
         if (hamiltonian_type != -1 && hamiltonian_type != 0 && hamiltonian_type != 1) {
-            throw std::runtime_error("deterministic loops are only compatible with Hamiltonian types -1, 0 and 1\n");
+            throw std::runtime_error("Deterministic loops are only compatible with Hamiltonian types -1, 0 and 1\n");
         }
     }
 
-    if (loop_type == "directed_loops" || loop_type == "heat_bath") {
+    if (loop_type == "DirectedLoop" || loop_type == "Heatbath") {
         if (hamiltonian_type != 2 && hamiltonian_type != 3) {
             throw std::runtime_error("directed loops and heat bath probabilities are only compatible with Hamiltonian "
                                      "types 2 and 3\n");
@@ -243,7 +243,7 @@ void SimulationParameters::extractInteractionType(const std::string &key_str, co
 
     extractStringEntry(key_str, val_str, interaction_type);
 
-    if (interaction_type != "Power-Law" && interaction_type != "Matrix-Input") {
+    if (interaction_type != "PowerLaw" && interaction_type != "MatrixInput") {
         throw std::runtime_error("Supported interaction types are: 'Power-Law' and 'Matrix-Input'\n");
     }
 }
@@ -294,7 +294,7 @@ void SimulationParameters::extractInitialConditionsFromFile(std::string &file_pa
     }
 
     extractIntegerEntry("M", input_kev_val_pairs["M"], init_M, true, 1);
-    extractIntegerEntry("n", input_kev_val_pairs["n"], init_n, true, 0);
+    extractIntegerEntry("K", input_kev_val_pairs["K"], init_n, true, 0);
     extractDoubleEntry("W", input_kev_val_pairs["W"], winding, false);
 
     extractListInts("Operator Locations List", input_kev_val_pairs["Operator Locations List"],

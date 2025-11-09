@@ -160,7 +160,7 @@ class Heatbath(ProbabilityTable):
             fmt="%d", header="NumBonds={}".format(num_bonds))
 
         header="norm={},spectrum_offset={},loop_update_type={}".format(self.max_diag_norm, 
-            self.spectrum_offset, "HeatBath")
+            self.spectrum_offset, "Heatbath")
 
         np.savetxt(diag_file_name, self.diag_prob_table, delimiter=",", header=header)
         np.savetxt(vertex_weights_file_name, self.vertex_weights, delimiter=",", header=header)

@@ -1,5 +1,5 @@
 from common.inputs.input_file_reader import InputFileReader
-from common.preprocess.factory import PreprocessFactory
+from common.preprocessor.factory import PreprocessorFactory
 from common.driver.factory import DriverFactory
 
 class Workflow:
@@ -16,9 +16,9 @@ class Workflow:
 
         file_inputs = InputFileReader(input_file_path)
 
-        preprocessor = PreprocessFactory.create(file_inputs.simulator, file_inputs.parameter_set_list)
+        preprocessor = PreprocessorFactory.create(file_inputs.simulator, file_inputs.parameter_set_list)
 
-        driver = DriverFactory.create(preprocessor.root_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()
 
         return 0
@@ -29,9 +29,9 @@ class Workflow:
         simulator = kwargs["Simulator"]
         parameter_set_list = [kwargs]
 
-        preprocessor = PreprocessFactory.create(simulator, parameter_set_list)
+        preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
 
-        driver = DriverFactory.create(preprocessor.root_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()
 
         return 0

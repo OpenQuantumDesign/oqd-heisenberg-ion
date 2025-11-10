@@ -4,7 +4,7 @@ class ExactDiagonalization(Driver):
 
     def __init__(self, root_folder):
 
-        super.__init__(root_folder)
+        super().__init__(root_folder)
 
         pass
 

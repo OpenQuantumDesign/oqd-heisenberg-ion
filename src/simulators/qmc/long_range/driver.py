@@ -4,10 +4,10 @@ from src.common.driver.base import Driver
 
 class LongRangeQMC(Driver):
 
-    def __init__(self, root_folder, bin_dir=None, source_dir=None):
+    def __init__(self, simulation_folder, bin_dir=None, source_dir=None):
 
-        self.input_file = os.path.join(root_folder, "sse_inputs.txt")
-        self.build_dir = os.path.join(root_folder, "build")
+        self.input_file = os.path.join(simulation_folder, "sse_inputs.txt")
+        self.build_dir = os.path.join(simulation_folder, "build")
         os.mkdir(self.build_dir)
 
         self.bin_dir = bin_dir

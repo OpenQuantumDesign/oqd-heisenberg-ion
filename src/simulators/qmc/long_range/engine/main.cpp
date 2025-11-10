@@ -10,11 +10,11 @@
 
 void checkRootFolder(std::map<std::string, std::string> &input_key_vals) {
 
-    if (!input_key_vals.contains("RootFolder") || input_key_vals["RootFolder"].empty()) {
+    if (!input_key_vals.contains("SimulationFolder") || input_key_vals["SimulationFolder"].empty()) {
         throw std::runtime_error("No root folder provided\n");
     }
-    else if(!std::filesystem::exists(input_key_vals["RootFolder"])) {
-        throw std::runtime_error("Root folder path does not exist\n");
+    else if(!std::filesystem::exists(input_key_vals["SimulationFolder"])) {
+        throw std::runtime_error("Simulation folder path does not exist\n");
     }
 
 }

@@ -2,7 +2,7 @@
 
 SimulationParameters::SimulationParameters(std::map<std::string, std::string> &input_key_vals) {
 
-    extractStringEntry("RootFolder", input_key_vals["RootFolder"], root_folder);
+    extractStringEntry("SimulationFolder", input_key_vals["SimulationFolder"], root_folder);
     extractStringEntry("Uuid", input_key_vals["Uuid"], uuid);
     simulation_subfolder = root_folder + "/" + uuid + "/";
 

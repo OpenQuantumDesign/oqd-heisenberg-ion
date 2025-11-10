@@ -8,7 +8,7 @@ class LongRangeQMC(Preprocessor):
 
     def __init__(self, parameter_set_list):
 
-        super.__init__(parameter_set_list)
+        super().__init__(parameter_set_list)
 
         self.bin_folder = None
         self.cpp_source_folder = None
@@ -20,6 +20,8 @@ class LongRangeQMC(Preprocessor):
 
         self.check_single_input("RootFolder")
         self.root_folder = self.parameter_set_list[0]["RootFolder"]
+
+        self.simulation_folder = self.create_output_folder()
 
         self.check_single_input("NumberOfThreads", True)
 
@@ -50,6 +52,8 @@ class LongRangeQMC(Preprocessor):
         run_id = self.get_run_id(misc_args)
         misc_args['Uuid'] = run_id
 
+        misc_args['SimulationFolder'] = self.simulation_folder
+
         run_folder = self.create_run_folder(misc_args)
         misc_args['RunFolder'] = run_folder
 
@@ -66,8 +70,8 @@ class LongRangeQMC(Preprocessor):
 
     def write_see_input_file(self):
 
-        root_folder_path = self.parameter_set_list[0]["RootFolder"]
-        sse_input_file = os.path.join(root_folder_path, "sse_inputs.txt")
+        simulation_folder = self.simulation_folder
+        sse_input_file = os.path.join(simulation_folder, "sse_inputs.txt")
 
         with open(sse_input_file, "w") as f:
             for key in self.parameter_set_list[0].keys():

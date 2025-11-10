@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime
 
 class Preprocessor:
 
@@ -9,6 +10,7 @@ class Preprocessor:
         self.num_parameter_sets = len(parameter_set_list)
 
         self.root_folder = None
+        self.simulation_folder = None
 
         self.driver_inputs = None
 
@@ -18,11 +20,22 @@ class Preprocessor:
         pass
 
 
+    def create_output_folder(self):
+
+        date_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.simulation_folder = os.path.join(self.root_folder, date_time_str)
+
+        os.mkdir(self.simulation_folder)
+
+        return self.simulation_folder
+
+
     def create_run_folder(self, misc_args):
 
-        root_folder = misc_args['RootFolder']
+        simulation_folder = self.simulation_folder
         run_id = misc_args['Uuid']
-        run_folder = os.path.join(root_folder, run_id)
+        run_folder = os.path.join(simulation_folder, run_id)
+
         os.mkdir(run_folder)
 
         return run_folder

@@ -5,6 +5,7 @@ num_legs_per_vertex = 4
 num_diagonal_vertices = 4
 num_legs_indices = num_legs_per_vertex**2
 
+# Mapping from vertex to integer. The 4 integers that define a vertex specify the spin at each leg (up or down)
 vertex_map = {(1,1,1,1):0,
               (1,-1,1,-1):1,
               (-1,1,-1,1):2,
@@ -12,11 +13,12 @@ vertex_map = {(1,1,1,1):0,
               (1,-1,-1,1):4,
               (-1,1,1,-1):5}
 
-operator_type = (0,0,0,0,1,1)
+operator_type = (0,0,0,0,1,1) # 0 -> diagonal operator, 1 -> off-diagonal. Index defines vertex type 
 
-leg_spin = [(1,1,1,1), (1,-1,1,-1), (-1,1,-1,1), (-1,-1,-1,-1), (1,-1,-1,1), (-1,1,1,-1)]
+leg_spin = [(1,1,1,1), (1,-1,1,-1), (-1,1,-1,1), (-1,-1,-1,-1), (1,-1,-1,1), (-1,1,1,-1)] # Inverse map of vertex_map
 # <1|S_z|1> = 1/2, <-1|S_z|-1> = -1/2
 
+# mapping[x] -> y => vertex defined by x maps to y under swap vertex operation
 vertical_swap_mapping = [2,3,0,1]
 horizontal_swap_mapping = [1,0,3,2]
 composed_swaps_mapping = [3,2,1,0]
@@ -49,7 +51,7 @@ def generate_new_vertex_type_array():
 
     return new_vertex_types
 
-new_vertex_map = generate_new_vertex_type_array()
+new_vertex_map = generate_new_vertex_type_array() # all possible transitions for all vertices
 
 def set_vertex_weights(vertex_weights, bond, Delta, J_ij, h_B):
 

@@ -14,6 +14,9 @@ class ProbabilityTable:
 
     
     def validate_system(self):
+
+        if not self.system.geometry.interaction_range == "LongRange":
+            raise Exception("Probability tables are constructed for long range systems\n")
         pass
 
     

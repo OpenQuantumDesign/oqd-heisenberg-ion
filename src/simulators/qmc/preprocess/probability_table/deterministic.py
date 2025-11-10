@@ -8,7 +8,7 @@ class Deterministic(ProbabilityTable):
 
     def __init__(self, system):
 
-        super.__init__(system)
+        super().__init__(system)
 
         self.validate_system()
 
@@ -16,6 +16,8 @@ class Deterministic(ProbabilityTable):
 
     
     def validate_system(self):
+
+        super().validate_system()
 
         hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
         self.allowed_hamiltonians = ["XY", "FMHeisenbergAFMZ", "FMHeisenbergFMZ"]

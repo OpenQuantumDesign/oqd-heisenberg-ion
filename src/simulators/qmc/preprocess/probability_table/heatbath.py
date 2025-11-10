@@ -10,7 +10,7 @@ class Heatbath(ProbabilityTable):
 
     def __init__(self, system, gamma):
 
-        super.__init__(system, gamma=gamma)
+        super().__init__(system, gamma=gamma)
 
         self.gamma = gamma
 
@@ -22,6 +22,8 @@ class Heatbath(ProbabilityTable):
 
     
     def validate_system(self):
+
+        super().validate_system()
 
         hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
         self.allowed_hamiltonians = ["XXZ", "XXZh"]

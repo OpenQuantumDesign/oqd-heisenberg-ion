@@ -70,7 +70,7 @@ class LongRangeOpenChain(Geometry):
 
     def __init__(self, N):
 
-        super.__init__()
+        super().__init__()
 
         self.spatial_dimension = 1
 
@@ -117,7 +117,7 @@ class LongRangePeriodicChain(Geometry):
 
     def __init__(self, N):
 
-        super.__init__()
+        super().__init__()
 
         self.spatial_dimension = 1
 
@@ -168,7 +168,7 @@ class LongRangeOpenTriangular(Geometry):
 
     def __init__(self, N1, N2):
 
-        super.__init__()
+        super().__init__()
 
         self.spatial_dimension = 2
 

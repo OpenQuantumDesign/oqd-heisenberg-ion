@@ -45,7 +45,7 @@ class MatrixInput(Interactions):
 
     def __init__(self, geometry, J_ij_file):
 
-        super.__init__(geometry)
+        super().__init__(geometry)
 
         self.file_path = J_ij_file
         self.get_J_ij(geometry.N, geometry.num_bonds, self.file_path)
@@ -70,7 +70,7 @@ class PowerLaw(Interactions):
 
     def __init__(self, geometry, alpha):
 
-        super.__init__(geometry)
+        super().__init__(geometry)
 
         self.alpha = alpha
         self.get_J_ij(geometry.num_bonds, geometry.distances, self.alpha)
@@ -91,7 +91,7 @@ class NearestNeighbors(Interactions):
 
     def __init__(self, geometry):
 
-        super.__init__(geometry)
+        super().__init__(geometry)
         
 
 InteractionsFactory.register("PowerLaw", PowerLaw)

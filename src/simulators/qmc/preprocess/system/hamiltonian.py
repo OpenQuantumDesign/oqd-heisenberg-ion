@@ -45,7 +45,7 @@ class FMHeisenbergAFMZ(HamiltonianParameters):
 
     def __init__(self, J):
 
-        super.__init__()
+        super().__init__()
 
         self.hamiltonian_name = "FMHeisenbergAFMZ"
         self.hamiltonian_type = -1
@@ -59,7 +59,7 @@ class XY(HamiltonianParameters):
 
     def __init__(self, J):
 
-        super.__init__()
+        super().__init__()
 
         self.hamiltonian_name = "XY"
         self.hamiltonian_type = 0
@@ -73,7 +73,7 @@ class FMHeisenbergFMZ(HamiltonianParameters):
 
     def __init__(self, J):
 
-        super.__init__()
+        super().__init__()
 
         self.hamiltonian_name = "FMHeisenbergFMZ"
         self.hamiltonian_type = 1
@@ -87,7 +87,7 @@ class XXZ(HamiltonianParameters):
 
     def __init__(self, Delta, J):
 
-        super.__init__()
+        super().__init__()
         
         self.Delta = Delta
         self.hamiltonian_type = 2
@@ -100,7 +100,7 @@ class XXZh(HamiltonianParameters):
 
     def __init__(self, Delta, h, J):
 
-        super.__init__()
+        super().__init__()
 
         self.Delta = Delta
         self.hamiltonian_type = 3
@@ -113,7 +113,7 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
 
     def __init__(self, J):
 
-        super.__init__()
+        super().__init__()
 
         self.hamiltonian_name = "AFMHeisenbergFMZ"
         self.hamiltonian_type = 4

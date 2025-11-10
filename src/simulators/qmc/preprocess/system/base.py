@@ -36,11 +36,4 @@ class System:
         num_neighbors = self.goemetry.num_neighbors_per_site
 
         return h/(J*num_neighbors)
-    
-
-    def validate_system(self):
-
-        if self.model_name == "AFMHeisenbergFMZ":
-            if not self.geometry.bipartite:
-                raise Exception("AFMHeisenbergFMZ Hamiltonian type requires a bipartite lattice\n")
 

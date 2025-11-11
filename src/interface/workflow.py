@@ -15,10 +15,11 @@ class Workflow:
     def build_from_file(self, input_file_path):
 
         file_inputs = InputFileReader(input_file_path)
+        simulator = file_inputs.simulator
 
-        preprocessor = PreprocessorFactory.create(file_inputs.simulator, file_inputs.parameter_set_list)
+        preprocessor = PreprocessorFactory.create(simulator, file_inputs.parameter_set_list)
 
-        driver = DriverFactory.create(preprocessor.simulation_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()
 
         return 0
@@ -31,7 +32,7 @@ class Workflow:
 
         preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
 
-        driver = DriverFactory.create(preprocessor.simulation_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()
 
         return 0

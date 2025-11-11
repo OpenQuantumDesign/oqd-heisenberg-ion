@@ -1,6 +1,6 @@
 class SamplingParameters:
 
-    def __init__(self, sampling_args):
+    def __init__(self, **sampling_args):
 
         self.T = sampling_args["T"]
         self.beta = 1.0/self.T

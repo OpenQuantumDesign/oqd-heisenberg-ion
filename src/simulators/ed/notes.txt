@@ -1,0 +1,5 @@
+1: LongRangePeriodic
+2: LongRangeOpen
+3: NearestNeighborPeriodic
+4: NearestNeighborOpen
+5: LongRangeOpenFileJij

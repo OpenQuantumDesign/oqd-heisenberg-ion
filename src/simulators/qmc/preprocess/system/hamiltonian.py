@@ -96,15 +96,15 @@ class XXZ(HamiltonianParameters):
 
 class XXZh(HamiltonianParameters):
 
-    args = {"Delta": float, "h": float, "J" : float}
+    args = {"Delta": float, "H": float, "J" : float}
 
-    def __init__(self, Delta, h, J):
+    def __init__(self, Delta, H, J):
 
         super().__init__()
 
         self.Delta = Delta
         self.hamiltonian_type = 3
-        self.h = h
+        self.h = H
         self.J = J
 
 class AFMHeisenbergFMZ(HamiltonianParameters):

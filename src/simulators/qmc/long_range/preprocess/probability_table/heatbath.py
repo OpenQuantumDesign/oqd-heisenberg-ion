@@ -8,11 +8,11 @@ class Heatbath(ProbabilityTable):
 
     args = {"gamma" : float}
 
-    def __init__(self, system, gamma):
+    def __init__(self, system, Gamma):
 
-        super().__init__(system, gamma=gamma)
+        super().__init__(system, gamma=Gamma)
 
-        self.gamma = gamma
+        self.gamma = Gamma
 
         self.h_B = self.system.compute_h_B()
 

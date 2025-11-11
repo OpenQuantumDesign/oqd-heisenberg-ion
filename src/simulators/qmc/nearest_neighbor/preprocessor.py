@@ -54,13 +54,13 @@ class NearestNeighborQMC(Preprocessor):
         run_folder = self.create_run_folder(misc_args)
         misc_args['RunFolder'] = run_folder
 
-        system = System(system_args)
+        system = System(**system_args)
 
         self.validate_system(system)
 
         sampling_args = input_config.simulation_config['Sampling']
 
-        sampling_params = SamplingParameters(sampling_args)
+        sampling_params = SamplingParameters(**sampling_args)
 
         simulation_parameters = SSEParameters(system, sampling_params, run_folder)
 

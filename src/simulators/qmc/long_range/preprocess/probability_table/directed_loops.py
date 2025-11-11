@@ -8,13 +8,13 @@ class DirectedLoops(ProbabilityTable):
 
     args = {"gamma": float, "ksi" : float, "dist_dep_gamma" : bool}
 
-    def __init__(self, system, gamma, ksi, dist_dep_gamma):
+    def __init__(self, system, Gamma, Ksi, DistDepGamma):
 
-        super().__init__(system, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
+        super().__init__(system, gamma=Gamma, ksi=Ksi, dist_dep_gamma=DistDepGamma)
 
-        self.gamma = gamma
-        self.ksi = ksi
-        self.dist_dep_gamma = dist_dep_gamma
+        self.gamma = Gamma
+        self.ksi = Ksi
+        self.dist_dep_gamma = DistDepGamma
 
         self.h_B = self.system.compute_h_B()
 

@@ -43,11 +43,11 @@ class MatrixInput(Interactions):
 
     args = {"JijFile": str}
 
-    def __init__(self, geometry, J_ij_file):
+    def __init__(self, geometry, JijFile):
 
         super().__init__(geometry)
 
-        self.file_path = J_ij_file
+        self.file_path = JijFile
         self.get_J_ij(geometry.N, geometry.num_bonds, self.file_path)
         
 
@@ -68,11 +68,11 @@ class PowerLaw(Interactions):
 
     args = {"Alpha" : float}
 
-    def __init__(self, geometry, alpha):
+    def __init__(self, geometry, Alpha):
 
         super().__init__(geometry)
 
-        self.alpha = alpha
+        self.alpha = Alpha
         self.get_J_ij(geometry.num_bonds, geometry.distances, self.alpha)
 
 

@@ -57,12 +57,12 @@ class LongRangeQMC(Preprocessor):
         run_folder = self.create_run_folder(misc_args)
         misc_args['RunFolder'] = run_folder
 
-        system = System(system_args)
+        system = System(**system_args)
 
         sampling_args = input_config.simulation_config['Sampling']
         prob_table_type = sampling_args['LoopType']
 
-        probability_table = ProbabilityTableFactory.create(prob_table_type, system, sampling_args)
+        probability_table = ProbabilityTableFactory.create(prob_table_type, system, **sampling_args)
         probability_table.write(run_folder)
 
         return 0

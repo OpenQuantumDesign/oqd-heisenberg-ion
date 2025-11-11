@@ -49,7 +49,7 @@ class LongRangeQMC(Driver):
             raise Exception("Copying binaries failed with exit code: {}.\n" \
             "Stack trace: {}".format(copy_results.returncode, copy_results.stderr))
         
-        run_results = subprocess.run(["./cpp_qmc"], cwd=self.build_dir, check=True, capture_output=True)
+        run_results = subprocess.run(["./cpp_qmc", self.input_file], cwd=self.build_dir, check=True, capture_output=True)
 
         if run_results.returncode != 0:
             raise Exception("Cpp run failed with exit code: {}.\n" \

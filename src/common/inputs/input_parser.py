@@ -67,7 +67,7 @@ input_schema = {
 
 class InputParser:
 
-    def __init__(self, schema, **config_settings):
+    def __init__(self, **config_settings):
 
         self.dtype_parsers = {str: self.extract_string, 
                     int: self.extract_integer, 
@@ -75,7 +75,7 @@ class InputParser:
                     bool: self.extract_bool,
                     "categorical": self.extract_categorical}
         
-        self.input_schema = schema
+        self.input_schema = input_schema
 
         self.simulation_config = {}
 

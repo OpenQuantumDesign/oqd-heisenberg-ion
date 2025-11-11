@@ -40,7 +40,7 @@ class LongRangeQMC(Preprocessor):
 
             self.configure_parameter_set(parameter_set)
 
-            self.write_see_input_file()
+        self.write_sse_input_file()
 
 
     def configure_parameter_set(self, parameter_args):
@@ -68,7 +68,7 @@ class LongRangeQMC(Preprocessor):
         return 0
     
 
-    def write_see_input_file(self):
+    def write_sse_input_file(self):
 
         simulation_folder = self.simulation_folder
         sse_input_file = os.path.join(simulation_folder, "sse_inputs.txt")

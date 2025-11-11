@@ -11,12 +11,12 @@ class DriverFactory:
         cls.registry[name] = subclass
         
 
-    def create(cls, name, root_folder, **kwargs):
+    def create(cls, name, root_folder, simulator_inputs):
 
         if name not in cls.registry:
             raise ValueError(f"Driver implementation not found for name: {name}")
         else:
-            return cls.registry[name](root_folder, **kwargs)
+            return cls.registry[name](root_folder, simulator_inputs)
         
 
 DriverFactory.create = classmethod(DriverFactory.create)

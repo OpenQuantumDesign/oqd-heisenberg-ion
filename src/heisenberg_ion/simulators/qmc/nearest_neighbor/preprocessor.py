@@ -20,7 +20,7 @@ class NearestNeighborQMC(Preprocessor):
     def build(self):
 
         self.check_single_input("root_folder")
-        self.root_folder = self.parameter_set_list[0]["RootFolder"]
+        self.root_folder = self.parameter_set_list[0]["root_folder"]
 
         self.simulation_folder = self.create_output_folder()
 
@@ -43,22 +43,22 @@ class NearestNeighborQMC(Preprocessor):
     def configure_parameter_set(self, parameter_args):
 
         input_config = InputParser(**parameter_args)
-        system_args = input_config.simulation_config['System']
+        system_args = input_config.simulation_config['system']
 
-        misc_args = input_config.simulation_config['Misc']
+        misc_args = input_config.simulation_config['misc']
         run_id = self.get_run_id(misc_args)
-        misc_args['Uuid'] = run_id
+        misc_args['uuid'] = run_id
 
-        misc_args['SimulationFolder'] = self.simulation_folder
+        misc_args['simulation_folder'] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
-        misc_args['RunFolder'] = run_folder
+        misc_args['run_folder'] = run_folder
 
         system = System(**system_args)
 
         self.validate_system(system)
 
-        sampling_args = input_config.simulation_config['Sampling']
+        sampling_args = input_config.simulation_config['sampling']
 
         sampling_params = SamplingParameters(**sampling_args)
 

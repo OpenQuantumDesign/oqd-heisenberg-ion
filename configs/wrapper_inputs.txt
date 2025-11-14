@@ -5,7 +5,7 @@
 # If any two lists have different lengths, the SSE program will error out. 
 
 Simulator   LongRangeQMC
-Hamiltonian Name    0   # Can be XY (J=-1, Delta=0), FMHeisenbergFMZ (J=-1, Delta=1), FMHeisenbergAFMZ (J=-1, Delta=-1), AFMHeisenbergFMZ (J=1, Delta=1), XXZ or XXZh
+Hamiltonian Name    XY   # Can be XY (J=-1, Delta=0), FMHeisenbergFMZ (J=-1, Delta=1), FMHeisenbergAFMZ (J=-1, Delta=-1), AFMHeisenbergFMZ (J=1, Delta=1), XXZ or XXZh
 Boundary Conditions Periodic   # Open or Periodic
 Interaction Range   Long Range  # Long Range or Nearest Neighbours
 Interaction Type    Power Law   # Power-Law or Input-Matrix

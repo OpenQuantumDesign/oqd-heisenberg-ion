@@ -12,7 +12,7 @@ Interaction Type    Power-Law   # Power-Law or Input-Matrix
 N   11  # Number of sites - any positive integer
 Delta   0.0 # Anisotropy strength (coefficient of the Z_i Z_j term in the Hamiltonian). Can be any real number
 H   0.0 # External field in the z direction - any real number
-Alpha   1.0 # Power law interaction strength exponent (alpha in 1/r^{alpha}). Can be any positive real number
+alpha   1.0 # Power law interaction strength exponent (alpha in 1/r^{alpha}). Can be any positive real number
 J   1.0 # Energy scale - any positive real number
 T   0.005   # Temperature - any positive real number
 

@@ -11,3 +11,4 @@ SSE_v2/__pycache__
 *.png
 *.csv
 /src/simulators/qmc/long_range/engine/.idea
+*.pyc

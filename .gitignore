@@ -12,3 +12,5 @@ SSE_v2/__pycache__
 *.csv
 /src/simulators/qmc/long_range/engine/.idea
 *.pyc
+/src/heisenberg_ion/simulators/qmc/long_range/engine/.idea
+/src/heisenberg_ion.egg-info

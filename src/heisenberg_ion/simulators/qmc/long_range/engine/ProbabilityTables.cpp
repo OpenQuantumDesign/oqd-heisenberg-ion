@@ -17,6 +17,9 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         lineCount += 1;
         if (lineCount == 1) {
             header = line;
+            header.erase(std::remove_if(header.begin(), header.end(),
+                [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
+            std::cout << header << std::endl;
             continue;
         }
 
@@ -64,6 +67,9 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         lineCount += 1;
         if (lineCount == 1) {
             header = line;
+            header.erase(std::remove_if(header.begin(), header.end(),
+                [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
+            std::cout << header << std::endl;
             continue;
         }
 
@@ -104,6 +110,9 @@ std::string ProbabilityTables::readVectorFile(const std::string &file_path, std:
         lineCount += 1;
         if (lineCount == 1) {
             header = line;
+            header.erase(std::remove_if(header.begin(), header.end(),
+                [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
+            std::cout << header << std::endl;
             continue;
         }
 
@@ -147,6 +156,7 @@ void ProbabilityTables::extractHeaderEntry(const std::string &header_string, con
         std::string kvp_segment;
 
         while(std::getline(ss_2, kvp_segment, '=')) {
+
             if (norm_found) {
                 member_to_update = std::stod(kvp_segment);
             }

@@ -1,5 +1,5 @@
-#ifndef SSE_V2_SIMULATIONPARAMETERS_H
-#define SSE_V2_SIMULATIONPARAMETERS_H
+#ifndef cpp_qmc_SIMULATIONPARAMETERS_H
+#define cpp_qmc_SIMULATIONPARAMETERS_H
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -91,4 +91,4 @@ public:
 };
 
 
-#endif //SSE_V2_SIMULATIONPARAMETERS_H
+#endif //cpp_qmc_SIMULATIONPARAMETERS_H

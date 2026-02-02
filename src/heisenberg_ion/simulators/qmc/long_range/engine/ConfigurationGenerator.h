@@ -1,5 +1,5 @@
-#ifndef SSE_V2_CONFIGURATIONGENERATOR_H
-#define SSE_V2_CONFIGURATIONGENERATOR_H
+#ifndef cpp_qmc_CONFIGURATIONGENERATOR_H
+#define cpp_qmc_CONFIGURATIONGENERATOR_H
 #include<vector>
 #include<unordered_set>
 #include<random>
@@ -145,4 +145,4 @@ public:
 };
 
 
-#endif //SSE_V2_CONFIGURATIONGENERATOR_H
+#endif //cpp_qmc_CONFIGURATIONGENERATOR_H

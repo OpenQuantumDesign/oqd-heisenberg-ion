@@ -1,5 +1,5 @@
-#ifndef SSE_V2_VERTEXTYPES_H
-#define SSE_V2_VERTEXTYPES_H
+#ifndef cpp_qmc_VERTEXTYPES_H
+#define cpp_qmc_VERTEXTYPES_H
 #include<vector>
 #include<map>
 
@@ -42,4 +42,4 @@ public:
     int getFlippedSpinsVertexIndex(const int &l_e, const int &l_x, const int &old_vertex_index) const;
 };
 
-#endif //SSE_V2_VERTEXTYPES_H
+#endif //cpp_qmc_VERTEXTYPES_H

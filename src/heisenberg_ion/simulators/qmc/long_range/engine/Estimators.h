@@ -1,5 +1,5 @@
-#ifndef SSE_V2_ESTIMATORS_H
-#define SSE_V2_ESTIMATORS_H
+#ifndef cpp_qmc_ESTIMATORS_H
+#define cpp_qmc_ESTIMATORS_H
 #include<vector>
 #include "SimulationParameters.h"
 
@@ -47,4 +47,4 @@ public:
 };
 
 
-#endif //SSE_V2_ESTIMATORS_H
+#endif //cpp_qmc_ESTIMATORS_H

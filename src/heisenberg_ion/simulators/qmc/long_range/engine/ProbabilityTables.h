@@ -1,5 +1,5 @@
-#ifndef SSE_V2_PROBABILITYTABLES_H
-#define SSE_V2_PROBABILITYTABLES_H
+#ifndef cpp_qmc_PROBABILITYTABLES_H
+#define cpp_qmc_PROBABILITYTABLES_H
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -42,4 +42,4 @@ public:
 };
 
 
-#endif //SSE_V2_PROBABILITYTABLES_H
+#endif //cpp_qmc_PROBABILITYTABLES_H

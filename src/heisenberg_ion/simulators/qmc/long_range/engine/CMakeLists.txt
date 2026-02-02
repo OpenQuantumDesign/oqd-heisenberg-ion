@@ -3,7 +3,7 @@ project(cpp_qmc)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(SSE_v2 main.cpp
+add_executable(cpp_qmc main.cpp
         ConfigurationGenerator.cpp
         Estimators.cpp
         ProbabilityTables.cpp

@@ -34,7 +34,7 @@ class Preprocessor:
     def create_run_folder(self, misc_args):
 
         simulation_folder = self.simulation_folder
-        run_id = misc_args['uuid']
+        run_id = str(misc_args['uuid'])
         run_folder = os.path.join(simulation_folder, run_id)
 
         os.mkdir(run_folder)

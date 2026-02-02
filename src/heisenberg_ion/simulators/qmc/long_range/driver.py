@@ -13,7 +13,7 @@ class LongRangeQMC(Driver):
         os.mkdir(self.build_dir)
 
         self.bin_dir = simulator_inputs["bin_folder"]
-        self.source_dir = simulator_inputs["source_folder"]
+        self.source_dir = simulator_inputs["cpp_source_folder"]
 
         if self.bin_dir is None:
             self.build_from_cmake(self.source_dir)

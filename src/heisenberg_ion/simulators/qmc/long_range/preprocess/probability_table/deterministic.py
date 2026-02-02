@@ -19,8 +19,8 @@ class Deterministic(ProbabilityTable):
 
         super().validate_system()
 
-        hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
-        self.allowed_hamiltonians = ["XY", "FMHeisenbergAFMZ", "FMHeisenbergFMZ"]
+        hamiltonian_name = self.system.hamiltonian_parameters.hamiltonian_name
+        self.allowed_hamiltonians = ["XY", "fm_heisenberg_afm_Z", "fm_heisenberg_fm_Z"]
 
         if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Deterministic probability tables " \

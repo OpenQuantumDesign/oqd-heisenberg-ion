@@ -10,10 +10,10 @@
 
 void checkRootFolder(std::map<std::string, std::string> &input_key_vals) {
 
-    if (!input_key_vals.contains("SimulationFolder") || input_key_vals["SimulationFolder"].empty()) {
+    if (!input_key_vals.contains("simulation_folder") || input_key_vals["simulation_folder"].empty()) {
         throw std::runtime_error("No root folder provided\n");
     }
-    else if(!std::filesystem::exists(input_key_vals["SimulationFolder"])) {
+    else if(!std::filesystem::exists(input_key_vals["simulation_folder"])) {
         throw std::runtime_error("Simulation folder path does not exist\n");
     }
 
@@ -21,12 +21,12 @@ void checkRootFolder(std::map<std::string, std::string> &input_key_vals) {
 
 void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int num_parameter_sets) {
 
-    if (!input_key_vals.contains("Uuid") || input_key_vals["Uuid"].empty()) {
+    if (!input_key_vals.contains("uuid") || input_key_vals["uuid"].empty()) {
         throw std::runtime_error("No UUID provided\n");
     }
     else {
         std::unordered_set<std::string> uuid_collection;
-        std::string uuid_str = input_key_vals["Uuid"];
+        std::string uuid_str = input_key_vals["uuid"];
         std::stringstream uuid_ss(uuid_str);
         std::string single_uuid;
         while(std::getline(uuid_ss, single_uuid, ',')) {
@@ -46,10 +46,10 @@ void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int nu
 
 void checkNumberOfThreads(std::map<std::string, std::string> &input_key_vals) {
 
-    if (input_key_vals.contains("NumberOfThreads")) {
-        std::string num_threads_str = input_key_vals["NumberOfThreads"];
-        if (num_threads_str.empty()) {
-            input_key_vals["NumberOfThreads"] = "1";
+    if (input_key_vals.contains("number_of_threads")) {
+        std::string num_threads_str = input_key_vals["number_of_threads"];
+        if (num_threads_str.empty() || num_threads_str == "-1") {
+            input_key_vals["number_of_threads"] = "1";
         }
         else {
             size_t pos;
@@ -60,12 +60,12 @@ void checkNumberOfThreads(std::map<std::string, std::string> &input_key_vals) {
         }
     }
     else {
-        input_key_vals["NumberOfThreads"] = "1";
+        input_key_vals["number_of_threads"] = "1";
     }
 }
 
-void readInputFile(const std::string &input_file_path, std::map<std::string, std::string> input_key_vals,
-                   std::map<std::string, bool> is_parameter_iterable){
+void readInputFile(const std::string &input_file_path, std::map<std::string, std::string> &input_key_vals,
+                   std::map<std::string, bool> &is_parameter_iterable){
 
     std::ifstream file_stream(input_file_path);
 
@@ -119,7 +119,7 @@ void readInputFile(const std::string &input_file_path, std::map<std::string, std
         }
     }
 
-    input_key_vals["NumberOfParameterSets"] = std::to_string(num_parameter_sets);
+    input_key_vals["number_of_parameter_sets"] = std::to_string(num_parameter_sets);
 
     file_stream.close();
 
@@ -136,7 +136,7 @@ void gatherThreadParameterSets(const int &num_sets_per_thread, std::map<std::str
         std::map<std::string, std::string> sim_parameters;
         for (const std::pair<const std::string, std::string>& key_value_pair : input_settings) {
             std::string key = key_value_pair.first;
-            if (key == "NumberOfThreads") {
+            if (key == "number_of_threads") {
                 continue;
             }
             std::string val = key_value_pair.second;
@@ -161,8 +161,8 @@ void gatherParameterSets(std::map<std::string, bool> &specify_iterables,
                          std::map<std::string, std::string> &input_settings,
                          std::vector<std::vector<std::map<std::string, std::string>>> &parameter_sets) {
 
-    int num_total_parameter_sets = std::stoi(input_settings["NumberOfParameterSets"]);
-    int num_threads = std::stoi(input_settings["NumberOfThreads"]);
+    int num_total_parameter_sets = std::stoi(input_settings["number_of_parameter_sets"]);
+    int num_threads = std::stoi(input_settings["number_of_threads"]);
     if (num_threads > num_total_parameter_sets) {
         num_threads = num_total_parameter_sets;
     }

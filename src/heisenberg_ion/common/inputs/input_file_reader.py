@@ -1,4 +1,4 @@
-from .utils import standardize_string_format
+from .utils import convert_to_snake_case
 
 class InputFileReader:
 
@@ -38,7 +38,7 @@ class InputFileReader:
 
                 self.count_parameter_sets(count_entries, line_count)
 
-                key = standardize_string_format(line_data[0])
+                key = line_data[0]
 
                 input_config[key] = data
                 self.is_param_iterable[key] = (count_entries != 1)

@@ -47,7 +47,7 @@ class FMHeisenbergAFMZ(HamiltonianParameters):
 
         super().__init__()
 
-        self.hamiltonian_name = "FMHeisenbergAFMZ"
+        self.hamiltonian_name = "fm_heisenberg_afm_Z"
         self.hamiltonian_type = -1
         self.Delta = -1.0
         self.h = 0.0
@@ -75,7 +75,7 @@ class FMHeisenbergFMZ(HamiltonianParameters):
 
         super().__init__()
 
-        self.hamiltonian_name = "FMHeisenbergFMZ"
+        self.hamiltonian_name = "fm_heisenberg_fm_Z"
         self.hamiltonian_type = 1
         self.Delta = 1.0
         self.h = 0.0
@@ -115,7 +115,7 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
 
         super().__init__()
 
-        self.hamiltonian_name = "AFMHeisenbergFMZ"
+        self.hamiltonian_name = "afm_heisenberg_fm_Z"
         self.hamiltonian_type = 4
         self.Delta = 1.0
         self.h = 0.0
@@ -125,6 +125,6 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
 HamiltonianFactory.register("XY", XY)
 HamiltonianFactory.register("XXZ", XXZ)
 HamiltonianFactory.register("XXZh", XXZh)
-HamiltonianFactory.register("FMHeisenbergFMZ", FMHeisenbergFMZ)
-HamiltonianFactory.register("FMHeisenbergAFMZ", FMHeisenbergAFMZ)
-HamiltonianFactory.register("AFMHeisenbergFMZ", AFMHeisenbergFMZ)
+HamiltonianFactory.register("fm_heisenberg_fm_Z", FMHeisenbergFMZ)
+HamiltonianFactory.register("fm_heisenberg_afm_Z", FMHeisenbergAFMZ)
+HamiltonianFactory.register("afm_heisenberg_fm_Z", AFMHeisenbergFMZ)

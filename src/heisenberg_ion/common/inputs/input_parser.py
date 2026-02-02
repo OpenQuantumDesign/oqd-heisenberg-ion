@@ -2,98 +2,98 @@ from .utils import convert_to_snake_case
 from .utils import convert_to_pascal
 
 input_schema = {
-        "Hamiltonian Name" : {
+        "hamiltonian_name" : {
             "DataType": "categorical",
-            "Categories" : ["FMHeisenbergAFMZ", "XY", "FMHeisenbergFMZ", "XXZ", "XXZh", "AFMHeisenbergFMZ"],
-            "ParameterType" : "System",
+            "Categories" : ["fm_heisenberg_afm_Z", "XY", "fm_heisenberg_fm_Z", "XXZ", "XXZh", "afm_heisenberg_fm_Z"],
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": False
             },
-        "Loop Type" : {
+        "loop_type" : {
             "DataType": "categorical", 
-            "Categories": ["Determinisitic", "Heatbath", "DirectedLoop"],
-            "ParameterType" : "Sampling",
+            "Categories": ["deterministic", "heatbath", "directed_loop"],
+            "ParameterType" : "sampling",
             "ConvertKeyCase": True,
             "ConvertValCase": True
             },
-        "Boundary": {
+        "boundary": {
             "DataType": "categorical",
-            "Categories": ["Periodic", "Open"],
-            "ParameterType" : "System",
+            "Categories": ["periodic", "open"],
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": True
             }, 
-        "Interaction Range": {
+        "interaction_range": {
             "DataType": "categorical",
-            "Categories": ["NearestNeighbors", "LongRange"],
-            "ParameterType" : "System",
+            "Categories": ["nearest_neighbors", "long_range"],
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": True
             },
-        "Interaction Type" : {
+        "interaction_type" : {
             "DataType": "categorical", 
-            "Categories": ["PowerLaw", "InputMatrix"],
-            "ParameterType" : "System",
+            "Categories": ["power_law", "input_matrix"],
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": True
             },
-        "Spatial Dimension" : {
+        "spatial_dimension" : {
             "DataType": "categorical",
             "Categories": ["1d", "2d"],
-            "ParameterType" : "System",
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": False
             }, 
-        "Lattice Type" : {
+        "lattice_type" : {
             "DataType" : "categorical", 
-            "Categories": ["Rectangular", "Triangular"], 
-            "ParameterType" : "System",
+            "Categories": ["rectangular", "triangular"], 
+            "ParameterType" : "system",
             "ConvertKeyCase": True,
             "ConvertValCase": True
             },
-        "Simulator" : {
+        "simulator" : {
             "DataType" : "categorical", 
-            "Categories" : ["LongRangeQMC", "NearestNeighborQMC", "ExactDiagonalization"],
-            "ParameterType" : "Simulation",
+            "Categories" : ["long_range_qmc", "nearest_neighbor_qmc", "exact_diagonalization"],
+            "ParameterType" : "simulation",
             "ConvertKeyCase": True,
             "ConvertValCase": True
         },
 
-        "N" : {"DataType" : int, "ParameterType" : "System", "ConvertKeyCase": False, "ConvertValCase": False}, 
-        "Delta" : {"DataType" : float, "ParameterType" : "System", "ConvertKeyCase": False, "ConvertValCase": False}, 
-        "alpha" : {"DataType" : float, "ParameterType" : "System", "ConvertKeyCase": False, "ConvertValCase": False}, 
-        "h" : {"DataType" : float, "ParameterType" : "System", "ConvertKeyCase": False, "ConvertValCase": False},
-        "J" : {"DataType" : float, "ParameterType" : "System", "ConvertKeyCase": False, "ConvertValCase": False},
-        "T" : {"DataType" : float, "ParameterType" : "Sampling", "ConvertKeyCase": False, "ConvertValCase": False},
+        "N" : {"DataType" : int, "ParameterType" : "system", "ConvertKeyCase": False, "ConvertValCase": False}, 
+        "Delta" : {"DataType" : float, "ParameterType" : "system", "ConvertKeyCase": False, "ConvertValCase": False}, 
+        "alpha" : {"DataType" : float, "ParameterType" : "system", "ConvertKeyCase": False, "ConvertValCase": False}, 
+        "h" : {"DataType" : float, "ParameterType" : "system", "ConvertKeyCase": False, "ConvertValCase": False},
+        "J" : {"DataType" : float, "ParameterType" : "system", "ConvertKeyCase": False, "ConvertValCase": False},
+        "T" : {"DataType" : float, "ParameterType" : "sampling", "ConvertKeyCase": False, "ConvertValCase": False},
 
-        "Equilibration Steps" : {"DataType" : int, "ParameterType" : "Simulation", 
+        "equilibration_steps" : {"DataType" : int, "ParameterType" : "simulation", 
                                 "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Simulation Steps" : {"DataType" : int, "ParameterType" : "Simulation", 
+        "simulation_steps" : {"DataType" : int, "ParameterType" : "simulation", 
                              "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Operator List Update Multiplier" : {"DataType" : float, "ParameterType" : "Simulation", 
+        "operator_list_update_multiplier" : {"DataType" : float, "ParameterType" : "simulation", 
                                           "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "gamma" : {"DataType" : float, "ParameterType" : "Sampling", 
+        "gamma" : {"DataType" : float, "ParameterType" : "sampling", 
                    "ConvertKeyCase": False, "ConvertValCase": False}, 
-        "ksi" : {"DataType" : float, "ParameterType" : "Sampling", 
+        "ksi" : {"DataType" : float, "ParameterType" : "sampling", 
                  "ConvertKeyCase": False, "ConvertValCase": False}, 
-        "Distance Dependant Offset" : {"DataType": bool, "ParameterType" : "Sampling", 
+        "distance_dependent_offset" : {"DataType": bool, "ParameterType" : "sampling", 
                                      "ConvertKeyCase": True, "ConvertValCase": False}, 
 
-        "Root Folder" : {"DataType" : str, "ParameterType" : "Misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Bin Folder" : {"DataType" : str, "ParameterType" : "Misc", "ConvertKeyCase": True, "ConvertValCase": False},
-        "Cpp Source Folder" : {"DataType" : str, "ParameterType" : "Misc", "ConvertKeyCase": True, "ConvertValCase": False},
-        "UUID" : {"DataType" : str, "ParameterType" : "Misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Number Of Threads" : {"DataType" : int, "ParameterType" : "Misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Track Spin Configurations" : {"DataType" : bool, "ParameterType" : "Simulation", "ConvertKeyCase": True, 
+        "root_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
+        "bin_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertKeyCase": True, "ConvertValCase": False},
+        "cpp_source_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertKeyCase": True, "ConvertValCase": False},
+        "uuid" : {"DataType" : str, "ParameterType" : "misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
+        "number_of_threads" : {"DataType" : int, "ParameterType" : "misc", "ConvertKeyCase": True, "ConvertValCase": False}, 
+        "track_spin_configurations" : {"DataType" : bool, "ParameterType" : "simulation", "ConvertKeyCase": True, 
                                      "ConvertValCase": False}, 
-        "Write Final Spin Configuration": {"DataType" : bool, "ParameterType" : "Simulation", "ConvertKeyCase": True, 
+        "write_final_spin_configuration": {"DataType" : bool, "ParameterType" : "simulation", "ConvertKeyCase": True, 
                                         "ConvertValCase": False},
 
-        "Initial Configuration Index" : {"DataType" : int, "ParameterType" : "Simulation", 
+        "initial_configuration_index" : {"DataType" : int, "ParameterType" : "simulation", 
                                        "ConvertKeyCase": True, "ConvertValCase": False}, 
-        "Initial Configuration File Path" : {"DataType" : str, "ParameterType" : "Simulation", 
+        "initial_configuration_file_path" : {"DataType" : str, "ParameterType" : "simulation", 
                                           "ConvertKeyCase": True, "ConvertValCase": False},
-        "Initial Operator List Size" : {"DataType": int, "ParameterType" : "Simulation", 
+        "initial_operator_list_size" : {"DataType": int, "ParameterType" : "simulation", 
                                      "ConvertKeyCase": True, "ConvertValCase": False}
         }
 
@@ -143,11 +143,10 @@ class InputParser:
     def extract_categorical(self, config_settings, key):
 
         val = config_settings[key]
-        val_std = convert_to_pascal(val)
 
         allowed_vals = self.input_schema[key]["Categories"]
         
-        if val_std in allowed_vals:
+        if val in allowed_vals:
             return val
         else:
             raise ValueError("Unrecognized input for key: {}. Value provided: {}. " \
@@ -167,8 +166,8 @@ class InputParser:
             if not param_type in self.simulation_config:
                 self.simulation_config[param_type] = {}
 
-            std_key = convert_to_snake_case(key) if input_schema[key]["ConvertKeyCase"] else key
-            std_val = convert_to_snake_case(val) if input_schema[key]["ConvertValCase"] else val
+            std_key = convert_to_snake_case(key) if self.input_schema[key]["ConvertKeyCase"] else key
+            std_val = convert_to_snake_case(val) if self.input_schema[key]["ConvertValCase"] else val
 
             self.simulation_config[param_type][std_key] = std_val
 

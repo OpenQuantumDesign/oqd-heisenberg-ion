@@ -6,7 +6,7 @@ class System:
 
     def __init__(self, **kwargs):
 
-        self.model_name = kwargs["hamiltonian_type"]
+        self.model_name = kwargs["hamiltonian_name"]
         hamiltonian_args = HamiltonianFactory.extract_args(self.model_name, **kwargs)
         self.hamiltonian_parameters = HamiltonianFactory.create(self.model_name, **hamiltonian_args)
         

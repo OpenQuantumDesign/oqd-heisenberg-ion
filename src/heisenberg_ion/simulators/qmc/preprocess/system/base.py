@@ -18,7 +18,7 @@ class System:
         self.interaction_range = kwargs["interaction_range"]
         self.interaction_name = self.get_interaction_name(kwargs)
         self.interaction_args = InteractionsFactory.extract_args(self.interaction_name, **kwargs)
-        self.interactions = InteractionsFactory.create(self.interaction_name, self.geometry, **kwargs)
+        self.interactions = InteractionsFactory.create(self.interaction_name, self.geometry, **self.interaction_args)
 
 
     def get_interaction_name(self, kwarg_dict):

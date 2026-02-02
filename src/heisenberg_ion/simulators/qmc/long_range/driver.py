@@ -17,7 +17,7 @@ class LongRangeQMC(Driver):
 
         if self.bin_dir is None:
             self.build_from_cmake(self.source_dir)
-            self.compile_source(self.source_dir)
+            self.compile_source()
 
 
     def build_from_cmake(self, cpp_source):

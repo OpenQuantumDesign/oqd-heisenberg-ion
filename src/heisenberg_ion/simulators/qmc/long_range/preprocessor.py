@@ -35,10 +35,7 @@ class LongRangeQMC(Preprocessor):
     def configure_simulation(self):
 
         for i in range(self.num_parameter_sets):
-
-            parameter_set = self.parameter_set_list[i]
-
-            self.configure_parameter_set(parameter_set)
+            self.configure_parameter_set(self.parameter_set_list[i])
 
         self.write_sse_input_file()
 
@@ -51,19 +48,24 @@ class LongRangeQMC(Preprocessor):
         misc_args = input_config.simulation_config['misc']
         run_id = self.get_run_id(misc_args)
         misc_args['uuid'] = run_id
+        parameter_args['uuid'] = run_id
 
         misc_args['simulation_folder'] = self.simulation_folder
+        parameter_args['simulation_folder'] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
         misc_args['run_folder'] = run_folder
+        parameter_args['run_folder'] = run_folder
 
         system = System(**system_args)
+        parameter_args['hamiltonian_type'] = system.hamiltonian_parameters.hamiltonian_type
 
         sampling_args = input_config.simulation_config['sampling']
         prob_table_type = sampling_args['loop_type']
 
-        probability_table = ProbabilityTableFactory.create(prob_table_type, system, **sampling_args)
-        probability_table.write(run_folder)
+        prob_table_args = ProbabilityTableFactory.extract_args(prob_table_type, **sampling_args)
+        probability_table = ProbabilityTableFactory.create(prob_table_type, system, **prob_table_args)
+        probability_table.write_to_files(run_folder)
 
         return 0
     

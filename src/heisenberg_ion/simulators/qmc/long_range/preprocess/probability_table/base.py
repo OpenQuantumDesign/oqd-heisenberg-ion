@@ -1,3 +1,5 @@
+import os
+
 class ProbabilityTable:
 
     args = {}
@@ -27,4 +29,7 @@ class ProbabilityTable:
     def write_to_files(self, out_dir):
 
         self.out_dir = out_dir
+        self.prob_dir= os.path.join(self.out_dir, "probability_densities/")
+        os.makedirs(self.prob_dir)
+
         return 0

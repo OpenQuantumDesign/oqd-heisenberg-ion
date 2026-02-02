@@ -69,8 +69,8 @@ class Deterministic(ProbabilityTable):
 
         super().write_to_files(out_dir)
 
-        geometry_file_name = os.path.join(out_dir, "geometry.csv")
-        max_over_states_file_name = os.path.join(out_dir, "max_over_states.csv")
+        geometry_file_name = os.path.join(self.prob_dir, "geometry.csv")
+        max_over_states_file_name = os.path.join(self.prob_dir, "max_over_states.csv")
 
         geometry_table = self.system.geometry.geometry_table
         N = self.system.geometry.N

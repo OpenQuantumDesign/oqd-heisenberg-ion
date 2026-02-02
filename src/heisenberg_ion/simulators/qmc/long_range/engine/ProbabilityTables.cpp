@@ -176,9 +176,9 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
 
     if (sim_params.hamiltonian_type == 2){
 
-        diagonal_probabilities_file = sim_params.simulation_subfolder + "/Probability_Densities/diag_probs.csv";
-        vertex_weights_file = sim_params.simulation_subfolder + "/Probability_Densities/vertex_weights.csv";
-        loop_update_probabilities_file = sim_params.simulation_subfolder + "/Probability_Densities/" +
+        diagonal_probabilities_file = sim_params.simulation_subfolder + "/probability_densities/diag_probs.csv";
+        vertex_weights_file = sim_params.simulation_subfolder + "/probability_densities/vertex_weights.csv";
+        loop_update_probabilities_file = sim_params.simulation_subfolder + "/probability_densities/" +
                 sim_params.loop_type + "_off_diag_table.csv";
 
         std::string header_diag_prob_file = readTabularFile(diagonal_probabilities_file,
@@ -191,8 +191,8 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
         normalizeLoopProbs(vertex_types, sim_params);
     }
 
-    max_norm_probabilities_file = sim_params.simulation_subfolder + "/Probability_Densities/max_over_states.csv";
-    geometry_file = sim_params.simulation_subfolder + "/Probability_Densities/geometry.csv";
+    max_norm_probabilities_file = sim_params.simulation_subfolder + "/probability_densities/max_over_states.csv";
+    geometry_file = sim_params.simulation_subfolder + "/probability_densities/geometry.csv";
 
     std::string header_max_norm_file = readVectorFile(max_norm_probabilities_file,
                                                       max_norm_probabilities);

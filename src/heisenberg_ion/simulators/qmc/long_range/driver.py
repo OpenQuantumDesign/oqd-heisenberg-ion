@@ -42,12 +42,13 @@ class LongRangeQMC(Driver):
 
     def simulate(self):
 
-        copy_command = ["cp", "-r", self.bin_dir, self.build_dir]
-        copy_results = subprocess.run(copy_command, check=True, capture_output=True)
+        if self.bin_dir != None:
+            copy_command = ["cp", "-r", self.bin_dir, self.build_dir]
+            copy_results = subprocess.run(copy_command, check=True, capture_output=True)
 
-        if copy_results.returncode != 0:
-            raise Exception("Copying binaries failed with exit code: {}.\n" \
-            "Stack trace: {}".format(copy_results.returncode, copy_results.stderr))
+            if copy_results.returncode != 0:
+                raise Exception("Copying binaries failed with exit code: {}.\n" \
+                "Stack trace: {}".format(copy_results.returncode, copy_results.stderr))
         
         run_results = subprocess.run(["./cpp_qmc", self.input_file], cwd=self.build_dir, check=True, capture_output=True)
 

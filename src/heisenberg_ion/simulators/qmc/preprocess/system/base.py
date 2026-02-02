@@ -24,7 +24,7 @@ class System:
     def get_interaction_name(self, kwarg_dict):
 
         if self.interaction_range == "long_range":
-            return kwarg_dict["interaction_range"]
+            return kwarg_dict["interaction_type"]
         else:
             return self.interaction_range
         

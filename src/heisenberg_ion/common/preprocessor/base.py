@@ -44,7 +44,7 @@ class Preprocessor:
 
     def get_run_id(self, misc_args):
 
-        if "Uuid" in misc_args:
+        if "uuid" in misc_args:
             run_id = misc_args["uuid"]
         else:
             run_id = uuid.uuid4()

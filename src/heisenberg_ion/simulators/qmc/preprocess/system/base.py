@@ -10,8 +10,8 @@ class System:
         hamiltonian_args = HamiltonianFactory.extract_args(self.model_name, **kwargs)
         self.hamiltonian_parameters = HamiltonianFactory.create(self.model_name, **hamiltonian_args)
         
-        self.geometry_name = kwargs["interaction_range"] + "_" + kwargs["boundary_type"] + "_"\
-            + kwargs["spatial_dimension"] + "_" + kwargs["geometry_type"]
+        self.geometry_name = kwargs["interaction_range"] + "_" + kwargs["boundary"] + "_"\
+            + kwargs["spatial_dimension"] + "_" + kwargs["lattice_type"]
         geometry_args = GeometryFactory.extract_args(self.geometry_name, **kwargs)
         self.geometry = GeometryFactory.create(self.geometry_name, **geometry_args)
 

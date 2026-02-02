@@ -13,7 +13,7 @@ class InputFileReader:
 
         self.extract_parameter_set_list(input_config)
 
-        self.simulator = self.parameter_set_list[0]["Simulator"]
+        self.simulator = convert_to_snake_case(self.parameter_set_list[0]["simulator"])
 
     
     def extract_key_value_inputs(self):

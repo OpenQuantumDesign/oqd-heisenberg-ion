@@ -6,7 +6,7 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
     extractStringEntry("uuid", input_key_vals["uuid"], uuid);
     simulation_subfolder = root_folder + "/" + uuid + "/";
 
-    std::string file_path = simulation_subfolder + "/" + "Simulation Specs.txt";
+    std::string file_path = simulation_subfolder + "/" + "simulation_specs.txt";
     std::ofstream ofs(file_path);
 
     writeStringEntry("output_folder", simulation_subfolder, ofs);

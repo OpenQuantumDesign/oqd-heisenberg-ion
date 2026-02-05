@@ -36,7 +36,7 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 
     simulation_steps = sim_params.simulation_steps;
     track_spin_configs = track_spin_configs_in;
-    out_folder_path = sim_params.simulation_subfolder + "/QMC_Output/";
+    out_folder_path = sim_params.simulation_subfolder + "/qmc_output/";
 
     if (not std::filesystem::is_directory(out_folder_path)){
         std::filesystem::create_directory(out_folder_path);
@@ -45,8 +45,7 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 
 void Estimators::outputStepData(const SimulationParameters &sim_params) const {
 
-    std::string file_path = out_folder_path + "/" + "MC Step Outputs.csv";
-    //std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
+    std::string file_path = out_folder_path + "/" + "estimators.csv";
     std::string header = "# MC Step Outputs\n";
     header += "MC Step, Energy, Magnetization, Spin Stiffness\n";
     std::ofstream ofs(file_path);
@@ -85,7 +84,7 @@ void Estimators::outputPairCorrelations(const SimulationParameters &sim_params) 
 
 void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const {
 
-    std::string file_path = out_folder_path + "/" + "MC Spin Configurations.csv";
+    std::string file_path = out_folder_path + "/" + "spin_configurations.csv";
     std::string header = "# Spin Configurations\n";
     std::ofstream ofs(file_path);
     ofs << header << "\n";

@@ -6,7 +6,9 @@ class ConfigurationGenerator:
 
     def __init__(self, system_inputs, sampling_inputs, out_dir):
 
-        self.out_dir = out_dir
+        self.out_dir = out_dir + "/qmc_output/"
+        os.mkdir(self.out_dir)
+
         self.geometry = system_inputs.geometry
         self.hamiltonian = system_inputs.model_name
 
@@ -461,18 +463,18 @@ class ConfigurationGenerator:
 
         if self.hamiltonian == "XY":
             self.simulate_XY()
-        elif self.hamiltonian == "FMHeisenbergFMZ":
+        elif self.hamiltonian == "fm_heisenberg_fm_Z":
             self.simulate_isotropic()
-        elif self.hamiltonian == "AFMHeisenbergFMZ":
+        elif self.hamiltonian == "afm_heisenberg_fm_Z":
             self.simulate_isotropic()
 
 
     def write_outputs(self):
 
-        spin_configs_file = os.path.join(self.out_dir, "MC Spin Configurations.csv")
-        step_outputs_file = os.path.join(self.out_dir, "MC Step Outputs.csv")
+        spin_configs_file = os.path.join(self.out_dir, "spin_configurations.csv")
+        step_outputs_file = os.path.join(self.out_dir, "estimators.csv")
 
-        np.savetxt(spin_configs_file, self.spin_array, header="Spin Configuration\n", delimiter=",")
+        np.savetxt(spin_configs_file, self.spin_array, header="spin_configuration\n", delimiter=",")
 
         with open(step_outputs_file, 'w') as f:
             header = "MC Step Outputs\n"

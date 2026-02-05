@@ -85,4 +85,4 @@ isotropic_exit_leg_maps = [ferro_isotropic_exit_leg_map, anti_ferro_isotropic_ex
 isotropic_vertex_map = [ferro_vertex_map, anti_ferro_vertex_map]
 isotropic_leg_spin = [ferro_leg_spin, anti_ferro_leg_spin]
 
-isotropic_interaction_type_map = {"FMHeisenbergFMZ": 0, "AFMHeisenbergFMZ": 1}
+isotropic_interaction_type_map = {"fm_heisenberg_fm_Z": 0, "afm_heisenberg_fm_Z": 1}

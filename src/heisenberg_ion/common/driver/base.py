@@ -2,7 +2,7 @@ import os
 
 class Driver:
 
-    def __init__(self, simulation_folder, driver_inputs):
+    def __init__(self, simulation_folder):
 
         self.simulation_folder = simulation_folder
         if not os.path.exists(self.simulation_folder):

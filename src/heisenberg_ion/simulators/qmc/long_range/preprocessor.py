@@ -79,7 +79,8 @@ class LongRangeQMC(Preprocessor):
             for key in self.parameter_set_list[0].keys():
                 text_line = key + "\t" + str(self.parameter_set_list[0][key])
                 for i in range(1, self.num_parameter_sets):
-                    text_line += "," + str(self.parameter_set_list[i][key])
+                    if not key in self.keys_single_parameters:
+                        text_line += "," + str(self.parameter_set_list[i][key])
                 text_line += "\n"
                 f.write(text_line)
 

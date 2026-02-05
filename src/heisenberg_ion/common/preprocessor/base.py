@@ -4,6 +4,8 @@ from datetime import datetime
 
 class Preprocessor:
 
+    keys_single_parameters = {'root_folder', 'simulation_folder', 'number_of_threads'}
+
     def __init__(self, parameter_set_list):
 
         self.parameter_set_list = parameter_set_list

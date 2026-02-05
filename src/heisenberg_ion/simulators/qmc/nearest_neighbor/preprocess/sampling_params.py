@@ -6,7 +6,7 @@ class SamplingParameters:
         self.beta = 1.0/self.T
 
         self.equilibration_steps = sampling_args["equilibration_steps"]
-        self.mc_steps = sampling_args["mc_steps"]
+        self.mc_steps = sampling_args["simulation_steps"]
 
         self.M = self.set_optional_parameter("initial_operator_list_size", sampling_args, 50)
         self.a = self.set_optional_parameter("operator_list_update_multiplier", sampling_args, 1.25)

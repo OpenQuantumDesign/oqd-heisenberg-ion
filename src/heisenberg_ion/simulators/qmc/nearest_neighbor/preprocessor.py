@@ -77,7 +77,7 @@ class NearestNeighborQMC(Preprocessor):
             raise Exception("Unrecognized Hamiltonian name for nearest-neighbor simulator. " \
             "Allowed Hamiltonians are: {}".format(self.allowed_hamiltonians))
 
-        if system.model_name == "AFMHeisenbergFMZ":
+        if system.model_name == "afm_heisenberg_fm_Z":
             if not system.geometry.bipartite:
                 raise Exception("AFMHeisenbergFMZ Hamiltonian requires a bipartite lattice\n")
             

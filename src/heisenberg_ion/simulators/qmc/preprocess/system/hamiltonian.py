@@ -89,6 +89,7 @@ class XXZ(HamiltonianParameters):
 
         super().__init__()
         
+        self.hamiltonian_name = "XXZ"
         self.Delta = Delta
         self.hamiltonian_type = 2
         self.h = 0.0
@@ -102,6 +103,7 @@ class XXZh(HamiltonianParameters):
 
         super().__init__()
 
+        self.hamiltonian_name = "XXZh"
         self.Delta = Delta
         self.hamiltonian_type = 3
         self.h = h

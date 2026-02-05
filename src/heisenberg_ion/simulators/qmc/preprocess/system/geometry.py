@@ -86,7 +86,7 @@ class LongRangeOpenChain(Geometry):
         self.num_neighbors_per_site = N-1
 
         self.initialize_tables()
-        self.build()
+        #self.build()
 
 
     def initialize_tables(self):
@@ -133,7 +133,7 @@ class LongRangePeriodicChain(Geometry):
         self.num_neighbors_per_site = N-1
 
         self.initialize_tables()
-        self.build()
+        #self.build()
 
 
     def initialize_tables(self):
@@ -184,7 +184,7 @@ class LongRangeOpenTriangular(Geometry):
         self.num_neighbors_per_site = self.N-1
 
         self.initialize_tables()
-        self.build()
+        #self.build()
 
 
     def initialize_tables(self):
@@ -242,7 +242,7 @@ class NearestNeighborPeriodicChain(Geometry):
             self.bipartite = True
 
         self.initialize_tables()
-        self.build()
+        #self.build()
 
 
     def initialize_tables(self):
@@ -281,7 +281,7 @@ class NearestNeighborOpenChain(Geometry):
         self.bipartite = True
 
         self.initialize_tables()
-        self.build()
+        #self.build()
 
 
     def initialize_tables(self):

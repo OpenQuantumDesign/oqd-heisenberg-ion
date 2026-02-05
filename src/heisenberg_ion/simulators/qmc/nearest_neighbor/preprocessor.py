@@ -58,9 +58,11 @@ class NearestNeighborQMC(Preprocessor):
 
         self.validate_system(system)
 
+        simulation_args = input_config.simulation_config['simulation']
         sampling_args = input_config.simulation_config['sampling']
+        combined_args = simulation_args | sampling_args
 
-        sampling_params = SamplingParameters(**sampling_args)
+        sampling_params = SamplingParameters(**combined_args)
 
         simulation_parameters = SSEParameters(system, sampling_params, run_folder)
 

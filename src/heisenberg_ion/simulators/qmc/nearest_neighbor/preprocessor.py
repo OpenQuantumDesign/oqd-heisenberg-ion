@@ -6,7 +6,7 @@ import os
 
 class NearestNeighborQMC(Preprocessor):
 
-    allowed_hamiltonians = {"AFMHeisenbergFMZ", "XY", "FMHeisenbergFMZ"}
+    allowed_hamiltonians = {"afm_heisenberg_fm_Z", "XY", "fm_heisenberg_fm_Z"}
 
     def __init__(self, parameter_set_list):
 

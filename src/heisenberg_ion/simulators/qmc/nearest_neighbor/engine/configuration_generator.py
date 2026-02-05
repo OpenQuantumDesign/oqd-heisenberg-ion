@@ -10,14 +10,16 @@ class ConfigurationGenerator:
         self.geometry = system_inputs.geometry
         self.hamiltonian = system_inputs.model_name
 
-        self.init_M = sampling_inputs.M
+        self.init_M = sampling_inputs.initial_operator_list_size
+        if self.init_M == -1:
+            self.init_M = 50
         self.equilibration_steps = sampling_inputs.equilibration_steps
         self.mc_steps = sampling_inputs.mc_steps
 
         self.T = sampling_inputs.T
         self.beta = sampling_inputs.beta
-        self.a = sampling_inputs.operator_list_update_constant
-        self.init_config_index = sampling_inputs.init_config_index
+        self.a = sampling_inputs.operator_list_update_multiplier
+        self.init_config_index = sampling_inputs.initial_configuration_index
 
 
     def initialize_spin_array(self):

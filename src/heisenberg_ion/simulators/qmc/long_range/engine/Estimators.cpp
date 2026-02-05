@@ -14,15 +14,6 @@ void Estimators::updateAllPropertiesProbabilistic(const int &int_step_n, const s
         M_z *= 0.5/(double)sim_params.N;
         step_magnetization.push_back(M_z);
         step_spin_stiffness.push_back(pow((double)winding,2)/(sim_params.beta * sim_params.N));
-
-        double S_k_pi = 0.0;
-        for (int b=0; b<sim_params.num_bonds; b++) {
-            int i_b = lattice_sites.at(b).at(0);
-            int j_b = lattice_sites.at(b).at(1);
-            double pair_correlation = 0.25 * spin_configs.at(i_b) * spin_configs.at(j_b);
-            S_k_pi += pair_correlation;
-        }
-        step_S_k_pi.push_back(S_k_pi/((double)sim_params.N));
     }
 }
 
@@ -39,15 +30,6 @@ void Estimators::updateAllPropertiesDeterministic(const int &int_step_n, const s
     M_z *= 0.5/(double)sim_params.N;
     step_magnetization.push_back(M_z);
     step_spin_stiffness.push_back(pow((double)winding,2)/(sim_params.beta * sim_params.N));
-
-    double S_k_pi = 0.0;
-    for (int b=0; b<sim_params.num_bonds; b++) {
-        int i_b = lattice_sites.at(b).at(0);
-        int j_b = lattice_sites.at(b).at(1);
-        double pair_correlation = 0.25 * spin_configs.at(i_b) * spin_configs.at(j_b);
-        S_k_pi += pair_correlation;
-    }
-    step_S_k_pi.push_back(S_k_pi/((double)sim_params.N));
 }
 
 Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in) {
@@ -66,15 +48,14 @@ void Estimators::outputStepData(const SimulationParameters &sim_params) const {
     std::string file_path = out_folder_path + "/" + "MC Step Outputs.csv";
     //std::string header = sim_params.file_prefix + "_" + sim_params.loop_type + "\n";
     std::string header = "# MC Step Outputs\n";
-    header += "MC Step, Energy, Magnetization, Spin Stiffness, S(pi)\n";
+    header += "MC Step, Energy, Magnetization, Spin Stiffness\n";
     std::ofstream ofs(file_path);
     ofs << header;
     for (int i = 0; i < step_energy.size(); i++){
         ofs << std::to_string(i+1)
             << "," << std::to_string(step_energy.at(i))
             << "," << std::to_string(step_magnetization.at(i))
-            << "," << std::to_string(step_spin_stiffness.at(i))
-            << "," << std::to_string(step_S_k_pi.at(i)) << "\n";
+            << "," << std::to_string(step_spin_stiffness.at(i)) << "\n";
     }
     ofs.close();
 

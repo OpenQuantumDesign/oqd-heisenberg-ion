@@ -7,6 +7,7 @@ class ProbabilityTable:
     def __init__(self, system, **sampling_args):
 
         self.system = system
+        self.system.geometry.build()
 
         self.sampling_parameters = sampling_args
 

@@ -9,8 +9,9 @@ class ConfigurationGenerator:
         self.out_dir = out_dir + "/qmc_output/"
         os.mkdir(self.out_dir)
 
-        self.geometry = system_inputs.geometry
+        #self.geometry = system_inputs.geometry
         self.hamiltonian = system_inputs.model_name
+        self.Delta = system_inputs.hamiltonian_parameters.Delta
 
         self.init_M = sampling_inputs.initial_operator_list_size
         if self.init_M == -1:
@@ -19,14 +20,20 @@ class ConfigurationGenerator:
         self.mc_steps = sampling_inputs.mc_steps
 
         self.T = sampling_inputs.T
-        self.beta = sampling_inputs.beta
+        self.J = system_inputs.hamiltonian_parameters.J
+        self.beta = sampling_inputs.beta * self.J # beta times J determines the energy scale
         self.a = sampling_inputs.operator_list_update_multiplier
         self.init_config_index = sampling_inputs.initial_configuration_index
 
+        self.N = system_inputs.geometry.N
+        self.num_bonds = system_inputs.geometry.num_bonds
+        self.boundary = system_inputs.geometry.boundary_type
+
+        self.sites = system_inputs.geometry.sites
 
     def initialize_spin_array(self):
 
-        N = self.geometry.N
+        N = self.N
 
         if self.init_config_index == 1 or self.init_config_index == -1:
             spin_array = self.init_config_index * np.ones(N, dtype=int)
@@ -80,8 +87,8 @@ class ConfigurationGenerator:
 
                 bond_num = Sm_array[t] // 2
                 bond_index = bond_num-1
-                i_b = self.geometry.sites[bond_index,0]
-                j_b = self.geometry.sites[bond_index,1]
+                i_b = self.sites[bond_index,0]
+                j_b = self.sites[bond_index,1]
 
                 p_list[p] = t
                 b_list[p] = bond_num
@@ -261,7 +268,7 @@ class ConfigurationGenerator:
 
     def diagonal_updates_isotropic(self, Sm_array, spin_array, M, n, num_bonds, diag_update_sign):
 
-        sites = self.geometry.sites
+        sites = self.sites
         for t in range(M):
             if Sm_array[t] == 0:
                 # propose adding a diagonal operator
@@ -296,7 +303,7 @@ class ConfigurationGenerator:
 
     def diagonal_updates_XY(self, Sm_array, spin_array, M, n, num_bonds):
         
-        sites = self.geometry.sites
+        sites = self.sites
 
         for t in range(M):
             if Sm_array[t] == 0:
@@ -405,12 +412,12 @@ class ConfigurationGenerator:
         new_vertex_types = generate_new_vertex_type_array(vertex_mapping, num_vertices, leg_spin)
         exit_leg_map = generate_XY_exit_legs(new_vertex_types)
 
-        num_bonds = self.geometry.num_bonds
+        num_bonds = self.num_bonds
         spectrum_offset = num_bonds/2.0
 
         magnetization_array = np.zeros(self.mc_steps)
 
-        N = self.geometry.N
+        N = self.N
         M = self.init_M
         
         spin_array = self.initialize_spin_array()

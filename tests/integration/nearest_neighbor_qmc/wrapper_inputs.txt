@@ -7,7 +7,7 @@
 simulator	nearest_neighbor_qmc
 hamiltonian_name	XY	# Can be XY (J=-1, Delta=0), FMHeisenbergFMZ (J=-1, Delta=1), FMHeisenbergAFMZ (J=-1, Delta=-1), AFMHeisenbergFMZ (J=1, Delta=1), XXZ or XXZh
 boundary	periodic	# Open or Periodic
-interaction_range	long_range	# Long Range or Nearest Neighbours
+interaction_range	nearest_neighbor	# Long Range or Nearest Neighbours
 interaction_type	power_law	# Power-Law or Input-Matrix
 spatial_dimension	1d	# Only 1d is currently supported. The other option is 2d (for 2d triangular lattices) - still in testing
 lattice_type	rectangular	# Only 'Rectangular' is currently supported. The other type is 'Triangular' - still in testing

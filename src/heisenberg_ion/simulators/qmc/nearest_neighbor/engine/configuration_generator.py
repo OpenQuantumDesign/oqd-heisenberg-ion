@@ -4,9 +4,10 @@ import os
 
 class ConfigurationGenerator:
 
-    def __init__(self, system_inputs, sampling_inputs, out_dir):
+    def __init__(self, system_inputs, sampling_inputs, run_folder):
 
-        self.out_dir = out_dir + "/qmc_output/"
+        self.run_folder = run_folder
+        self.out_dir = run_folder + "/qmc_output/"
         os.mkdir(self.out_dir)
 
         #self.geometry = system_inputs.geometry
@@ -30,6 +31,32 @@ class ConfigurationGenerator:
         self.boundary = system_inputs.geometry.boundary_type
 
         self.sites = system_inputs.geometry.sites
+
+        self.write_simulation_specs()
+
+
+    def write_simulation_specs(self):
+
+        specs_file_path = os.path.join(self.run_folder, "simulation_specs.txt")
+        with open(specs_file_path, "w") as f:
+
+            f.write("output_folder\t{}\n".format(self.run_folder))
+            f.write("N\t{}\n".format(self.N))
+            f.write("num_bonds\t{}\n".format(self.num_bonds))
+            f.write("hamiltonian\t{}\n".format(self.hamiltonian))
+            f.write("Delta\t{}\n".format(self.Delta))
+            f.write("boundary\t{}\n".format(self.boundary))
+            f.write("initial_M\t{}\n".format(self.init_M))
+            f.write("equilibration_steps\t{}\n".format(self.equilibration_steps))
+            f.write("mc_steps\t{}\n".format(self.mc_steps))
+            f.write("T\t{}\n".format(self.T))
+            f.write("J\t{}\n".format(self.J))
+            f.write("beta\t{}\n".format(self.beta))
+            f.write("a\t{}\n".format(self.a))
+            f.write("init_config_index\t{}\n".format(self.init_config_index))
+
+        return 0
+
 
     def initialize_spin_array(self):
 

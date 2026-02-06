@@ -37,7 +37,7 @@ class LongRangeQMC(Preprocessor):
         for i in range(self.num_parameter_sets):
             self.configure_parameter_set(self.parameter_set_list[i])
 
-        self.write_sse_input_file()
+        self.write_input_file()
 
 
     def configure_parameter_set(self, parameter_args):
@@ -66,23 +66,6 @@ class LongRangeQMC(Preprocessor):
         prob_table_args = ProbabilityTableFactory.extract_args(prob_table_type, **sampling_args)
         probability_table = ProbabilityTableFactory.create(prob_table_type, system, **prob_table_args)
         probability_table.write_to_files(run_folder)
-
-        return 0
-    
-
-    def write_sse_input_file(self):
-
-        simulation_folder = self.simulation_folder
-        sse_input_file = os.path.join(simulation_folder, "sse_inputs.txt")
-
-        with open(sse_input_file, "w") as f:
-            for key in self.parameter_set_list[0].keys():
-                text_line = key + "\t" + str(self.parameter_set_list[0][key])
-                for i in range(1, self.num_parameter_sets):
-                    if not key in self.keys_single_parameters:
-                        text_line += "," + str(self.parameter_set_list[i][key])
-                text_line += "\n"
-                f.write(text_line)
 
         return 0
             

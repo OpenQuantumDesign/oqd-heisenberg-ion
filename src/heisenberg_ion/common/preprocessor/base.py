@@ -96,3 +96,20 @@ class Preprocessor:
                 return self.parameter_set_list[0][key]
             else:
                 return None
+            
+    
+    def write_input_file(self):
+
+        simulation_folder = self.simulation_folder
+        sse_input_file = os.path.join(simulation_folder, "inputs.txt")
+
+        with open(sse_input_file, "w") as f:
+            for key in self.parameter_set_list[0].keys():
+                text_line = key + "\t" + str(self.parameter_set_list[0][key])
+                for i in range(1, self.num_parameter_sets):
+                    if not key in self.keys_single_parameters:
+                        text_line += "," + str(self.parameter_set_list[i][key])
+                text_line += "\n"
+                f.write(text_line)
+
+        return 0

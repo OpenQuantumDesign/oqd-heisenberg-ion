@@ -8,7 +8,7 @@ class LongRangeQMC(Driver):
 
         super().__init__(simulation_folder)
 
-        self.input_file = os.path.join(simulation_folder, "sse_inputs.txt")
+        self.input_file = os.path.join(simulation_folder, "inputs.txt")
         self.build_dir = os.path.join(simulation_folder, "build")
         os.mkdir(self.build_dir)
 

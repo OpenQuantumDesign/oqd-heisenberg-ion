@@ -153,7 +153,7 @@ function initialize_hamiltonian(N, theta)
 
     Dim = 2^N
     if theta == 0
-        Hamiltonian = zeros(FloatF64, Dim, Dim)
+        Hamiltonian = zeros(Float64, Dim, Dim)
     else
         Hamiltonian = zeros(ComplexF64, Dim, Dim)
     end

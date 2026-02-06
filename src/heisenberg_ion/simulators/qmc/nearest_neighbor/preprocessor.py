@@ -56,6 +56,7 @@ class NearestNeighborQMC(Preprocessor):
         misc_args['run_folder'] = run_folder
 
         system = System(**system_args)
+        system.geometry.build()
 
         self.validate_system(system)
 

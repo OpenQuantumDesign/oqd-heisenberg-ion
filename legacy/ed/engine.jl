@@ -92,7 +92,10 @@ function hamiltonian_pbc_long_range_twist_even_N(N, delta, J_Y, h, B, alpha, the
                 j = j - N
             end
             
+            Spin1 = 2 * ((Ket >> i) & 1) - 1
+            Spin2 = 2 * ((Ket >> j) & 1) - 1
             one_over_r_b_alpha = r_distance_pbc(i, j, alpha, N)
+            Diagonal += -1.0 * one_over_r_b_alpha * J_Z * 0.25 * Spin1 * Spin2
 
             bit_i = 2^i
             bit_j = 2^j
@@ -436,24 +439,26 @@ function hamiltonian_pbc_nearest_neighbour_twist(N, delta, J_Y, h, B, theta)
 
         end
 
-        i = 0
-        j = N-1
+        if N != 2
+            i = 0
+            j = N-1
 
-        #S^Z part, similar to before 
-        Spin1 = 2 * ((Ket >> i) & 1) - 1
-        Spin2 = 2 * ((Ket >> j) & 1) - 1
-        int_strength = r_distance_NN_pbc(i, j, N)
-        Diagonal += -1.0 * int_strength * J_Z * 0.25 * Spin1 * Spin2
+            #S^Z part, similar to before 
+            Spin1 = 2 * ((Ket >> i) & 1) - 1
+            Spin2 = 2 * ((Ket >> j) & 1) - 1
+            int_strength = r_distance_NN_pbc(i, j, N)
+            Diagonal += -1.0 * int_strength * J_Z * 0.25 * Spin1 * Spin2
 
-        bit_i = 2^i
-        bit_j = 2^j
-        Bra = Ket ⊻ bit_i ⊻ bit_j
+            bit_i = 2^i
+            bit_j = 2^j
+            Bra = Ket ⊻ bit_i ⊻ bit_j
 
-        si = (Ket >> i) & 1
-        sj = (Ket >> j) & 1
+            si = (Ket >> i) & 1
+            sj = (Ket >> j) & 1
 
-        sign = (si == sj) ? 0 : 1
-        Hamiltonian[Bra+1, Ket+1] += -0.5 * 1 * J_Y * int_strength * sign * exp(-(si-sj) * theta * 1im)
+            sign = (si == sj) ? 0 : 1
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * 1 * J_Y * int_strength * sign * exp(-(si-sj) * theta * 1im)
+        end
 
         #field along Z
         for k in 0:N-1

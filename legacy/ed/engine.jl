@@ -46,7 +46,7 @@ function r_distance_NN_obc(index_i, index_j)
     end
 end
 
-function hamiltonian_pbc_long_range_twist_even_N(N, delta, J_Y, alpha, theta)
+function hamiltonian_pbc_long_range_twist_even_N(N, delta, J_Y, h, B, alpha, theta)
 
     Dim = 2^N
     J_Z = delta
@@ -108,25 +108,25 @@ function hamiltonian_pbc_long_range_twist_even_N(N, delta, J_Y, alpha, theta)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_pbc_long_range_twist_odd_N(N, delta, J_Y, alpha, theta)
+function hamiltonian_pbc_long_range_twist_odd_N(N, delta, J_Y, h, B, alpha, theta)
 
     Dim = 2^N
     J_Z = delta
@@ -166,25 +166,25 @@ function hamiltonian_pbc_long_range_twist_odd_N(N, delta, J_Y, alpha, theta)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_pbc_long_range(N, delta, J_Y, alpha)
+function hamiltonian_pbc_long_range(N, delta, J_Y, h, B, alpha)
 
     Dim = 2^N
     J_Z = delta
@@ -218,26 +218,26 @@ function hamiltonian_pbc_long_range(N, delta, J_Y, alpha)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
         #field along X
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_obc_long_range_twist(N, delta, J_Y, alpha, theta)
+function hamiltonian_obc_long_range_twist(N, delta, J_Y, h, B, alpha, theta)
 
     Dim = 2^N
     J_Z = delta
@@ -273,25 +273,25 @@ function hamiltonian_obc_long_range_twist(N, delta, J_Y, alpha, theta)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian
 end
 
-function hamiltonian_obc_long_range(N, delta, J_Y, alpha)
+function hamiltonian_obc_long_range(N, delta, J_Y, h, B, alpha)
 
     Dim = 2^N
     J_Z = delta
@@ -327,18 +327,18 @@ function hamiltonian_obc_long_range(N, delta, J_Y, alpha)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
@@ -383,25 +383,25 @@ function hamiltonian_obc_long_range_exp_J_ij(N, delta, exp_J_ij_file)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_pbc_nearest_neighbour_twist(N, delta, J_Y, theta)
+function hamiltonian_pbc_nearest_neighbour_twist(N, delta, J_Y, h, B, theta)
 
     Dim = 2^N
     J_Z = delta
@@ -456,25 +456,25 @@ function hamiltonian_pbc_nearest_neighbour_twist(N, delta, J_Y, theta)
         Hamiltonian[Bra+1, Ket+1] += -0.5 * 1 * J_Y * int_strength * sign * exp(-(si-sj) * theta * 1im)
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_pbc_nearest_neighbour(N, delta, J_Y)
+function hamiltonian_pbc_nearest_neighbour(N, delta, J_Y, h, B)
 
     Dim = 2^N
     J_Z = delta
@@ -512,25 +512,25 @@ function hamiltonian_pbc_nearest_neighbour(N, delta, J_Y)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian
 end
 
-function hamiltonian_obc_nearest_neighbour_twist(N, delta, J_Y, theta)
+function hamiltonian_obc_nearest_neighbour_twist(N, delta, J_Y, h, B, theta)
 
     Dim = 2^N
     J_Z = delta
@@ -568,25 +568,25 @@ function hamiltonian_obc_nearest_neighbour_twist(N, delta, J_Y, theta)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
     return Hamiltonian 
 end
 
-function hamiltonian_obc_nearest_neighbour(N, delta, J_Y)
+function hamiltonian_obc_nearest_neighbour(N, delta, J_Y, h, B)
 
     Dim = 2^N
     J_Z = delta
@@ -623,18 +623,18 @@ function hamiltonian_obc_nearest_neighbour(N, delta, J_Y)
         end
 
         #field along Z
-        #for k in 0:N-1
-        #    spin_k = 2 * ((Ket >> k) & 1) - 1
-        #    Diagonal += -0.5 * h * spin_k
-        #end
+        for k in 0:N-1
+            spin_k = 2 * ((Ket >> k) & 1) - 1
+            Diagonal += -0.5 * h * spin_k
+        end
 
         Hamiltonian[Ket+1, Ket+1] = Diagonal
 
-        #for SpinIndex = 0:N-1
-        #    bit = 2^SpinIndex   #The "label" of the bit to be flipped
-        #    Bra = Ket ⊻ bit    #Binary XOR flips the bit
-        #    Hamiltonian[Bra+1, Ket+1] += -0.5 * B
-        #end
+        for SpinIndex = 0:N-1
+            bit = 2^SpinIndex   #The "label" of the bit to be flipped
+            Bra = Ket ⊻ bit    #Binary XOR flips the bit
+            Hamiltonian[Bra+1, Ket+1] += -0.5 * B
+        end
 
     end
 
@@ -642,7 +642,7 @@ function hamiltonian_obc_nearest_neighbour(N, delta, J_Y)
 
 end
 
-
+#=
 function exact_diagonalization(N, delta, J_X, alpha, theta, hamiltonian_type, exp_J_ij_filepath)
     
     Dim = 2^N
@@ -759,3 +759,4 @@ function exact_diagonalization(N, delta, J_X, alpha, theta, hamiltonian_type, ex
     println(EigenEnergies[1])
 
 end
+=#

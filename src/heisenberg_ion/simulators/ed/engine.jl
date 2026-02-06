@@ -63,7 +63,7 @@ function hamiltonian_long_range(N, Delta, h, B, J_ij, J, Hamiltonian, theta)
 
                 #S^X part
                 Bra = get_non_zero_row_index(Ket, i, j)
-                Hamiltonian[Bra+1, Ket+1] += J * J_ij[i+1,j+1] * get_off_diag_term(Ket, i, j, r, theta)
+                Hamiltonian[Bra+1, Ket+1] += J_ij[i+1,j+1] * get_off_diag_term(Ket, i, j, r, theta)
             end
         end
         
@@ -77,7 +77,7 @@ function hamiltonian_long_range(N, Delta, h, B, J_ij, J, Hamiltonian, theta)
 
                 #S^X part
                 Bra = get_non_zero_row_index(Ket, i, j)
-                Hamiltonian[Bra+1, Ket+1] += J * J_ij[i+1,j+1] * get_off_diag_term(Ket, i, j, r, theta)
+                Hamiltonian[Bra+1, Ket+1] += J_ij[i+1,j+1] * get_off_diag_term(Ket, i, j, r, theta)
             end
         end
 
@@ -94,7 +94,7 @@ function hamiltonian_long_range(N, Delta, h, B, J_ij, J, Hamiltonian, theta)
         end
     end
 
-    return Hamiltonian
+    return J * Hamiltonian
 end
 
 function hamiltonian_nearest_neighbour(N, Delta, h, B, J, Hamiltonian, boundary, theta)
@@ -114,7 +114,7 @@ function hamiltonian_nearest_neighbour(N, Delta, h, B, J, Hamiltonian, boundary,
             si = (Ket >> i) & 1
             sj = (Ket >> j) & 1
             mask = (si == sj) ? 0 : 1
-            Hamiltonian[Bra+1, Ket+1] += J * get_off_diag_term(Ket, i, j, 1, theta)
+            Hamiltonian[Bra+1, Ket+1] += get_off_diag_term(Ket, i, j, 1, theta)
         end
 
         if boundary == "periodic" && N != 2
@@ -128,7 +128,7 @@ function hamiltonian_nearest_neighbour(N, Delta, h, B, J, Hamiltonian, boundary,
             si = (Ket >> i) & 1
             sj = (Ket >> j) & 1
             mask = (si == sj) ? 0 : 1
-            Hamiltonian[Bra+1, Ket+1] += J * get_off_diag_term(Ket, i, j, 1, theta)
+            Hamiltonian[Bra+1, Ket+1] += get_off_diag_term(Ket, i, j, 1, theta)
         end
 
         #field along Z
@@ -145,7 +145,7 @@ function hamiltonian_nearest_neighbour(N, Delta, h, B, J, Hamiltonian, boundary,
 
     end
 
-    return Hamiltonian
+    return J * Hamiltonian
 
 end
 

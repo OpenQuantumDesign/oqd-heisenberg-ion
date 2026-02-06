@@ -20,6 +20,9 @@ class ProbabilityTable:
 
         if not self.system.geometry.interaction_range == "long_range":
             raise Exception("Probability tables are constructed for long range systems\n")
+        
+        if self.system.hamiltonian_parameters.J <= 0:
+            raise Exception("J sets the energy scale. It must be positive for QMC")
         pass
 
     

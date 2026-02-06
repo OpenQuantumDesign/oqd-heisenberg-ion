@@ -38,7 +38,7 @@ class NearestNeighborQMC(Preprocessor):
 
             self.configure_parameter_set(parameter_set)
 
-            #self.write_sse_input_file()
+        self.write_input_file()
 
 
     def configure_parameter_set(self, parameter_args):

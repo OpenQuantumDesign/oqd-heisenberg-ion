@@ -85,7 +85,7 @@ class LongRangeOpenChain(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
         self.num_neighbors_per_site = N-1
 
-        self.initialize_tables()
+        #self.initialize_tables()
         #self.build()
 
 
@@ -93,6 +93,8 @@ class LongRangeOpenChain(Geometry):
         return super().initialize_tables()
 
     def build(self):
+
+        self.initialize_tables()
 
         b = 0
         for i in range(self.N):
@@ -132,7 +134,7 @@ class LongRangePeriodicChain(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
         self.num_neighbors_per_site = N-1
 
-        self.initialize_tables()
+        #self.initialize_tables()
         #self.build()
 
 
@@ -140,6 +142,8 @@ class LongRangePeriodicChain(Geometry):
         return super().initialize_tables()
     
     def build(self):
+
+        self.initialize_tables()
 
         b = 0
         for i in range(self.N):
@@ -183,7 +187,7 @@ class LongRangeOpenTriangular(Geometry):
         self.num_bonds = int(self.N*(self.N-1)/2)
         self.num_neighbors_per_site = self.N-1
 
-        self.initialize_tables()
+        #self.initialize_tables()
         #self.build()
 
 
@@ -191,6 +195,8 @@ class LongRangeOpenTriangular(Geometry):
         return super().initialize_tables()
     
     def build(self):
+
+        self.initialize_tables()
 
         a_1 = np.array([1.0,0.0])
         a_2 = np.array([-0.5, np.sqrt(3.0)/2.0])
@@ -223,7 +229,7 @@ class LongRangeOpenTriangular(Geometry):
 
 class NearestNeighborPeriodicChain(Geometry):
 
-    args = {"N", float}
+    args = {"N": int}
 
     def __init__(self, N):
 
@@ -241,7 +247,7 @@ class NearestNeighborPeriodicChain(Geometry):
         if self.N % 2 == 0:
             self.bipartite = True
 
-        self.initialize_tables()
+        #self.initialize_tables()
         #self.build()
 
 
@@ -250,6 +256,8 @@ class NearestNeighborPeriodicChain(Geometry):
 
 
     def build(self):
+
+        self.initialize_tables()
         
         self.sites = np.zeros((self.num_bonds,2), dtype=int)
 
@@ -263,7 +271,7 @@ class NearestNeighborPeriodicChain(Geometry):
 
 class NearestNeighborOpenChain(Geometry):
 
-    args = {"N", float}
+    args = {"N": int}
 
     def __init__(self, N):
 
@@ -280,7 +288,7 @@ class NearestNeighborOpenChain(Geometry):
 
         self.bipartite = True
 
-        self.initialize_tables()
+        #self.initialize_tables()
         #self.build()
 
 
@@ -289,6 +297,8 @@ class NearestNeighborOpenChain(Geometry):
 
 
     def build(self):
+
+        self.initialize_tables()
         
         self.sites = np.zeros((self.num_bonds,2), dtype=int)
 

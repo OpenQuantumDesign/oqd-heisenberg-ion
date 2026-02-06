@@ -9,6 +9,7 @@ class HamiltonianParameters:
         self.Delta = None
         self.h = None
         self.J = None
+        self.B = None
 
 class HamiltonianFactory:
 
@@ -52,6 +53,7 @@ class FMHeisenbergAFMZ(HamiltonianParameters):
         self.Delta = -1.0
         self.h = 0.0
         self.J = J
+        self.B = 0.0
         
 class XY(HamiltonianParameters):
 
@@ -66,6 +68,7 @@ class XY(HamiltonianParameters):
         self.Delta = 0.0
         self.h = 0.0
         self.J = J
+        self.B = 0.0
 
 class FMHeisenbergFMZ(HamiltonianParameters):
 
@@ -80,6 +83,7 @@ class FMHeisenbergFMZ(HamiltonianParameters):
         self.Delta = 1.0
         self.h = 0.0
         self.J = J
+        self.B = 0.0
 
 class XXZ(HamiltonianParameters):
 
@@ -94,6 +98,7 @@ class XXZ(HamiltonianParameters):
         self.hamiltonian_type = 2
         self.h = 0.0
         self.J = J
+        self.B = 0.0
 
 class XXZh(HamiltonianParameters):
 
@@ -108,6 +113,7 @@ class XXZh(HamiltonianParameters):
         self.hamiltonian_type = 3
         self.h = h
         self.J = J
+        self.B = 0.0
 
 class AFMHeisenbergFMZ(HamiltonianParameters):
 
@@ -122,11 +128,29 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
         self.Delta = 1.0
         self.h = 0.0
         self.J = J
+        self.B = 0.0
+
+class XXZhB(HamiltonianParameters):
+
+    args = {"Delta": float, "h": float, "B": float, "J" : float}
+
+    def __init__(self, Delta, h, B, J):
+
+        super().__init__()
+
+        self.hamiltonian_name = "XXZh"
+        self.Delta = Delta
+        self.hamiltonian_type = 5
+        self.h = h
+        self.J = J
+        self.B = B
+
 
 # Register all implemented Hamiltonian parameter types in the base HamiltonianParameters class
 HamiltonianFactory.register("XY", XY)
 HamiltonianFactory.register("XXZ", XXZ)
 HamiltonianFactory.register("XXZh", XXZh)
+HamiltonianFactory.register("XXZhB", XXZhB)
 HamiltonianFactory.register("fm_heisenberg_fm_Z", FMHeisenbergFMZ)
 HamiltonianFactory.register("fm_heisenberg_afm_Z", FMHeisenbergAFMZ)
 HamiltonianFactory.register("afm_heisenberg_fm_Z", AFMHeisenbergFMZ)

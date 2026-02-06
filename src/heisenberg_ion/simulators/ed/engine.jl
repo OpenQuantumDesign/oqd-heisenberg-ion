@@ -51,8 +51,6 @@ function hamiltonian_long_range(N, Delta, h, B, J_ij, J, Hamiltonian, theta)
     even_num_spins = (N % 2 == 0)
     r_max = even_num_spins ? round(Int32, N/2)-1 : round(Int32, (N-1)/2)
 
-    apply_twist = (theta != 0)
-
     for Ket = 0:Dim-1
         Diagonal = 0.0
 

@@ -39,7 +39,7 @@ class Deterministic(ProbabilityTable):
 
         if hamiltonian_name == "XY":
             self.spectrum_offset = self.max_diag_norm
-        elif hamiltonian_name == "FMHeisenbergAFMZ" or hamiltonian_name == "FMHeisenbergFMZ":
+        elif hamiltonian_name == "fm_heisenberg_afm_Z" or hamiltonian_name == "fm_heisenberg_fm_Z":
             self.spectrum_offset = 0.5*self.max_diag_norm
         else:
             raise ValueError("Invalid Hamiltonian type: {} provided for deterministic probability tables. " \

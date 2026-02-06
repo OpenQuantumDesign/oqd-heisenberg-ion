@@ -21,3 +21,13 @@ class SamplingParameters:
             var = default_val
 
         return var
+
+
+class SSEParameters:
+
+    def __init__(self, system, sampling_parameters, run_folder):
+
+        self.system = system
+        self.sampling_parameters = sampling_parameters
+
+        self.run_folder = run_folder

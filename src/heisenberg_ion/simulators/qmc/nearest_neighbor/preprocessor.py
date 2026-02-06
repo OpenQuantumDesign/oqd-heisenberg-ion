@@ -82,27 +82,6 @@ class NearestNeighborQMC(Preprocessor):
             if not system.geometry.bipartite:
                 raise Exception("AFMHeisenbergFMZ Hamiltonian requires a bipartite lattice\n")
             
-    
-    def write_sse_input_file(self, run_folder, sse_parameters):
-
-        sse_input_file = os.path.join(run_folder, "sse_inputs.txt")
-
-        with open(sse_input_file, "w") as f:
-            for key in sse_parameters.keys():
-                text_line = key + "\t" + str(sse_parameters[key]) + "\n"
-                f.write(text_line)
-
-        return 0
-    
-
-class SSEParameters:
-
-    def __init__(self, system, sampling_parameters, run_folder):
-
-        self.system = system
-        self.sampling_parameters = sampling_parameters
-
-        self.run_folder = run_folder
         if system.hamiltonian_parameters.J <= 0:
             raise Exception("J sets the energy scale. It must be a positive number for QMC\n")
         

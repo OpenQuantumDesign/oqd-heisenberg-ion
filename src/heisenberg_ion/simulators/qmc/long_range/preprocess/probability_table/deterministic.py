@@ -5,6 +5,7 @@ from .base import ProbabilityTable
 class Deterministic(ProbabilityTable):
 
     args = {}
+    allowed_hamiltonians = {"XY", "fm_heisenberg_afm_Z", "fm_heisenberg_fm_Z"}
 
     def __init__(self, system):
 
@@ -20,7 +21,6 @@ class Deterministic(ProbabilityTable):
         super().validate_system()
 
         hamiltonian_name = self.system.hamiltonian_parameters.hamiltonian_name
-        self.allowed_hamiltonians = ["XY", "fm_heisenberg_afm_Z", "fm_heisenberg_fm_Z"]
 
         if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Deterministic probability tables " \
@@ -64,7 +64,8 @@ class Deterministic(ProbabilityTable):
         self.max_diag_norm = max_diag_norm
 
         return 0
-    
+
+
     def write_to_files(self, out_dir):
 
         super().write_to_files(out_dir)

@@ -22,7 +22,7 @@ input_schema = {
             }, 
         "interaction_range": {
             "DataType": "categorical",
-            "Categories": ["nearest_neighbors", "long_range"],
+            "Categories": ["nearest_neighbor", "long_range"],
             "ParameterType" : "system",
             "ConvertValCase": True
             },

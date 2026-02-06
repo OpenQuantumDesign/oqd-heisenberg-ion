@@ -242,7 +242,7 @@ function hamiltonian_obc_long_range_twist(N, delta, J_Y, h, B, alpha, theta)
     Dim = 2^N
     J_Z = delta
 
-    Hamiltonian = zeros(ComplexF32, Dim, Dim)
+    Hamiltonian = zeros(ComplexF64, Dim, Dim)
 
     for Ket = 0:Dim-1
         Diagonal = 0.0
@@ -298,7 +298,7 @@ function hamiltonian_obc_long_range(N, delta, J_Y, h, B, alpha)
 
     cutoff = 1e-3
     # initialise Hamiltonian
-    Hamiltonian = zeros(Float32, Dim, Dim)
+    Hamiltonian = zeros(Float64, Dim, Dim)
 
     for Ket = 0:Dim-1
         Diagonal = 0.0
@@ -352,7 +352,7 @@ function hamiltonian_obc_long_range_exp_J_ij(N, delta, exp_J_ij_file)
 
     cutoff = 1e-3
     # initialise Hamiltonian
-    Hamiltonian = zeros(Float32, Dim, Dim)
+    Hamiltonian = zeros(Float64, Dim, Dim)
 
     J_ij_matrix = readdlm(exp_J_ij_file, ',', skipstart=1)
 
@@ -535,7 +535,7 @@ function hamiltonian_obc_nearest_neighbour_twist(N, delta, J_Y, h, B, theta)
     Dim = 2^N
     J_Z = delta
 
-    Hamiltonian = zeros(ComplexF32, Dim, Dim)
+    Hamiltonian = zeros(ComplexF64, Dim, Dim)
 
     for Ket = 0:Dim-1
         Diagonal = 0.0
@@ -591,7 +591,7 @@ function hamiltonian_obc_nearest_neighbour(N, delta, J_Y, h, B)
     Dim = 2^N
     J_Z = delta
 
-    Hamiltonian = zeros(Float32, Dim, Dim)
+    Hamiltonian = zeros(Float64, Dim, Dim)
 
     for Ket = 0:Dim-1
         Diagonal = 0.0

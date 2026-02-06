@@ -9,7 +9,7 @@ function get_zz_term(Ket, i, j)
     Spin1 = 2 * ((Ket >> i) & 1) - 1
     Spin2 = 2 * ((Ket >> j) & 1) - 1
 
-    return -0.25 * Spin1 *Spin2
+    return -0.25 * Spin1 * Spin2
 end
 
 

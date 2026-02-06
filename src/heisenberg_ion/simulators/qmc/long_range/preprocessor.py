@@ -1,5 +1,5 @@
 from heisenberg_ion.common.preprocessor.base import Preprocessor
-from ..preprocess.system.base import System
+from ...preprocess.system.base import System
 from .preprocess.probability_table.factory import ProbabilityTableFactory
 from heisenberg_ion.common.inputs.input_parser import InputParser
 import os

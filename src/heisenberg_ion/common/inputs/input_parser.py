@@ -57,6 +57,7 @@ input_schema = {
         "h" : {"DataType" : float, "ParameterType" : "system", "ConvertValCase": False},
         "J" : {"DataType" : float, "ParameterType" : "system", "ConvertValCase": False},
         "T" : {"DataType" : float, "ParameterType" : "sampling", "ConvertValCase": False},
+        "theta" : {"DataType" : float, "ParameterType" : "system", "ConvertValCase": False},
 
         "equilibration_steps" : {"DataType" : int, "ParameterType" : "simulation", 
                                 "ConvertValCase": False}, 
@@ -74,6 +75,7 @@ input_schema = {
         "root_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertValCase": False}, 
         "bin_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertValCase": False},
         "cpp_source_folder" : {"DataType" : str, "ParameterType" : "misc", "ConvertValCase": False},
+        "julia_path" : {"DataType" : str, "ParameterType" : "misc", "ConvertValCase": False},
         "uuid" : {"DataType" : str, "ParameterType" : "misc", "ConvertValCase": False}, 
         "number_of_threads" : {"DataType" : int, "ParameterType" : "misc", "ConvertValCase": False}, 
         "track_spin_configurations" : {"DataType" : bool, "ParameterType" : "simulation", 

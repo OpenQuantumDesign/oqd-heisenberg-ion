@@ -471,10 +471,10 @@ class ConfigurationGenerator:
 
     def write_outputs(self):
 
-        spin_configs_file = os.path.join(self.out_dir, "spin_configurations.csv")
+        spin_configs_file = os.path.join(self.out_dir, "final_spin_configurations.csv")
         step_outputs_file = os.path.join(self.out_dir, "estimators.csv")
 
-        np.savetxt(spin_configs_file, self.spin_array, header="spin_configuration\n", delimiter=",")
+        np.savetxt(spin_configs_file, self.spin_array, header="final_spin_configuration", delimiter=",", fmt="%d")
 
         with open(step_outputs_file, 'w') as f:
             header = "MC Step Outputs\n"

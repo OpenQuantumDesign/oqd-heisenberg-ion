@@ -1,9 +1,10 @@
-from heisenberg_ion.common.driver.base import Driver
-import subprocess
 import os
+import subprocess
+
+from heisenberg_ion.common.driver.base import Driver
+
 
 class ExactDiagonalization(Driver):
-
     def __init__(self, simulation_folder, simulator_inputs):
 
         super().__init__(simulation_folder)
@@ -12,16 +13,16 @@ class ExactDiagonalization(Driver):
         self.julia_path = simulator_inputs["julia_path"]
         self.ed_engine = os.path.dirname(os.path.abspath(__file__)) + "/engine.jl"
 
-
     def simulate(self):
 
         try:
-            subprocess.run([self.julia_path, self.ed_engine, self.input_file], check=True, 
-                           capture_output=True, text=True)
+            subprocess.run(
+                [self.julia_path, self.ed_engine, self.input_file], check=True, capture_output=True, text=True
+            )
         except subprocess.CalledProcessError as error:
-            print("Julia execution failed with exit code: {}\n".format(error.returncode))
-            print("STDOUT: {}".format(error.stdout))
-            print("STDERR:{}".format(error.stderr))
+            print(f"Julia execution failed with exit code: {error.returncode}\n")
+            print(f"STDOUT: {error.stdout}")
+            print(f"STDERR:{error.stderr}")
             raise
 
         return 0

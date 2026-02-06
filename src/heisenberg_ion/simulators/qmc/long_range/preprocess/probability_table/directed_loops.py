@@ -1,6 +1,6 @@
 import numpy as np
-from .utils.math_utils import *
-from .utils.vertex_utils import *
+from .utils import math_utils as mu
+from .utils import vertex_utils as vu
 from .base import ProbabilityTable
 import os
 
@@ -56,12 +56,12 @@ class DirectedLoops(ProbabilityTable):
 
     def initialize_tables(self, num_bonds):
 
-        num_rows = num_vertices * num_legs_indices
+        num_rows = vu.num_vertices * vu.num_legs_indices
 
         self.directed_loop_prob_table = np.zeros((num_rows, num_bonds))
-        self.diag_prob_table = np.zeros((num_diagonal_vertices, num_bonds))
+        self.diag_prob_table = np.zeros((vu.num_diagonal_vertices, num_bonds))
         self.max_over_states = np.zeros(num_bonds)
-        self.vertex_weights = np.zeros((num_vertices, num_bonds))
+        self.vertex_weights = np.zeros((vu.num_vertices, num_bonds))
 
         self.spectrum_offset = 0.0
         self.max_diag_norm = 0.0
@@ -103,17 +103,17 @@ class DirectedLoops(ProbabilityTable):
         init_composite_leg_index, init_row_index = self.get_composite_row_prob_index(vertex_enum, l_e, l_x)
         normalization = self.vertex_weights[vertex_enum, bond]
         if normalization != 0.0:
-            self.directed_loop_prob_table[init_row_index, bond] = set_probability(transition_weight/normalization)
+            self.directed_loop_prob_table[init_row_index,bond] = mu.set_probability(transition_weight/normalization)
 
-        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, vertical_swap_mapping)
+        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, vu.vertical_swap_mapping)
         new_composite_leg_index, new_row_index = self.get_composite_row_prob_index(new_vertex_enum, new_l_e, new_l_x)
         self.directed_loop_prob_table[new_row_index, bond] = self.directed_loop_prob_table[init_row_index, bond]
 
-        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, horizontal_swap_mapping)
+        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, vu.horizontal_swap_mapping)
         new_composite_leg_index, new_row_index = self.get_composite_row_prob_index(new_vertex_enum, new_l_e, new_l_x)
         self.directed_loop_prob_table[new_row_index, bond] = self.directed_loop_prob_table[init_row_index, bond]
 
-        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, composed_swaps_mapping)
+        new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, vu.composed_swaps_mapping)
         new_composite_leg_index, new_row_index = self.get_composite_row_prob_index(new_vertex_enum, new_l_e, new_l_x)
         self.directed_loop_prob_table[new_row_index, bond] = self.directed_loop_prob_table[init_row_index, bond]
 
@@ -122,18 +122,18 @@ class DirectedLoops(ProbabilityTable):
 
     def get_composite_row_prob_index(vertex_enum, entrance_leg_enum, exit_leg_enum):
 
-        composite_leg_index = num_legs_per_vertex*entrance_leg_enum + exit_leg_enum
-        row_index = num_legs_indices*vertex_enum + composite_leg_index
+        composite_leg_index = vu.num_legs_per_vertex*entrance_leg_enum + exit_leg_enum
+        row_index = vu.num_legs_indices*vertex_enum + composite_leg_index
 
         return composite_leg_index, row_index
     
 
     def get_symmetric_indices(vertex_enum, entrance_leg_enum, exit_leg_enum, symmetry_leg_mapping):
 
-        init_spin_tuple = leg_spin[vertex_enum]
+        init_spin_tuple = vu.leg_spin[vertex_enum]
         new_spin_tuple = (init_spin_tuple[symmetry_leg_mapping[0]], init_spin_tuple[symmetry_leg_mapping[1]], 
                         init_spin_tuple[symmetry_leg_mapping[2]], init_spin_tuple[symmetry_leg_mapping[3]])
-        new_vertex_enum = vertex_map[new_spin_tuple]
+        new_vertex_enum = vu.vertex_map[new_spin_tuple]
 
         new_entrance_leg_enum = symmetry_leg_mapping[entrance_leg_enum]
         new_exit_leg_enum = symmetry_leg_mapping[exit_leg_enum]
@@ -152,7 +152,7 @@ class DirectedLoops(ProbabilityTable):
 
                 exit_leg_weight_labels = self.vertex_weight_label_map[vertex_enum][l_e]
 
-                for l_x in range(num_legs_per_vertex):
+                for l_x in range(vu.num_legs_per_vertex):
 
                     l_x_weight_label = exit_leg_weight_labels[l_x]
                     l_x_weight = transition_weights[l_x_weight_label] if l_x_weight_label is not None else 0.0
@@ -170,7 +170,7 @@ class DirectedLoops(ProbabilityTable):
             
             J_ij = J_ij_vector[bond]
 
-            set_vertex_weights(self.vertex_weights, bond, Delta, J_ij, h_B)
+            vu.set_vertex_weights(self.vertex_weights, bond, Delta, J_ij, h_B)
 
             self.diag_prob_table[:, bond] = self.vertex_weights[0:4, bond]
 
@@ -184,8 +184,8 @@ class DirectedLoops(ProbabilityTable):
 
             self.diag_prob_table[:,bond] += offset
 
-            enforce_positive(self.diag_prob_table)
-            enforce_positive(self.vertex_weights)
+            mu.enforce_positive(self.diag_prob_table)
+            mu.enforce_positive(self.vertex_weights)
 
             self.update_directed_loop_table(bond, transition_weights)
 

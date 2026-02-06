@@ -1,9 +1,9 @@
+from heisenberg_ion.simulators.ed.preprocessor import ExactDiagonalization
 from heisenberg_ion.simulators.qmc.long_range.preprocessor import LongRangeQMC
 from heisenberg_ion.simulators.qmc.nearest_neighbor.preprocessor import NearestNeighborQMC
-from heisenberg_ion.simulators.ed.preprocessor import ExactDiagonalization
+
 
 class PreprocessorFactory:
-
     registry = {}
 
     def register(cls, name, subclass):
@@ -16,7 +16,7 @@ class PreprocessorFactory:
             raise ValueError(f"Preprocessor implementation not found for name: {name}")
         else:
             return cls.registry[name](parameter_set_list)
-        
+
 
 PreprocessorFactory.create = classmethod(PreprocessorFactory.create)
 PreprocessorFactory.register = classmethod(PreprocessorFactory.register)

@@ -2,9 +2,9 @@ import os
 import uuid
 from datetime import datetime
 
-class Preprocessor:
 
-    keys_single_parameters = {'root_folder', 'simulation_folder', 'number_of_threads'}
+class Preprocessor:
+    keys_single_parameters = {"root_folder", "simulation_folder", "number_of_threads"}
 
     def __init__(self, parameter_set_list):
 
@@ -16,11 +16,9 @@ class Preprocessor:
 
         self.driver_inputs = None
 
-    
     def build(self):
 
         pass
-
 
     def create_output_folder(self):
 
@@ -32,17 +30,15 @@ class Preprocessor:
 
         return self.simulation_folder
 
-
     def create_run_folder(self, misc_args):
 
         simulation_folder = self.simulation_folder
-        run_id = str(misc_args['uuid'])
+        run_id = str(misc_args["uuid"])
         run_folder = os.path.join(simulation_folder, run_id)
 
         os.mkdir(run_folder)
 
         return run_folder
-
 
     def get_run_id(self, misc_args):
 
@@ -52,16 +48,14 @@ class Preprocessor:
             run_id = uuid.uuid4()
 
         return run_id
-    
 
     def check_input_provided(self, key, optional=False):
 
         input_provided = key in self.parameter_set_list[0]
         if not input_provided and not optional:
-            raise Exception("Missing required key: {}".format(key))
+            raise Exception(f"Missing required key: {key}")
         else:
             return input_provided
-    
 
     def check_unique_uuids(self):
 
@@ -71,7 +65,6 @@ class Preprocessor:
             if len(uuid_set) != self.num_parameter_sets:
                 raise Exception("Specified uuids are not unique\n")
 
-
     def check_single_input(self, key, optional=False):
 
         input_provided = self.check_input_provided(key, optional)
@@ -79,14 +72,13 @@ class Preprocessor:
             val = self.parameter_set_list[0][key]
             for i in range(self.num_parameter_sets):
                 if self.parameter_set_list[i][key] != val:
-                    raise Exception("There should only be one input for key: {}".format(key))
+                    raise Exception(f"There should only be one input for key: {key}")
 
         return input_provided
-    
 
     def extract_optional_input(self, key, unique=False):
 
-        if unique: 
+        if unique:
             if self.check_single_input(key, True):
                 return self.parameter_set_list[0][key]
             else:
@@ -96,8 +88,7 @@ class Preprocessor:
                 return self.parameter_set_list[0][key]
             else:
                 return None
-            
-    
+
     def write_input_file(self):
 
         simulation_folder = self.simulation_folder
@@ -107,7 +98,7 @@ class Preprocessor:
             for key in self.parameter_set_list[0].keys():
                 text_line = key + "\t" + str(self.parameter_set_list[0][key])
                 for i in range(1, self.num_parameter_sets):
-                    if not key in self.keys_single_parameters:
+                    if key not in self.keys_single_parameters:
                         text_line += "," + str(self.parameter_set_list[i][key])
                 text_line += "\n"
                 f.write(text_line)

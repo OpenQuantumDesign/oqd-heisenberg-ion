@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def set_probability(val):
 
     if val < 0.0:
@@ -10,7 +11,8 @@ def set_probability(val):
             print("invalid probability encountered: ", val)
     else:
         return val
-    
+
+
 def enforce_positive(table):
 
     size = np.shape(table)[0]

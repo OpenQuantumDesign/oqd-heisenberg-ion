@@ -1,7 +1,7 @@
 import numpy as np
 import os
-from .utils.math_utils import *
-from .utils.vertex_utils import *
+from .utils import math_utils as mu
+from .utils import vertex_utils as vu
 from .base import ProbabilityTable
 
 class Heatbath(ProbabilityTable):
@@ -50,12 +50,12 @@ class Heatbath(ProbabilityTable):
 
     def initialize_tables(self, num_bonds):
 
-        self.num_rows = num_vertices * num_legs_indices
+        self.num_rows = vu.num_vertices * vu.num_legs_indices
         self.heat_bath_prob_table = np.zeros((self.num_rows, num_bonds))
 
-        self.diag_prob_table = np.zeros((num_diagonal_vertices, num_bonds))
+        self.diag_prob_table = np.zeros((vu.num_diagonal_vertices, num_bonds))
         self.max_over_states = np.zeros(num_bonds)
-        self.vertex_weights = np.zeros((num_vertices, num_bonds))
+        self.vertex_weights = np.zeros((vu.num_vertices, num_bonds))
 
         self.spectrum_offset = 0.0
         self.max_diag_norm = 0.0
@@ -87,28 +87,28 @@ class Heatbath(ProbabilityTable):
 
     def update_heat_bath_probs(self, bond):
 
-        for vertex_enum in range(num_vertices):
-            for l_e in range(num_legs_per_vertex):
+        for vertex_enum in range(vu.num_vertices):
+            for l_e in range(vu.num_legs_per_vertex):
 
                 norm = 0.0
                 count_invalid_vertices = 0
 
-                for l_x in range(num_legs_per_vertex):
+                for l_x in range(vu.num_legs_per_vertex):
 
-                    composite_leg_index = num_legs_per_vertex*l_e + l_x
-                    row_index = num_legs_indices*vertex_enum + composite_leg_index
+                    composite_leg_index = vu.num_legs_per_vertex*l_e + l_x
+                    row_index = vu.num_legs_indices*vertex_enum + composite_leg_index
 
                     #new_vertex = get_new_vertex(v_map, l_spin, l_e, l_x, vertex_enum)
-                    new_vertex = new_vertex_map[vertex_enum, composite_leg_index]
+                    new_vertex = vu.new_vertex_map[vertex_enum, composite_leg_index]
 
                     if new_vertex == -1:
                         count_invalid_vertices += 1
                         self.heat_bath_prob_table[row_index, bond] = 0.0
                     else:
-                        self.heat_bath_prob_table[row_index, bond] = set_probability(self.vertex_weights[new_vertex, bond])
+                        self.heat_bath_prob_table[row_index, bond] = mu.set_probability(self.vertex_weights[new_vertex, bond])
                         norm += self.vertex_weights[new_vertex, bond]
 
-                self.heat_bath_prob_table[row_index-num_legs_per_vertex+1:row_index+1, bond] /= norm
+                self.heat_bath_prob_table[row_index-vu.num_legs_per_vertex+1:row_index+1, bond] /= norm
 
         return 0
     
@@ -122,7 +122,7 @@ class Heatbath(ProbabilityTable):
 
             J_ij = J_ij_vector[bond]
 
-            set_vertex_weights(self.vertex_weights, bond, Delta, J_ij, h_B)
+            vu.set_vertex_weights(self.vertex_weights, bond, Delta, J_ij, h_B)
 
             self.diag_prob_table[:, bond] = self.vertex_weights[0:4, bond]
 
@@ -133,8 +133,8 @@ class Heatbath(ProbabilityTable):
 
             self.diag_prob_table[:,bond] += offset
 
-            enforce_positive(self.diag_prob_table)
-            enforce_positive(self.vertex_weights)
+            mu.enforce_positive(self.diag_prob_table)
+            mu.enforce_positive(self.vertex_weights)
 
             self.max_over_states[bond] = np.max(self.diag_prob_table[:,bond])
             self.diag_prob_table[:,bond] /= self.max_over_states[bond]

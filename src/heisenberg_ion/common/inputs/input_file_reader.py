@@ -1,7 +1,7 @@
 from .utils import convert_to_snake_case
 
-class InputFileReader:
 
+class InputFileReader:
     def __init__(self, input_file_path):
 
         self.input_file = input_file_path
@@ -15,17 +15,14 @@ class InputFileReader:
 
         self.simulator = convert_to_snake_case(self.parameter_set_list[0]["simulator"])
 
-    
     def extract_key_value_inputs(self):
 
         input_config = {}
 
-        with open(self.input_file, 'r') as f:
-
+        with open(self.input_file) as f:
             line_count = 0
 
             for line in f.readlines():
-
                 line_count += 1
 
                 if line.startswith("#") or line.strip() == "":
@@ -41,11 +38,10 @@ class InputFileReader:
                 key = line_data[0]
 
                 input_config[key] = data
-                self.is_param_iterable[key] = (count_entries != 1)
+                self.is_param_iterable[key] = count_entries != 1
 
         return input_config
-    
-    
+
     def count_parameter_sets(self, count_entries, line_number):
 
         if count_entries != 1:
@@ -54,18 +50,17 @@ class InputFileReader:
                 line_num_parameters_set = line_number
 
             elif self.num_parameter_sets != count_entries:
-                raise ValueError("Inconistent number of entries in line: {} and "
-                "line: {} \n".format(line_number, line_num_parameters_set))
-            
+                raise ValueError(
+                    f"Inconistent number of entries in line: {line_number} and line: {line_num_parameters_set} \n"
+                )
+
         return 0
-    
 
     def extract_parameter_set_list(self, input_config):
 
-
         self.parameter_set_list = [{} for i in range(self.num_parameter_sets)]
 
-        for key,val in input_config.items():
+        for key, val in input_config.items():
             if len(val) == 1:
                 for i in range(self.num_parameter_sets):
                     self.parameter_set_list[i][key] = val[0]

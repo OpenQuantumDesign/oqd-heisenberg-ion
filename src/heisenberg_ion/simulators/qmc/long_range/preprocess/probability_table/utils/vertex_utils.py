@@ -5,7 +5,8 @@ num_legs_per_vertex = 4
 num_diagonal_vertices = 4
 num_legs_indices = num_legs_per_vertex**2
 
-# Mapping from vertex to integer. The 4 integers that define a vertex specify the spin at each leg (up or down)
+# Mapping from vertex to integer. 
+# The 4 integers that define a vertex specify the spin at each leg (up or down)
 vertex_map = {(1,1,1,1):0,
               (1,-1,1,-1):1,
               (-1,1,-1,1):2,
@@ -13,9 +14,10 @@ vertex_map = {(1,1,1,1):0,
               (1,-1,-1,1):4,
               (-1,1,1,-1):5}
 
-operator_type = (0,0,0,0,1,1) # 0 -> diagonal operator, 1 -> off-diagonal. Index defines vertex type 
+operator_type = (0,0,0,0,1,1) # 0 -> diagonal operator, 1 -> off-diagonal. Index defines vertex type
 
-leg_spin = [(1,1,1,1), (1,-1,1,-1), (-1,1,-1,1), (-1,-1,-1,-1), (1,-1,-1,1), (-1,1,1,-1)] # Inverse map of vertex_map
+# Inverse map of vertex_map
+leg_spin = [(1,1,1,1), (1,-1,1,-1), (-1,1,-1,1), (-1,-1,-1,-1), (1,-1,-1,1), (-1,1,1,-1)]
 # <1|S_z|1> = 1/2, <-1|S_z|-1> = -1/2
 
 # mapping[x] -> y => vertex defined by x maps to y under swap vertex operation

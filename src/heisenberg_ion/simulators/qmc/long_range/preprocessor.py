@@ -2,7 +2,6 @@ from heisenberg_ion.common.preprocessor.base import Preprocessor
 from ...preprocess.system.base import System
 from .preprocess.probability_table.factory import ProbabilityTableFactory
 from heisenberg_ion.common.inputs.input_parser import InputParser
-import os
 
 class LongRangeQMC(Preprocessor):
 
@@ -74,7 +73,7 @@ class LongRangeQMC(Preprocessor):
 
         bin_folder = self.extract_optional_input("bin_folder", True)
         cpp_source_folder = self.extract_optional_input("cpp_source_folder", True)
-        if bin_folder == None and cpp_source_folder == None:
+        if bin_folder is None and cpp_source_folder is None:
             raise Exception("No cpp binaries or source directory provided\n")
         else:
             self.driver_inputs = {"bin_folder": bin_folder, "cpp_source_folder": cpp_source_folder}

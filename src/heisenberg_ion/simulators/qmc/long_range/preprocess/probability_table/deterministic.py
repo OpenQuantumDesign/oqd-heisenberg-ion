@@ -74,7 +74,6 @@ class Deterministic(ProbabilityTable):
         max_over_states_file_name = os.path.join(self.prob_dir, "max_over_states.csv")
 
         geometry_table = self.system.geometry.geometry_table
-        N = self.system.geometry.N
         num_bonds = self.system.geometry.num_bonds
 
         np.savetxt(geometry_file_name, geometry_table, delimiter=",", fmt="%d", 

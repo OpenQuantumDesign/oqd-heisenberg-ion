@@ -44,7 +44,7 @@ class LongRangeQMC(Driver):
 
     def simulate(self):
 
-        if self.bin_dir != None:
+        if self.bin_dir is not None:
             copy_command = ["cp", "-r", self.bin_dir, self.build_dir]
             try:
                 subprocess.run(copy_command, check=True, capture_output=True, text=True)

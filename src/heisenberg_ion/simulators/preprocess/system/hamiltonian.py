@@ -1,5 +1,4 @@
 class HamiltonianParameters:
-
     args = {}
 
     def __init__(self):
@@ -11,8 +10,8 @@ class HamiltonianParameters:
         self.J = None
         self.B = None
 
-class HamiltonianFactory:
 
+class HamiltonianFactory:
     registry = {}
 
     def register(cls, name, subclass):
@@ -33,16 +32,17 @@ class HamiltonianFactory:
             raise ValueError(f"HamiltonianParameters implementation not found for name: {name}")
         else:
             return cls.registry[name](**kwargs)
-        
-# Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
+
+
+# Make register and create classmethods so subclasses can be added to the registry
+# and instantiated agnostically
 HamiltonianFactory.register = classmethod(HamiltonianFactory.register)
 HamiltonianFactory.create = classmethod(HamiltonianFactory.create)
 HamiltonianFactory.extract_args = classmethod(HamiltonianFactory.extract_args)
 
 
 class FMHeisenbergAFMZ(HamiltonianParameters):
-
-    args = {"J" : float}
+    args = {"J": float}
 
     def __init__(self, J):
 
@@ -54,10 +54,10 @@ class FMHeisenbergAFMZ(HamiltonianParameters):
         self.h = 0.0
         self.J = J
         self.B = 0.0
-        
-class XY(HamiltonianParameters):
 
-    args = {"J" : float}
+
+class XY(HamiltonianParameters):
+    args = {"J": float}
 
     def __init__(self, J):
 
@@ -70,9 +70,9 @@ class XY(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
-class FMHeisenbergFMZ(HamiltonianParameters):
 
-    args = {"J" : float}
+class FMHeisenbergFMZ(HamiltonianParameters):
+    args = {"J": float}
 
     def __init__(self, J):
 
@@ -85,14 +85,14 @@ class FMHeisenbergFMZ(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
-class XXZ(HamiltonianParameters):
 
-    args = {"Delta": float, "J" : float}
+class XXZ(HamiltonianParameters):
+    args = {"Delta": float, "J": float}
 
     def __init__(self, Delta, J):
 
         super().__init__()
-        
+
         self.hamiltonian_name = "XXZ"
         self.Delta = Delta
         self.hamiltonian_type = 2
@@ -100,9 +100,9 @@ class XXZ(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
-class XXZh(HamiltonianParameters):
 
-    args = {"Delta": float, "h": float, "J" : float}
+class XXZh(HamiltonianParameters):
+    args = {"Delta": float, "h": float, "J": float}
 
     def __init__(self, Delta, h, J):
 
@@ -115,9 +115,9 @@ class XXZh(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
-class AFMHeisenbergFMZ(HamiltonianParameters):
 
-    args = {"J" : float}
+class AFMHeisenbergFMZ(HamiltonianParameters):
+    args = {"J": float}
 
     def __init__(self, J):
 
@@ -130,9 +130,9 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
-class XXZhB(HamiltonianParameters):
 
-    args = {"Delta": float, "h": float, "B": float, "J" : float}
+class XXZhB(HamiltonianParameters):
+    args = {"Delta": float, "h": float, "B": float, "J": float}
 
     def __init__(self, Delta, h, B, J):
 

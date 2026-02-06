@@ -1,7 +1,7 @@
 import os
 
-class Driver:
 
+class Driver:
     def __init__(self, simulation_folder):
 
         self.simulation_folder = simulation_folder

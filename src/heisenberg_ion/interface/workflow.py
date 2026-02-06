@@ -1,16 +1,15 @@
+from ..common.driver.factory import DriverFactory
 from ..common.inputs.input_file_reader import InputFileReader
 from ..common.preprocessor.factory import PreprocessorFactory
-from ..common.driver.factory import DriverFactory
+
 
 class Workflow:
-
     def __init__(self, **kwargs):
 
         if "input_file" in kwargs:
             self.build_from_file(**kwargs)
         else:
             self.build_from_parameters(**kwargs)
-
 
     def build_from_file(self, input_file):
 
@@ -23,7 +22,6 @@ class Workflow:
         driver.simulate()
 
         return 0
-
 
     def build_from_parameters(self, **kwargs):
 

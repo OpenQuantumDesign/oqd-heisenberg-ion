@@ -103,3 +103,9 @@ class SSEParameters:
         self.sampling_parameters = sampling_parameters
 
         self.run_folder = run_folder
+        if system.hamiltonian_parameters.J <= 0:
+            raise Exception("J sets the energy scale. It must be a positive number for QMC\n")
+        
+        if system.interaction_range != "nearest_neighbor":
+            print(system.interaction_range)
+            raise Exception("NearestNeighborQMC can only be used for nearest-neighbor interactions\n")

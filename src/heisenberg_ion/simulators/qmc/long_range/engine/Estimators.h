@@ -9,6 +9,8 @@ private:
     std::vector<double> step_magnetization;
     std::vector<double> step_energy;
 
+    std::shared_ptr<spdlog::logger> logger;
+
     std::string out_folder_path;
 
     int simulation_steps;
@@ -21,7 +23,8 @@ private:
     std::vector<double> step_S_k_pi;
 
 public:
-    Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs);
+    Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs,
+        std::shared_ptr<spdlog::logger> &logger_ptr);
 
     void updateAllPropertiesProbabilistic(const int &i_step_n, const std::vector<int> &spin_configs,
                              const SimulationParameters &sim_params, const double &spectrum_offset,

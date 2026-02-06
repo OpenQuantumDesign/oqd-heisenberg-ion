@@ -1,9 +1,15 @@
 #include "SimulationParameters.h"
 
-SimulationParameters::SimulationParameters(std::map<std::string, std::string> &input_key_vals) {
+SimulationParameters::SimulationParameters(std::map<std::string, std::string> &input_key_vals,
+    const std::shared_ptr<spdlog::logger> &logger_ptr) {
+
+    logger = logger_ptr;
+    logger->info("Setting simulation parameters");
 
     extractStringEntry("simulation_folder", input_key_vals["simulation_folder"], root_folder);
+    logger->info("root_folder: {}", root_folder);
     extractStringEntry("uuid", input_key_vals["uuid"], uuid);
+    logger->info("uuid: {}", uuid);
     simulation_subfolder = root_folder + "/" + uuid + "/";
 
     std::string file_path = simulation_subfolder + "/" + "simulation_specs.txt";
@@ -109,23 +115,31 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
     }
 
     ofs.close();
+    logger->flush();
 }
 
 void SimulationParameters::extractIntegerEntry(const std::string &key_str, const std::string &val_str,
                                                       int &member_var, const bool &enforce_minimum,
-                                                      const int &min_val) {
+                                                      const int &min_val) const {
 
     if (val_str.empty()) {
+        logger->error("No value found for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
 
     size_t pos;
     member_var = std::stoi(val_str, &pos);
     if (pos != val_str.length()){
+        logger->error("Value could not be converted to an integer for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("Value could not be converted to an integer for key: " + key_str + ".\n");
     }
 
     if (enforce_minimum && member_var < min_val){
+        logger->error("Value for key: " + key_str + " is below the expected minimum: " +
+        std::to_string(min_val));
+        logger->flush();
         throw std::runtime_error("Value for key: " + key_str + " is below the expected minimum: " +
         std::to_string(min_val) + ".\n");
     }
@@ -137,16 +151,23 @@ void SimulationParameters::extractDoubleEntry(const std::string &key_str, const 
                                               const double &min_val) {
 
     if (val_str.empty()) {
+        logger->error("No value found for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
 
     size_t pos;
     member_var = std::stod(val_str, &pos);
     if (pos != val_str.length()){
+        logger->error("Value could not be converted to a double for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("Value could not be converted to a double for key: " + key_str + ".\n");
     }
 
     if (enforce_minimum && member_var < min_val){
+        logger->error("Value for key: " + key_str + " is below the expected minimum: " +
+                                 std::to_string(min_val));
+        logger->flush();
         throw std::runtime_error("Value for key: " + key_str + " is below the expected minimum: " +
                                  std::to_string(min_val) + ".\n");
     }
@@ -156,6 +177,8 @@ void SimulationParameters::extractBoolEntry(const std::string &key_str, const st
                                             bool &member_var) {
 
     if (val_str.empty()) {
+        logger->error("No value found for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
 
@@ -166,6 +189,8 @@ void SimulationParameters::extractBoolEntry(const std::string &key_str, const st
         member_var = false;
     }
     else {
+        logger->error("Value could not be converted to a bool for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("Value could not be converted to a bool for key: " + key_str + ".\n");
     }
 
@@ -175,6 +200,8 @@ void SimulationParameters::extractStringEntry(const std::string &key_str, const 
                                               std::string &member_var) {
 
     if (val_str.empty()) {
+        logger->error("No value found for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
     else {
@@ -188,6 +215,8 @@ void SimulationParameters::extractListInts(const std::string &key_str, const std
                                            const bool &enforce_minimum, const int &min_val) {
 
     if (val_str.empty()) {
+        logger->error("No value found for key: " + key_str);
+        logger->flush();
         throw std::runtime_error("No value found for key: " + key_str + ".\n");
     }
 
@@ -203,6 +232,8 @@ void SimulationParameters::extractListInts(const std::string &key_str, const std
     }
 
     if (entry_count+1 != list_size) {
+        logger->error("Expected size for " + key_str + " does not match length of list");
+        logger->flush();
         throw std::runtime_error("Expected size for " + key_str + " does not match length of list\n");
     }
 
@@ -213,6 +244,8 @@ void SimulationParameters::extractLoopType(const std::string &key_str, const std
     extractStringEntry(key_str, val_str, loop_type);
 
     if (loop_type != "deterministic" && loop_type != "heatbath" && loop_type != "directed_loop") {
+        logger->error("Loop Type must be 'deterministic', heat_bath or directed_loop");
+        logger->flush();
         throw std::runtime_error("Loop Type must be 'deterministic', heat_bath or directed_loop\n");
     }
 }
@@ -222,17 +255,24 @@ void SimulationParameters::extractHamiltonianType(const std::string &key_str, co
     extractIntegerEntry(key_str, val_str, hamiltonian_type, false);
 
     if (hamiltonian_type > 3 || hamiltonian_type < -1) {
+        logger->error("Hamiltonian type can only be -1, 0, 1, 2 or 3 for long range interactions");
+        logger->flush();
         throw std::runtime_error("Hamiltonian type can only be -1, 0, 1, 2 or 3 for long range interactions\n");
     }
 
     if (loop_type == "deterministic") {
         if (hamiltonian_type != -1 && hamiltonian_type != 0 && hamiltonian_type != 1) {
+            logger->error("Deterministic loops are only compatible with Hamiltonian types -1, 0 and 1");
+            logger->flush();
             throw std::runtime_error("Deterministic loops are only compatible with Hamiltonian types -1, 0 and 1\n");
         }
     }
 
     if (loop_type == "directed_loop" || loop_type == "heatbath") {
         if (hamiltonian_type != 2 && hamiltonian_type != 3) {
+            logger->error("directed loops and heat bath probabilities are only compatible with Hamiltonian "
+                                     "types 2 and 3");
+            logger->flush();
             throw std::runtime_error("directed loops and heat bath probabilities are only compatible with Hamiltonian "
                                      "types 2 and 3\n");
         }
@@ -244,6 +284,8 @@ void SimulationParameters::extractInteractionType(const std::string &key_str, co
     extractStringEntry(key_str, val_str, interaction_type);
 
     if (interaction_type != "power_law" && interaction_type != "matrix_input") {
+        logger->error("Supported interaction types are: 'power_law' and 'matrix_input'");
+        logger->flush();
         throw std::runtime_error("Supported interaction types are: 'Power-Law' and 'Matrix-Input'\n");
     }
 }
@@ -253,7 +295,9 @@ void SimulationParameters::extractBoundaryConditions(const std::string &key_str,
     extractStringEntry(key_str, val_str, boundary_conditions);
 
     if (boundary_conditions != "open" && boundary_conditions != "periodic") {
-        throw std::runtime_error("Boundary conditions can either be 'Open' or 'Periodic'\n");
+        logger->error("Boundary conditions must be 'open' or 'periodic'");
+        logger->flush();
+        throw std::runtime_error("Boundary conditions can either be 'open' or 'periodic'\n");
     }
 
 }
@@ -263,8 +307,11 @@ void SimulationParameters::extractInitialConditionsFromFile(std::string &file_pa
     std::ifstream file_stream(file_path);
     std::map<std::string, std::string> input_kev_val_pairs;
 
-    if (!file_stream.good())
+    if (!file_stream.good()) {
+        logger->error("Could not open file with path: " + file_path);
+        logger->flush();
         throw std::runtime_error("Could not open file with path: " + file_path);
+    }
 
     std::string line;
     int line_count = 0;
@@ -290,6 +337,8 @@ void SimulationParameters::extractInitialConditionsFromFile(std::string &file_pa
     file_stream.close();
 
     if (input_kev_val_pairs["N"] != std::to_string(N)) {
+        logger->error("Number of sites in SSE configuration inputs do not equal expected number of sites");
+        logger->flush();
         throw std::runtime_error("Number of sites in SSE configuration inputs do not equal expected number of sites\n");
     }
 
@@ -304,32 +353,34 @@ void SimulationParameters::extractInitialConditionsFromFile(std::string &file_pa
                     init_spin_config,N, false);
 }
 
-void SimulationParameters::writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream) {
+void SimulationParameters::writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream) const {
 
     file_stream << key_str << "\t" << std::to_string(val) << "\n";
-
+    logger->info(key_str + ": " + std::to_string(val));
 }
 
-void SimulationParameters::writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream) {
+void SimulationParameters::writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream) const {
 
     file_stream << key_str << "\t" << std::to_string(val) << "\n";
-
+    logger->info(key_str + ": " + std::to_string(val));
 }
 
 void SimulationParameters::writeStringEntry(const std::string &key_str, const std::string &val,
-                                            std::ofstream &file_stream) {
+                                            std::ofstream &file_stream) const {
 
     file_stream << key_str << "\t" << val << "\n";
-
+    logger->info(key_str + ": " + val);
 }
 
 void SimulationParameters::writeBoolEntry(const std::string &key_str, const bool &val,
-                                            std::ofstream &file_stream) {
+                                            std::ofstream &file_stream) const {
 
     if (val) {
         file_stream << key_str << "\t" << "True" << "\n";
+        logger->info(key_str + ": " + "True");
     }
     else {
         file_stream << key_str << "\t" << "False" << "\n";
+        logger->info(key_str + ": " + "False");
     }
 }

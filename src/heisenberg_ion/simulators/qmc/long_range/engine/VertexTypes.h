@@ -2,6 +2,7 @@
 #define cpp_qmc_VERTEXTYPES_H
 #include<vector>
 #include<map>
+#include <spdlog/spdlog.h>
 
 class VertexTypes {
 private:

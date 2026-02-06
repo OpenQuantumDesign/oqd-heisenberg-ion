@@ -1,11 +1,14 @@
 #include "ConfigurationGenerator.h"
 
 ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_params,
-                                               const ProbabilityTables &prob_tables){
+                                               const ProbabilityTables &prob_tables,
+                                               std::shared_ptr<spdlog::logger> &logger_ptr){
 
     init_config_index = sim_params.init_config_index;
     hamiltonian_type = sim_params.hamiltonian_type;
     a_parameter = sim_params.new_M_multiplier;
+
+    logger=logger_ptr;
 
     // Updated and used throughout the simulation if necessary by the required methods
     cumulative_loop_size = -1;
@@ -20,6 +23,13 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         count_non_skipped_loop_updates = 0;
         skip_loop_update = true;
         loop_start_pos_generator.seed(loop_start_pos_seed);
+
+        logger->info("SSE loop parameter initialization:");
+        logger->info("hamiltonian_type = 2, average_cumulative_loop_size = {}, max_loop_size = {}, N_l = {}",
+            average_cumulative_loop_size, max_loop_size, num_total_legs, N_l);
+        logger->info("count_non_skipped_loop_updates = {}, skip_loop_update = {}",
+            count_non_skipped_loop_updates, skip_loop_update);
+
     }
 
     num_bonds = sim_params.num_bonds;
@@ -57,6 +67,10 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         init_M = sim_params.init_M;
         M = init_M;
         num_winding = sim_params.winding;
+
+        logger->info("SSE sampling initialization:");
+        logger->info("init_config_index = {}, n = {}, init_M = {}, num_winding = {}",
+            init_config_index,n, init_M, num_winding);
     }
     else {
         init_M = std::max((int)(2 * sim_params.beta * prob_tables.max_diagonal_norm), sim_params.init_M);
@@ -64,6 +78,10 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         n=0;
         ConfigurationGenerator::populateOperatorLocations(M);
         num_winding = 0.0;
+
+        logger->info("SSE sampling initialization:");
+        logger->info("init_config_index = {}, n = {}, init_M = {}, num_winding = {}",
+            init_config_index, n, init_M, num_winding);
     }
 }
 
@@ -109,11 +127,9 @@ void ConfigurationGenerator::setInitialConfiguration(const SimulationParameters 
         for (int i=0; i<N; i++){
             if (i % init_config_index == 0){
                 spin_configuration.push_back(1);
-                std::cout << spin_configuration.at(i) << "\n";
             }
             else {
                 spin_configuration.push_back(-1);
-                std::cout << spin_configuration.at(i) << "\n";
             }
         }
     }
@@ -121,6 +137,8 @@ void ConfigurationGenerator::setInitialConfiguration(const SimulationParameters 
         spin_configuration = sim_params.init_spin_config;
     }
     else {
+        logger->error("Invalid initial configuration index provided");
+        logger->flush();
         throw std::runtime_error("Invalid initial configuration index provided\n");
     }
 }
@@ -661,6 +679,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     double prob_non_skip_update;
     double N_l_d;
 
+    logger->info("Starting burn in");
+
     for (int step=0; step<equilibration_steps; step++) {
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
         if (n > max_n) {
@@ -693,6 +713,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         }
     }
 
+    logger->info("Burn in finished");
+
     avg_cumul_loop_size_d = ConfigurationGenerator::computeAverage(cumulative_loop_size_list,
                                                                    avg_num_samples);
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
@@ -708,6 +730,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
     N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
     N_l = std::max((int)std::round(N_l_d), 1);
+
+    logger->info("Starting equilibration");
 
     for (int step=0; step<equilibration_steps; step++){
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
@@ -741,7 +765,15 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
         N_l = std::max((int)std::round(N_l_d), 1);
 
+        if (step % 1000 == 0) {
+            logger->info("Equilibration step = {}, n = {}, M = {}, N_l = {}",
+                step, n, M, N_l);
+            logger->flush();
+        }
+
     }
+
+    logger->info("Equilibration finished");
 
     max_loop_size = std::max(10000*avg_n,1);
 
@@ -754,6 +786,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)equilibration_steps);
     N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
     N_l = std::max((int)std::round(N_l_d), 1);
+
+    logger->info("Starting estimation run");
 
     for (int step=0; step<mc_steps; step++){
 
@@ -770,6 +804,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
             estimators.trackSpinConfigs(spin_configuration);
         }
     }
+
+    logger->info("Estimation run finished");
 }
 
 void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTables &prob_tables,
@@ -778,6 +814,8 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
                                                            const VertexTypes &vertex_types) {
 
     if (hamiltonian_type != 1 and hamiltonian_type != -1) {
+        logger->error("hamiltonian type is not 1 or -1");
+        logger->flush();
         throw std::runtime_error("hamiltonian type is not 1 or -1\n");
     }
 
@@ -786,6 +824,8 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
     double avg_n_d = 0.0;
     int avg_num_samples = 1000;
     int M_new;
+
+    logger->info("Starting burn in");
 
     for (int step=0; step<avg_num_samples; step++) {
         ConfigurationGenerator::diagonalUpdatesIsotropic(prob_tables);
@@ -807,10 +847,12 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         ConfigurationGenerator::flipAllSpins();
 
         if (step % 1000 == 0) {
-            std::cout << "n = " << n << "\n";
-            std::cout << "step = " << step << "\n";
+            logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
+            logger->flush();
         }
     }
+
+    logger->info("Burn in finished");
 
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
@@ -819,6 +861,8 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
     //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
     ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
     M = M_new;
+
+    logger->info("Starting equilibration");
 
     for (int step=0; step<equilibration_steps; step++) {
         ConfigurationGenerator::diagonalUpdatesIsotropic(prob_tables);
@@ -840,7 +884,16 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
 
         ConfigurationGenerator::flipAllSpins();
+
+        if (step % 1000 == 0) {
+            logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
+            logger->flush();
+        }
     }
+
+    logger->info("Equilibration finished");
+
+    logger->info("Starting estimation run");
 
     for (int step=0; step<mc_steps; step++){
 
@@ -859,14 +912,15 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
                                                     prob_tables.lattice_sites);
 
         if (step % 1000 == 0) {
-            std::cout << "n = " << n << "\n";
-            std::cout << "step = " << step << "\n";
+            logger->info("Simulation step = {}, n = {}", step, n);
+            logger->flush();
         }
 
         if (sim_params.track_spin_configs) {
             estimators.trackSpinConfigs(spin_configuration);
         }
     }
+    logger->info("Estimation run finished");
 }
 
 void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &prob_tables,
@@ -875,6 +929,8 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
                                                             const VertexTypes &vertex_types) {
 
     if (hamiltonian_type != 0) {
+        logger->error("hamiltonian type is not 0");
+        logger->flush();
         throw std::runtime_error("hamiltonian type is not 0\n");
     }
 
@@ -883,6 +939,8 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
     double avg_n_d = 0.0;
     int avg_num_samples = 1000;
     int M_new;
+
+    logger->info("Starting burn in");
 
     for (int step=0; step<1000; step++) {
         ConfigurationGenerator::diagonalUpdatesXY(prob_tables);
@@ -909,10 +967,12 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         ConfigurationGenerator::flipAllSpins();
 
         if (step % avg_num_samples == 0) {
-            std::cout << "n = " << n << "\n";
-            std::cout << "step = " << step << "\n";
+            logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
+            logger->flush();
         }
     }
+
+    logger->info("Burn in finished");
 
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
@@ -926,6 +986,8 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
 
     //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
     //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+
+    logger->info("Starting equilibration");
 
     for (int step=0; step<equilibration_steps; step++) {
         ConfigurationGenerator::diagonalUpdatesXY(prob_tables);
@@ -954,7 +1016,16 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         ConfigurationGenerator::offDiagonalUpdatesXY(prob_tables, vertex_types);
 
         ConfigurationGenerator::flipAllSpins();
+
+        if (step % 1000 == 0) {
+            logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
+            logger->flush();
+        }
     }
+
+    logger->info("Equilibration finished");
+
+    logger->info("Starting estimation run");
 
     for (int step=0; step<mc_steps; step++){
 
@@ -973,14 +1044,15 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
                                                     prob_tables.lattice_sites);
 
         if (step % 1000 == 0) {
-            std::cout << "n = " << n << "\n";
-            std::cout << "step = " << step << "\n";
+            logger->info("Simulation step = {}, n = {}", step, n);
+            logger->flush();
         }
 
         if (sim_params.track_spin_configs) {
             estimators.trackSpinConfigs(spin_configuration);
         }
     }
+    logger->info("Estimation run finished");
 }
 
 double ConfigurationGenerator::computeAverage(std::vector<int> &vector_entries,
@@ -1014,6 +1086,8 @@ void ConfigurationGenerator::generateConfigurations(const ProbabilityTables &pro
         simulateProbabilisticLoopsXXZh(prob_tables, estimators, sim_params, vertex_types);
     }
     else {
+        logger->error("Hamiltonian type can not be resolved");
+        logger->flush();
         throw std::runtime_error("Hamiltonian type can not be resolved.\n");
     }
 }
@@ -1021,6 +1095,7 @@ void ConfigurationGenerator::generateConfigurations(const ProbabilityTables &pro
 void ConfigurationGenerator::writeFinalConfigurations(const SimulationParameters &sim_params) {
 
     std::string file_path = sim_params.simulation_subfolder + "/" + "Final SSE Configuration.txt";
+    logger->info("Writing final configuration to: {}", file_path);
     std::ofstream ofs(file_path);
 
     ofs << "N" << "\t" << N;

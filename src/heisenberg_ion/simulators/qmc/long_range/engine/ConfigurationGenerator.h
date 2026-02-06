@@ -6,12 +6,15 @@
 #include "ProbabilityTables.h"
 #include "Estimators.h"
 #include "VertexTypes.h"
+#include <spdlog/spdlog.h>
 
 class ConfigurationGenerator {
 private:
     int num_legs_per_vertex = 4;
     int num_composite_leg_indices = 16;
     int num_total_legs;
+
+    std::shared_ptr<spdlog::logger> logger;
 
     int hamiltonian_type;
 
@@ -136,7 +139,8 @@ public:
     int M;
     int n;
 
-    ConfigurationGenerator(const SimulationParameters &sim_params, const ProbabilityTables &prob_tables);
+    ConfigurationGenerator(const SimulationParameters &sim_params, const ProbabilityTables &prob_tables,
+        std::shared_ptr<spdlog::logger> &logger_ptr);
 
     void generateConfigurations(const ProbabilityTables &prob_tables, Estimators &estimators,
                                 const SimulationParameters &sim_params, const VertexTypes &vertex_types);

@@ -1,11 +1,15 @@
 #include "ProbabilityTables.h"
 
 std::string ProbabilityTables::readTabularFile(const std::string &file_path,
-                                               std::vector<std::vector<double>> &data_container){
+                                               std::vector<std::vector<double>> &data_container) const {
 
+    logger->info("Reading tabular file {}", file_path);
     std::ifstream file_stream(file_path);
-    if (!file_stream.good())
+    if (!file_stream.good()) {
+        logger->error("Could not open file with path: " + file_path);
+        logger->flush();
         throw std::runtime_error("Could not open file with path: " + file_path);
+    }
 
     std::string line, entry;
     std::vector<double> row_data;
@@ -19,7 +23,6 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
             header = line;
             header.erase(std::remove_if(header.begin(), header.end(),
                 [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
-            std::cout << header << std::endl;
             continue;
         }
 
@@ -29,15 +32,14 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         while (std::getline(row_stream, entry, ',')) {
             double table_val = std::stod(entry);
             if (isnan(table_val)) {
+                logger->error("Invalid value encountered at line: {}", lineCount);
+                logger->flush();
                 throw std::runtime_error("Invalid value encountered\n");
             }
             else if (table_val < 0.0){
-                if (table_val > -1e-15){
-                    throw std::runtime_error("Small negative value encountered\n");
-                }
-                else {
-                    throw std::runtime_error("Large negative value encountered\n");
-                }
+                logger->error("Invalid value encountered at line: {}", lineCount);
+                logger->flush();
+                throw std::runtime_error("Negative value encountered\n");
             }
             row_data.push_back(table_val);
         }
@@ -53,9 +55,13 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
                                                std::vector<std::vector<int>> &data_container,
                                                const bool &negatives_allowed) {
 
+    logger->info("Reading tabular file {}", file_path);
     std::ifstream file_stream(file_path);
-    if (!file_stream.good())
+    if (!file_stream.good()) {
+        logger->error("Could not open file with path: " + file_path);
+        logger->flush();
         throw std::runtime_error("Could not open file with path: " + file_path);
+    }
 
     std::string line, entry;
     std::vector<int> row_data;
@@ -69,7 +75,6 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
             header = line;
             header.erase(std::remove_if(header.begin(), header.end(),
                 [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
-            std::cout << header << std::endl;
             continue;
         }
 
@@ -79,9 +84,13 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         while (std::getline(rowStream, entry, ',')) {
             int table_val = std::stoi(entry);
             if (isnan(table_val)) {
+                logger->error("Invalid value encountered at line: {}", lineCount);
+                logger->flush();
                 throw std::runtime_error("Invalid value encountered\n");
             }
             else if (table_val < 0 and !negatives_allowed) {
+                logger->error("Negative value encountered at line: {}", lineCount);
+                logger->flush();
                 throw std::runtime_error("Negative value encountered\n");
             }
             row_data.push_back(table_val);
@@ -96,9 +105,14 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
 
 std::string ProbabilityTables::readVectorFile(const std::string &file_path, std::vector<double> &data_container) {
 
+    logger->info("Reading vector file {}", file_path);
+
     std::ifstream file_stream(file_path);
-    if (!file_stream.good())
+    if (!file_stream.good()) {
+        logger->error("Could not open file with path: " + file_path);
+        logger->flush();
         throw std::runtime_error("Could not open file with path: " + file_path);
+    }
 
     std::string line, entry;
     double row_data;
@@ -112,7 +126,6 @@ std::string ProbabilityTables::readVectorFile(const std::string &file_path, std:
             header = line;
             header.erase(std::remove_if(header.begin(), header.end(),
                 [](unsigned char c){ return (c == '#' || c == ' '); }), header.end());
-            std::cout << header << std::endl;
             continue;
         }
 
@@ -121,15 +134,14 @@ std::string ProbabilityTables::readVectorFile(const std::string &file_path, std:
         row_data = std::stod(line);
 
         if (isnan(row_data)) {
+            logger->error("Invalid value encountered at line: {}", lineCount);
+            logger->flush();
             throw std::runtime_error("Invalid value encountered\n");
         }
         else if (row_data < 0.0){
-            if (row_data > -1e-15){
-                throw std::runtime_error("Small negative value encountered\n");
-            }
-            else {
-                throw std::runtime_error("Large negative value encountered\n");
-            }
+            logger->error("Negative value encountered at line: {}", lineCount);
+            logger->flush();
+            throw std::runtime_error("Negative value encountered\n");
         }
         data_container.push_back(row_data);
     }
@@ -145,6 +157,8 @@ void ProbabilityTables::extractHeaderEntry(const std::string &header_string, con
     std::stringstream ss_1(header_string);
     bool norm_found = false;
     member_to_update = 0.0;
+
+    logger->info("Extracting entry from probability tables: {}", identifier);
 
     while(std::getline(ss_1, key_val_pair, ','))
     {
@@ -167,12 +181,19 @@ void ProbabilityTables::extractHeaderEntry(const std::string &header_string, con
     }
 
     if (!norm_found) {
+        logger->error("Could not find entry in probability tables: {}", identifier);
+        logger->flush();
         throw std::runtime_error("Value not found in probability tables for " + identifier + "\n");
     }
 
 }
 
-ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, const VertexTypes &vertex_types) {
+ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, const VertexTypes &vertex_types,
+    std::shared_ptr<spdlog::logger> &logger_ptr) {
+
+    logger = logger_ptr;
+
+    logger->info("Initializing Probability Tables");
 
     if (sim_params.hamiltonian_type == 2){
 
@@ -201,6 +222,8 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
     extractHeaderEntry(header_max_norm_file, "spectrum_offset", spectrum_offset);
 
     readTabularFile(geometry_file, lattice_sites, true);
+
+    logger->info("Probability tables read");
 }
 
 void ProbabilityTables::normalizeLoopProbs(const VertexTypes &vertex_types, const SimulationParameters &sim_params) {

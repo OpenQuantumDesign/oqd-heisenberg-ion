@@ -8,6 +8,7 @@
 #include <sstream>
 #include "SimulationParameters.h"
 #include "VertexTypes.h"
+#include <spdlog/spdlog.h>
 
 class ProbabilityTables {
 private:
@@ -17,11 +18,13 @@ private:
     std::string max_norm_probabilities_file;
     std::string geometry_file;
 
-    static std::string readTabularFile(const std::string &file_path, std::vector<std::vector<double>> &data_container);
-    static std::string readTabularFile(const std::string &file_path, std::vector<std::vector<int>> &data_container,
+    std::shared_ptr<spdlog::logger> logger;
+
+    std::string readTabularFile(const std::string &file_path, std::vector<std::vector<double>> &data_container) const;
+    std::string readTabularFile(const std::string &file_path, std::vector<std::vector<int>> &data_container,
                                 const bool &negatives_allowed);
-    static std::string readVectorFile(const std::string &file_path, std::vector<double> &data_container);
-    static void extractHeaderEntry(const std::string &header_string, const std::string &identifier,
+    std::string readVectorFile(const std::string &file_path, std::vector<double> &data_container);
+    void extractHeaderEntry(const std::string &header_string, const std::string &identifier,
                                    double &member_to_update);
     void normalizeLoopProbs(const VertexTypes &vertex_types, const SimulationParameters &sim_params);
 
@@ -38,7 +41,8 @@ public:
 
     double spectrum_offset;
 
-    explicit ProbabilityTables(const SimulationParameters &sim_params, const VertexTypes &vertex_types);
+    explicit ProbabilityTables(const SimulationParameters &sim_params, const VertexTypes &vertex_types,
+        std::shared_ptr<spdlog::logger> &logger_ptr);
 };
 
 

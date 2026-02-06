@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <map>
+#include <spdlog/spdlog.h>
 
 class SimulationParameters {
 
@@ -21,6 +22,7 @@ public:
     double h;
     double h_B;
     int num_bonds;
+    std::shared_ptr<spdlog::logger> logger;
 
     int hamiltonian_type;
     std::string interaction_type;
@@ -55,19 +57,20 @@ public:
     std::vector<int> init_operator_locations;
     double winding;
 
-    explicit SimulationParameters(std::map<std::string, std::string> &input_key_vals);
+    explicit SimulationParameters(std::map<std::string, std::string> &input_key_vals,
+        const std::shared_ptr<spdlog::logger> &logger_ptr);
 
-    static void extractIntegerEntry(const std::string &key_str, const std::string &val_str, int &member_var,
-                             const bool &enforce_minimum, const int &min_val=0);
+     void extractIntegerEntry(const std::string &key_str, const std::string &val_str, int &member_var,
+                             const bool &enforce_minimum, const int &min_val=0) const;
 
-    static void extractDoubleEntry(const std::string &key_str, const std::string &val_str, double &member_var,
+     void extractDoubleEntry(const std::string &key_str, const std::string &val_str, double &member_var,
                             const bool &enforce_minimum, const double &min_val=0.0);
 
-    static void extractBoolEntry(const std::string &key_str, const std::string &val_str, bool &member_var);
+     void extractBoolEntry(const std::string &key_str, const std::string &val_str, bool &member_var);
 
-    static void extractStringEntry(const std::string &key_str, const std::string &val_str, std::string &member_var);
+     void extractStringEntry(const std::string &key_str, const std::string &val_str, std::string &member_var);
 
-    static void extractListInts(const std::string &key_str, const std::string &val_str, std::vector<int> &member_var,
+     void extractListInts(const std::string &key_str, const std::string &val_str, std::vector<int> &member_var,
                          const int &list_size, const bool &enforce_minimum, const int &min_val=0);
 
     void extractHamiltonianType(const std::string &key_str, const std::string &val_str);
@@ -80,13 +83,13 @@ public:
 
     void extractInitialConditionsFromFile(std::string &file_path);
 
-    static void writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream);
+    void writeNumericEntry(const std::string &key_str, const int &val, std::ofstream &file_stream) const;
 
-    static void writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream);
+    void writeNumericEntry(const std::string &key_str, const double &val, std::ofstream &file_stream) const;
 
-    static void writeStringEntry(const std::string &key_str, const std::string &val, std::ofstream &file_stream);
+    void writeStringEntry(const std::string &key_str, const std::string &val, std::ofstream &file_stream) const;
 
-    static void writeBoolEntry(const std::string &key_str, const bool &val, std::ofstream &file_stream);
+    void writeBoolEntry(const std::string &key_str, const bool &val, std::ofstream &file_stream) const;
 
 };
 

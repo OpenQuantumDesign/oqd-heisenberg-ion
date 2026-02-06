@@ -7,21 +7,35 @@
 #include "ConfigurationGenerator.h"
 #include "ProbabilityTables.h"
 #include "Estimators.h"
+#include <spdlog/spdlog.h>
+#include "spdlog/sinks/basic_file_sink.h"
 
-void checkRootFolder(std::map<std::string, std::string> &input_key_vals) {
+void checkRootFolder(std::map<std::string, std::string> &input_key_vals, const auto &logger) {
+
+    logger->info("Validating root directories");
 
     if (!input_key_vals.contains("simulation_folder") || input_key_vals["simulation_folder"].empty()) {
+        logger->error("No root folder provided");
+        logger->flush();
         throw std::runtime_error("No root folder provided\n");
     }
     else if(!std::filesystem::exists(input_key_vals["simulation_folder"])) {
+        logger->error("Simulation folder path does not exist");
+        logger->flush();
         throw std::runtime_error("Simulation folder path does not exist\n");
     }
 
+    logger->info("Root directories validated");
+
 }
 
-void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int num_parameter_sets) {
+void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int num_parameter_sets, const auto &logger) {
+
+    logger->info("Checking UUID collection");
 
     if (!input_key_vals.contains("uuid") || input_key_vals["uuid"].empty()) {
+        logger->error("No UUIDs provided");
+        logger->flush();
         throw std::runtime_error("No UUID provided\n");
     }
     else {
@@ -31,6 +45,8 @@ void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int nu
         std::string single_uuid;
         while(std::getline(uuid_ss, single_uuid, ',')) {
             if (uuid_collection.contains(single_uuid)) {
+                logger->error("UUIDs are not unique");
+                logger->flush();
                 throw std::runtime_error("UUIDs are not unique\n");
             }
             else {
@@ -39,12 +55,18 @@ void checkUUIDs(std::map<std::string, std::string> &input_key_vals, const int nu
         }
         size_t num_uuids = uuid_collection.size();
         if (num_uuids != num_parameter_sets) {
+            logger->error("Number of UUIDs should be equal to the number of parameter sets provided");
+            logger->flush();
             throw std::runtime_error("Number of UUIDs should be equal to the number of parameter sets provided\n");
         }
     }
+
+    logger->info("UUID collection validated");
 }
 
-void checkNumberOfThreads(std::map<std::string, std::string> &input_key_vals) {
+void checkNumberOfThreads(std::map<std::string, std::string> &input_key_vals, const auto &logger) {
+
+    logger->info("Checking number of threads input");
 
     if (input_key_vals.contains("number_of_threads")) {
         std::string num_threads_str = input_key_vals["number_of_threads"];
@@ -55,22 +77,31 @@ void checkNumberOfThreads(std::map<std::string, std::string> &input_key_vals) {
             size_t pos;
             std::stoi(num_threads_str, &pos);
             if (pos != num_threads_str.length()){
-                throw std::runtime_error("Value could not be converted to an integer for key: 'Number of Threads'\n");
+                logger->error("Value could not be converted to an integer for key: 'number_of_threads");
+                logger->flush();
+                throw std::runtime_error("Value could not be converted to an integer for key: 'number_of_threads'\n");
             }
         }
     }
     else {
         input_key_vals["number_of_threads"] = "1";
     }
+
+    logger->info("Number of threads input checked");
 }
 
 void readInputFile(const std::string &input_file_path, std::map<std::string, std::string> &input_key_vals,
-                   std::map<std::string, bool> &is_parameter_iterable){
+                   std::map<std::string, bool> &is_parameter_iterable, const auto &logger){
+
+    logger->info("Reading input file: " + input_file_path);
 
     std::ifstream file_stream(input_file_path);
 
-    if (!file_stream.good())
+    if (!file_stream.good()) {
+        logger->error("Could not open file with path: " + input_file_path);
+        logger->flush();
         throw std::runtime_error("Could not open file with path: " + input_file_path);
+    }
 
     std::string line;
     int num_parameter_sets = 1;
@@ -111,6 +142,10 @@ void readInputFile(const std::string &input_file_path, std::map<std::string, std
                 line_num_param_sets_identified = line_count;
             }
             else if (num_parameter_sets != count_entries) {
+                logger->error("Inconsistent numbers of entries in line numbers: " +
+                                         std::to_string(line_num_param_sets_identified) +
+                                         " and " + std::to_string(line_count));
+                logger->flush();
                 throw std::runtime_error("Inconsistent numbers of entries in line numbers: " +
                                          std::to_string(line_num_param_sets_identified) +
                                          " and " + std::to_string(line_count) + "\n");
@@ -120,12 +155,15 @@ void readInputFile(const std::string &input_file_path, std::map<std::string, std
     }
 
     input_key_vals["number_of_parameter_sets"] = std::to_string(num_parameter_sets);
+    logger->info("Number of parameter sets: " + std::to_string(num_parameter_sets));
 
     file_stream.close();
 
-    checkRootFolder(input_key_vals);
-    checkUUIDs(input_key_vals, num_parameter_sets);
-    checkNumberOfThreads(input_key_vals);
+    logger->info("Input file read");
+
+    checkRootFolder(input_key_vals, logger);
+    checkUUIDs(input_key_vals, num_parameter_sets, logger);
+    checkNumberOfThreads(input_key_vals, logger);
 }
 
 void gatherThreadParameterSets(const int &num_sets_per_thread, std::map<std::string, bool> &specify_iterables,
@@ -159,15 +197,23 @@ void gatherThreadParameterSets(const int &num_sets_per_thread, std::map<std::str
 
 void gatherParameterSets(std::map<std::string, bool> &specify_iterables,
                          std::map<std::string, std::string> &input_settings,
-                         std::vector<std::vector<std::map<std::string, std::string>>> &parameter_sets) {
+                         std::vector<std::vector<std::map<std::string, std::string>>> &parameter_sets,
+                         const auto &logger) {
+
+    logger->info("Gathering parameter sets");
 
     int num_total_parameter_sets = std::stoi(input_settings["number_of_parameter_sets"]);
     int num_threads = std::stoi(input_settings["number_of_threads"]);
     if (num_threads > num_total_parameter_sets) {
         num_threads = num_total_parameter_sets;
     }
+    logger->info("Number of threads: " + std::to_string(num_threads));
+
     int num_sets_per_thread = num_total_parameter_sets / num_threads;
+    logger->info("Number of threads per set: " + std::to_string(num_sets_per_thread));
+
     int extra_sets = num_total_parameter_sets - num_sets_per_thread * num_threads;
+    logger->info("Number of extra sets: " + std::to_string(extra_sets));
 
     for (int i = 0; i < extra_sets; i ++) {
         std::vector<std::map<std::string, std::string>> thread_parameter_sets;
@@ -182,22 +228,38 @@ void gatherParameterSets(std::map<std::string, bool> &specify_iterables,
                                   thread_parameter_sets);
         parameter_sets.push_back(thread_parameter_sets);
     }
+
+    logger->info("Parameter sets gathered");
 }
 
 void simulateParameterSets(std::vector<std::map<std::string, std::string>> parameter_sets) {
 
     for (std::map<std::string, std::string>& simulation_specs : parameter_sets){
 
-        SimulationParameters sim_params = SimulationParameters(simulation_specs);
+        std::string parameter_set_log_dir = simulation_specs["run_folder"] + "/parameter_set.log";
+        std::string uuid_str = simulation_specs["uuid"];
 
+        auto parameter_set_logger = spdlog::basic_logger_st(uuid_str,
+            parameter_set_log_dir, true);
+
+        parameter_set_logger->info("Parameter set logger initialized");
+
+        SimulationParameters sim_params = SimulationParameters(simulation_specs, parameter_set_logger);
+
+        parameter_set_logger->info("Simulation parameters initialized");
+
+        parameter_set_logger->info("Initializing vertex types for SSE calculation");
         VertexTypes vertex_types = VertexTypes(sim_params.hamiltonian_type);
+        parameter_set_logger->info("Vertex types initialized");
 
-        ProbabilityTables prob_tables = ProbabilityTables(sim_params, vertex_types);
+        ProbabilityTables prob_tables = ProbabilityTables(sim_params, vertex_types, parameter_set_logger);
 
-        Estimators estimators = Estimators(sim_params, false);
+        Estimators estimators = Estimators(sim_params, false, parameter_set_logger);
 
-        ConfigurationGenerator mc_simulator = ConfigurationGenerator(sim_params, prob_tables);
+        ConfigurationGenerator mc_simulator = ConfigurationGenerator(sim_params, prob_tables, parameter_set_logger);
         mc_simulator.generateConfigurations(prob_tables, estimators, sim_params, vertex_types);
+
+        parameter_set_logger->info("SSE calculation finished. Writing outputs.");
 
         estimators.outputStepData(sim_params);
 
@@ -208,6 +270,8 @@ void simulateParameterSets(std::vector<std::map<std::string, std::string>> param
         if (sim_params.write_final_SSE_configs) {
             mc_simulator.writeFinalConfigurations(sim_params);
         }
+
+        parameter_set_logger->info("SSE output files generated");
     }
 }
 
@@ -219,14 +283,27 @@ int main(int arg_count, char *args[]) {
     }
     else {
         std::string input_file_path = args[1];
+
+        std::filesystem::path file_path(args[1]);
+        std::filesystem::path dir = file_path.parent_path();
+
+        auto global_logger = spdlog::basic_logger_st("global_logger",
+            dir/ "global.log", true);
+        global_logger->flush_on(spdlog::level::info);
+
+        global_logger->info("Global logger initialized");
+
         std::map<std::string, std::string> input_settings;
         std::map<std::string, bool> specify_iterables;
-        readInputFile(input_file_path, input_settings, specify_iterables);
+
+        readInputFile(input_file_path, input_settings, specify_iterables, global_logger);
 
         std::vector<std::vector<std::map<std::string, std::string>>> parameter_sets;
         std::vector<std::thread> threads_list;
 
-        gatherParameterSets(specify_iterables, input_settings, parameter_sets);
+        gatherParameterSets(specify_iterables, input_settings, parameter_sets, global_logger);
+
+        global_logger->info("Executing threads");
 
         threads_list.reserve(parameter_sets.size());
         for (const std::vector<std::map<std::string, std::string>>& thread_parameter_sets : parameter_sets) {
@@ -236,6 +313,8 @@ int main(int arg_count, char *args[]) {
         for(std::thread& thread : threads_list){
             thread.join();
         }
+
+        global_logger->info("All threads finished");
 
         // Fix the structure factor calculation and test it
 

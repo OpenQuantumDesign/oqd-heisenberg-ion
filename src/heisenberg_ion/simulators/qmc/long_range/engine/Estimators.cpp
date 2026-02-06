@@ -32,7 +32,11 @@ void Estimators::updateAllPropertiesDeterministic(const int &int_step_n, const s
     step_spin_stiffness.push_back(pow((double)winding,2)/(sim_params.beta * sim_params.N));
 }
 
-Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in) {
+Estimators::Estimators(const SimulationParameters &sim_params, const bool &track_spin_configs_in,
+    std::shared_ptr<spdlog::logger> &logger_ptr) {
+
+    logger = logger_ptr;
+    logger->info("Initializing estimators");
 
     simulation_steps = sim_params.simulation_steps;
     track_spin_configs = track_spin_configs_in;
@@ -46,6 +50,7 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 void Estimators::outputStepData(const SimulationParameters &sim_params) const {
 
     std::string file_path = out_folder_path + "/" + "estimators.csv";
+    logger->info("Writing estimator data to: {}", file_path);
     std::string header = "# MC Step Outputs\n";
     header += "MC Step, Energy, Magnetization, Spin Stiffness\n";
     std::ofstream ofs(file_path);
@@ -85,6 +90,7 @@ void Estimators::outputPairCorrelations(const SimulationParameters &sim_params) 
 void Estimators::outputDiagnostics(const SimulationParameters &sim_params) const {
 
     std::string file_path = out_folder_path + "/" + "spin_configurations.csv";
+    logger->info("Writing shot data to: {}", file_path);
     std::string header = "# Spin Configurations\n";
     std::ofstream ofs(file_path);
     ofs << header << "\n";

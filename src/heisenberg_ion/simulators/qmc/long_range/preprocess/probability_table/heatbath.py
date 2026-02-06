@@ -7,6 +7,7 @@ from .base import ProbabilityTable
 class Heatbath(ProbabilityTable):
 
     args = {"gamma" : float}
+    allowed_hamiltonians = {"XXZ", "XXZh", "XY", "fm_heisenberg_fm_Z", "fm_heisenberg_afm_Z"}
 
     def __init__(self, system, gamma):
 
@@ -26,7 +27,6 @@ class Heatbath(ProbabilityTable):
         super().validate_system()
 
         hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
-        self.allowed_hamiltonians = ["XXZ", "XXZh"]
 
         if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Heatbath probability tables " \

@@ -7,6 +7,7 @@ import os
 class DirectedLoops(ProbabilityTable):
 
     args = {"gamma": float, "ksi" : float, "dist_dep_gamma" : bool}
+    allowed_hamiltonians = {"XXZ", "XXZh", "XY", "fm_heisenberg_fm_Z", "fm_heisenberg_afm_Z"}
 
     def __init__(self, system, gamma, ksi, dist_dep_gamma):
 
@@ -26,7 +27,6 @@ class DirectedLoops(ProbabilityTable):
         super().validate_system()
 
         hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
-        self.allowed_hamiltonians = ["XXZ", "XXZh"]
 
         if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception("Inconsistent hamiltonian and sampling types. Directed loop probability tables " \

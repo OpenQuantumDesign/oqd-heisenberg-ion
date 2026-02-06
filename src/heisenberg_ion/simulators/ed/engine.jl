@@ -161,25 +161,39 @@ function initialize_hamiltonian(N, theta)
     return Hamiltonian
 end
 
-function diagonalize_hamiltonian(; N::Int, Delta::Float64, h::Float64, B::Float64, J::Float64, 
-    theta::Int, interaction_type::String, kwargs...)
+function diagonalize_hamiltonian(; kwargs...)
+
+    N = parse(Int, kwargs[:N])
+    theta = parse(Float64, kwargs[:theta])
+    Delta = parse(Float64, kwargs[:Delta])
+    h = parse(Float64, kwargs[:h])
+    B = parse(Float64, kwargs[:B])
+    J = parse(Float64, kwargs[:J])
+    interaction_name = kwargs[:interaction_range]
 
     Hamiltonian = initialize_hamiltonian(N, theta)
 
-    if interaction_type == "long_range"
+    if interaction_name == "long_range"
 
-        J_ij_file = kwargs.J_ij_file
+        J_ij_file = kwargs[:J_ij_file]
         J_ij = readdlm(J_ij_file, ',', skipstart=1)
+
+        ed_parameters = (output_folder=kwargs[:run_folder], N=N, theta=theta, Delta=Delta, h=h, B=B, J=J, 
+        interaction_name=interaction_name,J_ij_file=J_ij_file)
 
         Hamiltonian = hamiltonian_long_range(N, Delta, h, B, J_ij, J, Hamiltonian, theta)
 
-    elseif interaction_type == "nearest_neighbors"
+    elseif interaction_name == "nearest_neighbor"
 
-        boundary = kwargs.boundary
+        boundary = kwargs[:boundary]
+
+        ed_parameters = (output_folder=kwargs[:run_folder], N=N, theta=theta, Delta=Delta, h=h, B=B, J=J, 
+        interaction_name=interaction_name,boundary=boundary)
+
         Hamiltonian = hamiltonian_nearest_neighbour(N, Delta, h, B, J, Hamiltonian, boundary, theta)
 
     else
-        throw("interaction_type can be long_range or nearest_neighbors")
+        throw("interaction_type can be long_range or nearest_neighbor")
     end
     
     Diag = eigen(Hamiltonian)
@@ -187,4 +201,98 @@ function diagonalize_hamiltonian(; N::Int, Delta::Float64, h::Float64, B::Float6
     evals = Diag.values
 
     return evals, evecs
+end
+
+
+function write_simulation_specs(parameter_set)
+
+    simulation_spec_file_path = parameter_set.output_folder + "/simulation_specs.txt"
+    open(simulation_spec_file_path) do f
+        for (key, val) in pairs(parameter_set)
+            println(key + "\t" + val + "\n")
+        end
+    end
+end
+
+
+function write_results(run_folder, evals, evecs)
+
+    ed_out_dir = run_folder * "/ed_output"
+    mkdir(ed_out_dir)
+
+    evals_df = DataFrame(evals=evals)
+    CSV.write(ed_out_dir * "/energies.csv", evals_df)
+    
+    column_names = [Symbol("|E_$i>") for i in 0:length(evals)-1]
+    evecs_df = DataFrame(evecs, column_names)
+    CSV.write(ed_out_dir * "/eigenvectors.csv", evecs_df)
+
+end
+
+
+function extract_inputs(input_file_path)
+
+    input_parameters = Dict{Symbol, Vector}()
+
+    num_parameter_sets = 0
+    simulation_folder = 0
+    simulation_folder_found = false
+    open(input_file_path) do f
+        for line in eachline(f)
+            key_val = split(line, "\t")
+            key = key_val[1]
+            val = key_val[2]
+            if key == "simulation_folder"
+                simulation_folder_found = true
+                simulation_folder = val
+            else
+                val_entries = split(val, "\t")
+                num_parameter_sets = length(val_entries)
+                input_parameters[Symbol(key)] = val_entries
+            end
+        end
+    end
+
+    if !simulation_folder_found
+        throw("Unable to find simulation_folder in input file\n")
+    end
+    input_parameters[Symbol("simulation_folder")] = fill(simulation_folder, num_parameter_sets)
+
+    parameter_sets = []
+    for i=1:num_parameter_sets
+        single_parameter_set = Dict{Symbol, String}()
+        for (key, val_list) in input_parameters
+            single_parameter_set[key] = val_list[i]
+        end
+        push!(parameter_sets, single_parameter_set)
+    end
+
+    return parameter_sets
+
+end
+
+
+function execute_simulations(parameter_sets)
+
+    num_parameter_sets = length(parameter_sets)
+
+    for i = 1:num_parameter_sets
+        kwargs = parameter_sets[i]
+        evals, evecs = diagonalize_hamiltonian(;kwargs...)
+        write_results(kwargs[:run_folder], evals, evecs)
+    end
+end
+
+
+function main()
+
+    input_file_path = ARGS[1]
+    #input_file_path = "/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results/2026_02_05_20_07_40/inputs.txt"
+    parameter_sets = extract_inputs(input_file_path)
+    execute_simulations(parameter_sets)
+
+end
+
+if abspath(PROGRAM_FILE) == @__FILE__
+    main()
 end

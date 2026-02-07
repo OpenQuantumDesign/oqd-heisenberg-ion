@@ -1,6 +1,6 @@
 import argparse
 
-from .workflow import Workflow
+from .orchestrator import Orchestrator
 
 
 def main():
@@ -9,7 +9,7 @@ def main():
     parser.add_argument("--input", "-i", required=True, help="Path to input file.")
     args = parser.parse_args()
 
-    return Workflow(InputFile=args.input)
+    return Orchestrator(input_file=args.input)
 
 
 if __name__ == "__main__":

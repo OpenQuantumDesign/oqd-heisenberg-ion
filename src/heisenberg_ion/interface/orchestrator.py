@@ -3,7 +3,7 @@ from ..common.inputs.input_file_reader import InputFileReader
 from ..common.preprocessor.factory import PreprocessorFactory
 
 
-class Workflow:
+class Orchestrator:
     def __init__(self, **kwargs):
 
         if "input_file" in kwargs:

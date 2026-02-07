@@ -1,9 +1,9 @@
 from .deterministic import Deterministic
-from .heatbath import Heatbath
 from .directed_loops import DirectedLoops
+from .heatbath import Heatbath
+
 
 class ProbabilityTableFactory:
-
     registry = {}
 
     def register(cls, name, subclass):
@@ -24,7 +24,7 @@ class ProbabilityTableFactory:
             raise ValueError(f"Probability Table implementation not found for name: {name}")
         else:
             return cls.registry[name](system, **kwargs)
-        
+
 
 # Make register and create classmethods so subclasses can be added to the registry and instantiated agnostically
 ProbabilityTableFactory.register = classmethod(ProbabilityTableFactory.register)

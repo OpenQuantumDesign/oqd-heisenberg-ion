@@ -1,10 +1,11 @@
+from heisenberg_ion.common.inputs.input_parser import InputParser
 from heisenberg_ion.common.preprocessor.base import Preprocessor
+
 from ...preprocess.system.base import System
 from .preprocess.probability_table.factory import ProbabilityTableFactory
-from heisenberg_ion.common.inputs.input_parser import InputParser
+
 
 class LongRangeQMC(Preprocessor):
-
     def __init__(self, parameter_set_list):
 
         super().__init__(parameter_set_list)
@@ -13,7 +14,6 @@ class LongRangeQMC(Preprocessor):
         self.cpp_source_folder = None
 
         self.build()
-    
 
     def build(self):
 
@@ -30,7 +30,6 @@ class LongRangeQMC(Preprocessor):
 
         self.configure_simulation()
 
-
     def configure_simulation(self):
 
         for i in range(self.num_parameter_sets):
@@ -38,36 +37,34 @@ class LongRangeQMC(Preprocessor):
 
         self.write_input_file()
 
-
     def configure_parameter_set(self, parameter_args):
 
         input_config = InputParser(**parameter_args)
-        system_args = input_config.simulation_config['system']
+        system_args = input_config.simulation_config["system"]
 
-        misc_args = input_config.simulation_config['misc']
+        misc_args = input_config.simulation_config["misc"]
         run_id = self.get_run_id(misc_args)
-        misc_args['uuid'] = run_id
-        parameter_args['uuid'] = run_id
+        misc_args["uuid"] = run_id
+        parameter_args["uuid"] = run_id
 
-        misc_args['simulation_folder'] = self.simulation_folder
-        parameter_args['simulation_folder'] = self.simulation_folder
+        misc_args["simulation_folder"] = self.simulation_folder
+        parameter_args["simulation_folder"] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
-        misc_args['run_folder'] = run_folder
-        parameter_args['run_folder'] = run_folder
+        misc_args["run_folder"] = run_folder
+        parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        parameter_args['hamiltonian_type'] = system.hamiltonian_parameters.hamiltonian_type
+        parameter_args["hamiltonian_type"] = system.hamiltonian_parameters.hamiltonian_type
 
-        sampling_args = input_config.simulation_config['sampling']
-        prob_table_type = sampling_args['loop_type']
+        sampling_args = input_config.simulation_config["sampling"]
+        prob_table_type = sampling_args["loop_type"]
 
         prob_table_args = ProbabilityTableFactory.extract_args(prob_table_type, **sampling_args)
         probability_table = ProbabilityTableFactory.create(prob_table_type, system, **prob_table_args)
         probability_table.write_to_files(run_folder)
 
         return 0
-            
 
     def extract_cli_requirements(self):
 

@@ -1,9 +1,10 @@
-import subprocess
 import os
+import subprocess
+
 from heisenberg_ion.common.driver.base import Driver
 
-class LongRangeQMC(Driver):
 
+class LongRangeQMC(Driver):
     def __init__(self, simulation_folder, simulator_inputs):
 
         super().__init__(simulation_folder)
@@ -19,7 +20,6 @@ class LongRangeQMC(Driver):
             self.build_from_cmake(self.source_dir)
             self.compile_source()
 
-
     def build_from_cmake(self, cpp_source):
 
         configure_command = ["cmake", cpp_source]
@@ -29,7 +29,6 @@ class LongRangeQMC(Driver):
             print("Build from cmake failed with exit code: {}\n".format(error.returncode))
             print("STDOUT: {}".format(error.stdout))
             print("STDERR:{}".format(error.stderr))
-
 
     def compile_source(self):
 
@@ -41,7 +40,6 @@ class LongRangeQMC(Driver):
             print("STDOUT: {}".format(error.stdout))
             print("STDERR:{}".format(error.stderr))
 
-
     def simulate(self):
 
         if self.bin_dir is not None:
@@ -52,9 +50,11 @@ class LongRangeQMC(Driver):
                 print("Copying binaries run failed with exit code: {}\n".format(error.returncode))
                 print("STDOUT: {}".format(error.stdout))
                 print("STDERR:{}".format(error.stderr))
-        
+
         try:
-            subprocess.run(["./cpp_qmc", self.input_file], cwd=self.build_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                ["./cpp_qmc", self.input_file], cwd=self.build_dir, check=True, capture_output=True, text=True
+            )
         except subprocess.CalledProcessError as error:
             print("Cpp run failed with exit code: {}\n".format(error.returncode))
             print("STDOUT: {}".format(error.stdout))
@@ -62,4 +62,3 @@ class LongRangeQMC(Driver):
             raise
 
         return 0
-

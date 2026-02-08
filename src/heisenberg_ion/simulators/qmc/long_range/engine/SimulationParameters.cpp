@@ -78,7 +78,7 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
     writeNumericEntry("simulation_steps", simulation_steps, ofs);
 
     extractIntegerEntry("equilibration_steps", input_key_vals["equilibration_steps"],
-                        simulation_steps, true, 1);
+                        equilibration_steps, true, 1);
     writeNumericEntry("equilibration_steps", equilibration_steps, ofs);
 
     extractDoubleEntry("operator_list_update_multiplier",

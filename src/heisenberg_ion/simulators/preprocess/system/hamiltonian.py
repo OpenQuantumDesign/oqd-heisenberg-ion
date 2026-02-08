@@ -10,6 +10,17 @@ class HamiltonianParameters:
         self.J = None
         self.B = None
 
+    def update_parameters(self, parameter_dict):
+
+        parameter_dict["hamiltonian_name"] = self.hamiltonian_name
+        parameter_dict["hamiltonian_type"] = self.hamiltonian_type
+        parameter_dict["Delta"] = self.Delta
+        parameter_dict["h"] = self.h
+        parameter_dict["J"] = self.J
+        parameter_dict["B"] = self.B
+
+        return parameter_dict
+
 
 class HamiltonianFactory:
     registry = {}

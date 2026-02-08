@@ -35,6 +35,16 @@ class Geometry:
     def build(self):
         pass
 
+    def update_parameters(self, parameter_dict):
+
+        parameter_dict["spatial_dimension"] = self.spatial_dimension
+        parameter_dict["boundary"] = self.boundary
+        parameter_dict["interaction_range"] = self.interaction_range
+        parameter_dict["N"] = self.N
+        parameter_dict["num_bonds"] = self.num_bonds
+
+        return parameter_dict
+
 
 # Make register and create factory classmethods so subclasses can be added to the registry
 # and instantiated agnostically

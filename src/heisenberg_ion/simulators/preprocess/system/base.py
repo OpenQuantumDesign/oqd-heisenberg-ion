@@ -41,3 +41,10 @@ class System:
         num_neighbors = self.geometry.num_neighbors_per_site
 
         return h / (J * num_neighbors)
+
+    def update_parameters(self, parameter_dict):
+
+        self.hamiltonian_parameters.update_parameters(parameter_dict)
+        self.geometry.update_parameters(parameter_dict)
+
+        return parameter_dict

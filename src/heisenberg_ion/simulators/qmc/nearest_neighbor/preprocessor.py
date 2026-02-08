@@ -83,8 +83,10 @@ class NearestNeighborQMC(Preprocessor):
             if not system.geometry.bipartite:
                 raise Exception("afm_heisenberg_fm_Z Hamiltonian requires a bipartite lattice\n")
 
-        if system.hamiltonian_parameters.J <= 0:
-            raise Exception("J sets the energy scale. It must be a positive number for QMC\n")
+        if system.hamiltonian_parameters.J <= 0 and system.model_name != "afm_heisenberg_fm_Z":
+            raise Exception(
+                "J sets the energy scale. It must be a positive number for QMC unless the model is afm_heisenberg_fm_Z on a bipartite lattice\n"
+            )
 
         if system.interaction_range != "nearest_neighbor":
             print(system.interaction_range)

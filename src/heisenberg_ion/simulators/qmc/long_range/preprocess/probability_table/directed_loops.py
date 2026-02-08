@@ -181,8 +181,8 @@ class DirectedLoops(ProbabilityTable):
 
             self.diag_prob_table[:, bond] += offset
 
-            mu.enforce_positive(self.diag_prob_table)
-            mu.enforce_positive(self.vertex_weights)
+            self.diag_prob_table = mu.enforce_positive(self.diag_prob_table, bond)
+            self.vertex_weights = mu.enforce_positive(self.vertex_weights, bond)
 
             self.update_directed_loop_table(bond, transition_weights)
 

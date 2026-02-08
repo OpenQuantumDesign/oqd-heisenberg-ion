@@ -13,10 +13,10 @@ def set_probability(val):
         return val
 
 
-def enforce_positive(table):
+def enforce_positive(table, bond):
 
     size = np.shape(table)[0]
     for i in range(size):
-        table[i] = set_probability(table[i])
+        table[i, bond] = set_probability(table[i, bond])
 
-    return 0
+    return table

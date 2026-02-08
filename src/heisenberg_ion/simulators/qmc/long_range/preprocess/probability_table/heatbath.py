@@ -130,8 +130,8 @@ class Heatbath(ProbabilityTable):
 
             self.diag_prob_table[:, bond] += offset
 
-            mu.enforce_positive(self.diag_prob_table)
-            mu.enforce_positive(self.vertex_weights)
+            self.diag_prob_table = mu.enforce_positive(self.diag_prob_table, bond)
+            self.vertex_weights = mu.enforce_positive(self.vertex_weights, bond)
 
             self.max_over_states[bond] = np.max(self.diag_prob_table[:, bond])
             self.diag_prob_table[:, bond] /= self.max_over_states[bond]

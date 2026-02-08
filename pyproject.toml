@@ -38,6 +38,9 @@ select = ["E4", "E7", "E9", "F", "I"]
 [dependency-groups]
 dev = ["ruff>=0.9.6"]
 
+[project.scripts]
+heisenberg-ion = "heisenberg_ion.interface.main:main"
+
 [project.urls]
 Homepage = "https://github.com/OpenQuantumDesign/Heisenberg_Ion"
 Repository = "https://github.com/OpenQuantumDesign/Heisenberg_Ion"

@@ -249,6 +249,8 @@ class NearestNeighborPeriodicChain(Geometry):
 
         if self.N % 2 == 0:
             self.bipartite = True
+        else:
+            self.bipartite = False
 
         # self.initialize_tables()
         # self.build()

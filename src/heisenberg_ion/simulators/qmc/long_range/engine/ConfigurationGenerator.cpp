@@ -625,6 +625,9 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
     int n_sum = 0;
     int cumulative_loop_size_sum = 0;
     int avg_n;
+
+    logger->info("Starting equilibration");
+
     for (int step=0; step<equilibration_steps; step++){
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
         if (n > max_n) {
@@ -641,11 +644,21 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         N_l = std::max(2*avg_n/average_cumulative_loop_size, 1);
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
         cumulative_loop_size_sum += cumulative_loop_size;
+
+        if (step % 1000 == 0) {
+            logger->info("Equilibration step = {}, n = {}, M = {}, N_l = {}",
+                step, n, M, N_l);
+            logger->flush();
+        }
     }
+
+    logger->info("Equilibration finished");
 
     average_cumulative_loop_size =  cumulative_loop_size_sum / count_non_skipped_loop_updates;
     N_l = std::max(2*avg_n/average_cumulative_loop_size, 1);
     max_loop_size = std::max(100*avg_n,1);
+
+    logger->info("Starting estimation run");
 
     for (int step=0; step<mc_steps; step++){
 
@@ -659,7 +672,14 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         if (sim_params.track_spin_configs) {
             estimators.trackSpinConfigs(spin_configuration);
         }
+
+        if (step % 1000 == 0) {
+            logger->info("Simulation step = {}, n = {}", step, n);
+            logger->flush();
+        }
     }
+
+    logger->info("Estimation run finished");
 
     estimators.outputStepData(sim_params);
 }
@@ -714,6 +734,12 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         if ((double)cumulative_loop_size_list.size() == avg_num_samples){
             break;
+        }
+
+        if (step % 1000 == 0) {
+            logger->info("Burn-in step = {}, n = {}, M = {}, N_l = {}",
+                step, n, M, N_l);
+            logger->flush();
         }
     }
 
@@ -811,6 +837,11 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
         if (sim_params.track_spin_configs) {
             estimators.trackSpinConfigs(spin_configuration);
+        }
+
+        if (step % 1000 == 0) {
+            logger->info("Simulation step = {}, n = {}", step, n);
+            logger->flush();
         }
     }
 

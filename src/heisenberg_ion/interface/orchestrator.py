@@ -11,9 +11,9 @@ class Orchestrator:
         else:
             self.build_from_parameters(**kwargs)
 
-    def build_from_file(self, input_file):
+    def build_from_file(self, input_file, **kwargs):
 
-        file_inputs = InputFileReader(input_file)
+        file_inputs = InputFileReader(input_file, **kwargs)
         simulator = file_inputs.simulator
 
         preprocessor = PreprocessorFactory.create(simulator, file_inputs.parameter_set_list)

@@ -22,7 +22,7 @@ class LongRangeQMC(Driver):
 
     def build_from_cmake(self, cpp_source):
 
-        configure_command = ["cmake", cpp_source]
+        configure_command = ["cmake", cpp_source, "-DCMAKE_BUILD_TYPE=Release"]
         try:
             subprocess.run(configure_command, cwd=self.build_dir, check=True, capture_output=True, text=True)
         except subprocess.CalledProcessError as error:

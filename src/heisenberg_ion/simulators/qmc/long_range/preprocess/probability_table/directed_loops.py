@@ -84,17 +84,17 @@ class DirectedLoops(ProbabilityTable):
         self.vertex_weight_label_map[vertex_enum] = [exit_leg_weights_le_0_v_0]
 
         vertex_enum = "1"
-        exit_leg_weights_le_0_v_1 = ["b_2_p", "a_p", "c_p", 0.0]  # l_e = 0
-        exit_leg_weights_le_1_v_1 = ["a", "b_2", 0.0, "c"]  # l_e = 1
+        exit_leg_weights_le_0_v_1 = ["b_2_p", "a_p", "c_p", None]  # l_e = 0
+        exit_leg_weights_le_1_v_1 = ["a", "b_2", None, "c"]  # l_e = 1
         self.vertex_weight_label_map[vertex_enum] = [exit_leg_weights_le_0_v_1, exit_leg_weights_le_1_v_1]
 
         vertex_enum = "5"
-        exit_leg_weights_le_0_v_5 = ["b_1", "a", 0.0, "b"]  # l_e = 0
-        exit_leg_weights_le_1_v_5 = ["a_p", "b_1_p", "b_p", 0.0]  # l_e = 1
+        exit_leg_weights_le_0_v_5 = ["b_1", "a", None, "b"]  # l_e = 0
+        exit_leg_weights_le_1_v_5 = ["a_p", "b_1_p", "b_p", None]  # l_e = 1
         self.vertex_weight_label_map[vertex_enum] = [exit_leg_weights_le_0_v_5, exit_leg_weights_le_1_v_5]
 
         vertex_enum = "3"
-        exit_leg_weights_le_0_v_3 = ["b_3_p", 0.0, "c_p", "b_p"]  # l_e = 0
+        exit_leg_weights_le_0_v_3 = ["b_3_p", None, "c_p", "b_p"]  # l_e = 0
         self.vertex_weight_label_map[vertex_enum] = [exit_leg_weights_le_0_v_3]
 
         return 0

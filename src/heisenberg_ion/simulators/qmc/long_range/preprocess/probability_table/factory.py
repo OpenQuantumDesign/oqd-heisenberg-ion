@@ -33,4 +33,4 @@ ProbabilityTableFactory.extract_args = classmethod(ProbabilityTableFactory.extra
 
 ProbabilityTableFactory.register("deterministic", Deterministic)
 ProbabilityTableFactory.register("heatbath", Heatbath)
-ProbabilityTableFactory.register("directed_loops", DirectedLoops)
+ProbabilityTableFactory.register("directed_loop", DirectedLoops)

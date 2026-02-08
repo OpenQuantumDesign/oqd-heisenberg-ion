@@ -21,7 +21,7 @@ class ProbabilityTable:
             raise Exception("Probability tables are constructed for long range systems\n")
 
         if self.system.hamiltonian_parameters.J <= 0:
-            raise Exception("J sets the energy scale. It must be positive for QMC")
+            raise Exception("J sets the energy scale. It must be positive for long-range QMC")
         pass
 
     def build(self):

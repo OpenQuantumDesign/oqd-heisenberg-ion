@@ -200,7 +200,7 @@ ProbabilityTables::ProbabilityTables(const SimulationParameters &sim_params, con
         diagonal_probabilities_file = sim_params.simulation_subfolder + "/probability_densities/diag_probs.csv";
         vertex_weights_file = sim_params.simulation_subfolder + "/probability_densities/vertex_weights.csv";
         loop_update_probabilities_file = sim_params.simulation_subfolder + "/probability_densities/" +
-                sim_params.loop_type + "_off_diag_table.csv";
+                                         "off_diag_table.csv";
 
         std::string header_diag_prob_file = readTabularFile(diagonal_probabilities_file,
                                                             diagonal_probabilities);

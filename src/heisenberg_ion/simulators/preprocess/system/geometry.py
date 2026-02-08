@@ -9,7 +9,7 @@ class Geometry:
 
         self.spatial_dimension = None
 
-        self.boundary_type = None
+        self.boundary = None
         self.interaction_range = None
         self.lattice_type = None
 
@@ -86,7 +86,7 @@ class LongRangeOpenChain(Geometry):
 
         self.spatial_dimension = 1
 
-        self.boundary_type = "open"
+        self.boundary = "open"
         self.interaction_range = "long_range"
         self.lattice_type = "chain"
 
@@ -132,7 +132,7 @@ class LongRangePeriodicChain(Geometry):
 
         self.spatial_dimension = 1
 
-        self.boundary_type = "periodic"
+        self.boundary = "periodic"
         self.interaction_range = "long_range"
         self.lattice_type = "chain"
 
@@ -182,7 +182,7 @@ class LongRangeOpenTriangular(Geometry):
 
         self.spatial_dimension = 2
 
-        self.boundary_type = "periodic"
+        self.boundary = "periodic"
         self.interaction_range = "long_range"
         self.lattice_type = "chain"
 
@@ -238,7 +238,7 @@ class NearestNeighborPeriodicChain(Geometry):
 
         self.spatial_dimension = 1
 
-        self.boundary_type = "periodic"
+        self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"
         self.lattice_type = "chain"
 
@@ -277,7 +277,7 @@ class NearestNeighborOpenChain(Geometry):
 
         self.spatial_dimension = 1
 
-        self.boundary_type = "periodic"
+        self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"
         self.lattice_type = "chain"
 

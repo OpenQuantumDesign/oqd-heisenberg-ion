@@ -2,7 +2,7 @@ from .utils import convert_to_snake_case
 
 
 class InputFileReader:
-    def __init__(self, input_file_path):
+    def __init__(self, input_file_path, **kwargs):
 
         self.input_file = input_file_path
 
@@ -10,6 +10,8 @@ class InputFileReader:
 
         self.is_param_iterable = {}
         input_config = self.extract_key_value_inputs()
+
+        self.override_file_inputs(input_config, **kwargs)
 
         self.extract_parameter_set_list(input_config)
 
@@ -30,15 +32,28 @@ class InputFileReader:
 
                 line_data = line.strip().split("\t")
 
-                data = line_data[1].strip().split(",")
-                count_entries = len(data)
-
-                self.count_parameter_sets(count_entries, line_count)
-
                 key = line_data[0]
+                data = line_data[1].strip().split(",")
 
-                input_config[key] = data
-                self.is_param_iterable[key] = count_entries != 1
+                self.record_input(input_config, key, data)
+
+        return input_config
+
+    def record_input(self, input_config, key, data):
+
+        count_entries = len(data)
+        self.count_parameter_sets(count_entries, key)
+
+        input_config[key] = data
+        self.is_param_iterable[key] = count_entries != 1
+
+        return input_config
+
+    def override_file_inputs(self, input_config, **kwargs):
+
+        for key, val in kwargs.items():
+            data = val.strip().split(",")
+            self.record_input(input_config, key, data)
 
         return input_config
 

@@ -66,6 +66,9 @@ class FMHeisenbergAFMZ(HamiltonianParameters):
         self.J = J
         self.B = 0.0
 
+        if self.J <= 0:
+            raise Exception("J must be positive for ferromagnetic interactions")
+
 
 class XY(HamiltonianParameters):
     args = {"J": float}
@@ -95,6 +98,9 @@ class FMHeisenbergFMZ(HamiltonianParameters):
         self.h = 0.0
         self.J = J
         self.B = 0.0
+
+        if self.J <= 0:
+            raise Exception("J must be positive for ferromagnetic interactions")
 
 
 class XXZ(HamiltonianParameters):
@@ -140,6 +146,9 @@ class AFMHeisenbergFMZ(HamiltonianParameters):
         self.h = 0.0
         self.J = J
         self.B = 0.0
+
+        if self.J >= 0:
+            raise Exception("J must be negative for anti-ferromagnetic interactions")
 
 
 class XXZhB(HamiltonianParameters):

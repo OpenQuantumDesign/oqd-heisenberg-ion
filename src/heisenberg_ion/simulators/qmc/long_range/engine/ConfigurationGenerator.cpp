@@ -632,7 +632,8 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         }
         n_sum += n;
         int M_new = std::max((int)(a_parameter * max_n),M);
-        ConfigurationGenerator::populateOperatorLocations(int (M_new - n));
+        //ConfigurationGenerator::populateOperatorLocations(int (M_new - n));
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
         avg_n = n_sum / step;
         average_cumulative_loop_size = cumulative_loop_size_sum / count_non_skipped_loop_updates;
@@ -693,8 +694,10 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         avg_n_d = n_sum / ((double)step+1.0);
         avg_n = (int)std::round(avg_n_d);
 
-        M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
         max_loop_size = 10000 * std::max(avg_n, 1);
@@ -706,7 +709,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         cumulative_loop_size_list.push_back(cumulative_loop_size);
         avg_cumul_loop_size_d = ((double)cumulative_loop_size_sum)/((double)step+1.0);
         prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)step+1.0);
-        N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
+        N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d);
         N_l = std::max((int)std::round(N_l_d), 1);
 
         if ((double)cumulative_loop_size_list.size() == avg_num_samples){
@@ -724,8 +727,11 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     avg_n = (int)std::round(avg_n_d);
     average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
 
-    M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
-    ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+    //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+    //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+    M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+    ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+
     M = M_new;
     count_non_skipped_loop_updates = 0;
 
@@ -746,8 +752,10 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         avg_n = (int)std::round(avg_n_d);
         n_list.push_back(n);
 
-        M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
         max_loop_size = std::max(10000*avg_n,1);
@@ -839,9 +847,10 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         avg_n_d = n_sum / ((double) step + 1.0);
 
         //M_new = std::max((int)std::round(1.25 * max_n), M);
-        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        ///M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
         ConfigurationGenerator::offDiagonalUpdatesIsotropic(prob_tables, vertex_types);
@@ -858,9 +867,10 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
     //M_new = std::max((int)std::round(1.25 * max_n), M);
-    M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-    //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+    //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
     ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+    M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+    ConfigurationGenerator::getNewOperatorLocations(M_new-M);
     M = M_new;
 
     logger->info("Starting equilibration");
@@ -877,9 +887,10 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         n_list.push_back(n);
 
         //M_new = std::max((int)std::round(1.25 * max_n), M);
-        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
-        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
-        ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);

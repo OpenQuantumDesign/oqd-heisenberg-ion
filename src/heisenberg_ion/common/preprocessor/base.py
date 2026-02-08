@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class Preprocessor:
-    keys_single_parameters = {"root_folder", "simulation_folder", "number_of_threads"}
+    keys_single_parameters = {"root_folder", "simulation_folder", "number_of_threads", "output_folder_name"}
 
     def __init__(self, parameter_set_list):
 
@@ -22,9 +22,14 @@ class Preprocessor:
 
     def create_output_folder(self):
 
-        date_time_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        print(date_time_str)
-        self.simulation_folder = os.path.join(self.root_folder, date_time_str)
+        output_folder_name_provided = self.check_single_input("output_folder_name", True)
+
+        if output_folder_name_provided:
+            self.output_folder_name = self.parameter_set_list[0]["output_folder_name"]
+        else:
+            self.output_folder_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+
+        self.simulation_folder = os.path.join(self.root_folder, self.output_folder_name)
 
         os.mkdir(self.simulation_folder)
 

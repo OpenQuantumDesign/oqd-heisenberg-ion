@@ -76,6 +76,7 @@ input_schema = {
     "cpp_source_folder": {"DataType": str, "ParameterType": "misc", "ConvertValCase": False},
     "julia_path": {"DataType": str, "ParameterType": "misc", "ConvertValCase": False},
     "uuid": {"DataType": str, "ParameterType": "misc", "ConvertValCase": False},
+    "output_folder_name": {"DataType": str, "ParameterType": "misc", "ConvertValCase": False},
     "number_of_threads": {"DataType": int, "ParameterType": "misc", "ConvertValCase": False},
     "track_spin_configurations": {"DataType": bool, "ParameterType": "simulation", "ConvertValCase": False},
     "write_final_spin_configuration": {"DataType": bool, "ParameterType": "simulation", "ConvertValCase": False},

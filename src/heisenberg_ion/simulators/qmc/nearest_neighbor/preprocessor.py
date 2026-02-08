@@ -45,6 +45,7 @@ class NearestNeighborQMC(Preprocessor):
         run_id = self.get_run_id(misc_args)
         misc_args["uuid"] = run_id
         parameter_args["uuid"] = run_id
+        parameter_args["output_folder_name"] = self.output_folder_name
 
         misc_args["simulation_folder"] = self.simulation_folder
         parameter_args["simulation_folder"] = self.simulation_folder

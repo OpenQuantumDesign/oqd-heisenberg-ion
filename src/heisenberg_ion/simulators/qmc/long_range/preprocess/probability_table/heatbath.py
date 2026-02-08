@@ -38,14 +38,13 @@ class Heatbath(ProbabilityTable):
     def build(self):
 
         num_bonds = self.system.geometry.num_bonds
-        sites = self.system.geometry.sites
         J_ij_vector = self.system.interactions.J_ij_vector
         gamma = self.gamma
         h_B = self.h_B
         Delta = self.system.hamiltonian_parameters.Delta
 
         self.initialize_tables(num_bonds)
-        self.compute_prob_tables_heat_bath(num_bonds, sites, J_ij_vector, gamma, h_B, Delta)
+        self.compute_prob_tables_heat_bath(num_bonds, J_ij_vector, gamma, h_B, Delta)
 
         return 0
 

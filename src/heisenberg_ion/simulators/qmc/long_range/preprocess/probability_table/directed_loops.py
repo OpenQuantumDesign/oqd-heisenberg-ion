@@ -122,14 +122,14 @@ class DirectedLoops(ProbabilityTable):
 
         return 0
 
-    def get_composite_row_prob_index(vertex_enum, entrance_leg_enum, exit_leg_enum):
+    def get_composite_row_prob_index(self, vertex_enum, entrance_leg_enum, exit_leg_enum):
 
         composite_leg_index = vu.num_legs_per_vertex * entrance_leg_enum + exit_leg_enum
         row_index = vu.num_legs_indices * vertex_enum + composite_leg_index
 
         return composite_leg_index, row_index
 
-    def get_symmetric_indices(vertex_enum, entrance_leg_enum, exit_leg_enum, symmetry_leg_mapping):
+    def get_symmetric_indices(self, vertex_enum, entrance_leg_enum, exit_leg_enum, symmetry_leg_mapping):
 
         init_spin_tuple = vu.leg_spin[vertex_enum]
         new_spin_tuple = (

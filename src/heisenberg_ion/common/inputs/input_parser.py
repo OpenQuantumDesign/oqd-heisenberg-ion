@@ -3,7 +3,15 @@ from .utils import convert_to_snake_case
 input_schema = {
     "hamiltonian_name": {
         "DataType": "categorical",
-        "Categories": ["fm_heisenberg_afm_Z", "XY", "fm_heisenberg_fm_Z", "XXZ", "XXZh", "afm_heisenberg_fm_Z"],
+        "Categories": [
+            "fm_heisenberg_afm_Z",
+            "XY",
+            "fm_heisenberg_fm_Z",
+            "XXZ",
+            "XXZh",
+            "afm_heisenberg_fm_Z",
+            "XXZhB",
+        ],
         "ParameterType": "system",
         "ConvertValCase": False,
     },
@@ -55,6 +63,7 @@ input_schema = {
     "h": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "J": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "T": {"DataType": float, "ParameterType": "sampling", "ConvertValCase": False},
+    "B": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "theta": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "equilibration_steps": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
     "simulation_steps": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},

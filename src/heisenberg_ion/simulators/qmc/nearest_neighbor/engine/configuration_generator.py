@@ -374,8 +374,8 @@ class ConfigurationGenerator:
         num_vertices = vt.num_vertices_isotropic
         new_vertex_types = vt.generate_new_vertex_type_array(vertex_mapping, num_vertices, leg_spin)
 
-        num_bonds = self.system.geometry.num_bonds
-        N = self.system.geometry.N
+        num_bonds = self.num_bonds
+        N = self.N
         spectrum_offset = num_bonds / 4.0
         M = self.init_M
 

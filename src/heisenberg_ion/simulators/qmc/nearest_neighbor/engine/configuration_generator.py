@@ -24,7 +24,7 @@ class ConfigurationGenerator:
 
         self.T = sampling_inputs.T
         self.J = system_inputs.hamiltonian_parameters.J
-        self.beta = sampling_inputs.beta * self.J  # beta times J determines the energy scale
+        self.beta = sampling_inputs.beta * np.abs(self.J)  # beta times |J| determines the energy scale
         self.a = sampling_inputs.operator_list_update_multiplier
         self.init_config_index = sampling_inputs.initial_configuration_index
 

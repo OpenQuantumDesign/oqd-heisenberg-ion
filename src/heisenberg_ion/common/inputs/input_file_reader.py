@@ -42,17 +42,16 @@ class InputFileReader:
 
         return input_config
 
-    def count_parameter_sets(self, count_entries, line_number):
+    def count_parameter_sets(self, count_entries, key):
 
         if count_entries != 1:
             if self.num_parameter_sets == 1:
                 self.num_parameter_sets = count_entries
-                line_num_parameters_set = line_number
+                self.key_num_parameters_set = key
 
+            # Can't have n>1 parameter sets in one field and m>1 parameter sets in another
             elif self.num_parameter_sets != count_entries:
-                raise ValueError(
-                    f"Inconistent number of entries in line: {line_number} and line: {line_num_parameters_set} \n"
-                )
+                raise ValueError(f"Inconistent number of entries for fields: {key} and {self.key_num_parameters_set}\n")
 
         return 0
 

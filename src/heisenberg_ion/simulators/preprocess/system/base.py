@@ -38,6 +38,6 @@ class System:
 
         h = self.hamiltonian_parameters.h
         J = self.hamiltonian_parameters.J
-        num_neighbors = self.goemetry.num_neighbors_per_site
+        num_neighbors = self.geometry.num_neighbors_per_site
 
         return h / (J * num_neighbors)

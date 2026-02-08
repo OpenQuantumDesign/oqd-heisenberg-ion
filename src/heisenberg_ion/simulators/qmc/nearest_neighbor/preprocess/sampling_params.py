@@ -22,6 +22,14 @@ class SamplingParameters:
 
         return var
 
+    def update_parameters(self, parameter_dict):
+
+        parameter_dict["initial_operator_list_size"] = self.initial_operator_list_size
+        parameter_dict["operator_list_update_multiplier"] = self.operator_list_update_multiplier
+        parameter_dict["initial_configuration_index"] = self.initial_configuration_index
+
+        return parameter_dict
+
 
 class SSEParameters:
     def __init__(self, system, sampling_parameters, run_folder):

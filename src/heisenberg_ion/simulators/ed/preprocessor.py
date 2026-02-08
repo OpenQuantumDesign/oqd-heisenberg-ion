@@ -56,8 +56,7 @@ class ExactDiagonalization(Preprocessor):
         parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        system_args["B"] = system.hamiltonian_parameters.B
-        parameter_args["B"] = system.hamiltonian_parameters.B
+        parameter_args = system.update_parameters(parameter_args)
 
         if system.interaction_range == "long_range":
             J_ij_file_path = os.path.join(run_folder, "J_ij_file.csv")

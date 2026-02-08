@@ -55,7 +55,7 @@ class LongRangeQMC(Preprocessor):
         parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        parameter_args["hamiltonian_type"] = system.hamiltonian_parameters.hamiltonian_type
+        parameter_args = system.update_parameters(parameter_args)
 
         sampling_args = input_config.simulation_config["sampling"]
         prob_table_type = sampling_args["loop_type"]

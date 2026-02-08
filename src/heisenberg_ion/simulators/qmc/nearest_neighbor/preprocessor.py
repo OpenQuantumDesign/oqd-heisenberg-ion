@@ -54,16 +54,18 @@ class NearestNeighborQMC(Preprocessor):
         parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        parameter_args["hamiltonian_type"] = system.hamiltonian_parameters.hamiltonian_type
         system.geometry.build()
 
         self.validate_system(system)
+
+        parameter_args = system.update_parameters(parameter_args)
 
         simulation_args = input_config.simulation_config["simulation"]
         sampling_args = input_config.simulation_config["sampling"]
         combined_args = simulation_args | sampling_args
 
         sampling_params = SamplingParameters(**combined_args)
+        parameter_args = sampling_params.update_parameters(parameter_args)
 
         simulation_parameters = SSEParameters(system, sampling_params, run_folder)
 

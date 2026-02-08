@@ -73,7 +73,8 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
             init_config_index,n, init_M, num_winding);
     }
     else {
-        init_M = std::max((int)(2 * sim_params.beta * prob_tables.max_diagonal_norm), sim_params.init_M);
+        //init_M = std::max((int)(2 * sim_params.beta * prob_tables.max_diagonal_norm), sim_params.init_M);
+        init_M = sim_params.init_M;
         M = init_M;
         n=0;
         ConfigurationGenerator::populateOperatorLocations(M);

@@ -30,7 +30,7 @@ class ConfigurationGenerator:
 
         self.N = system_inputs.geometry.N
         self.num_bonds = system_inputs.geometry.num_bonds
-        self.boundary = system_inputs.geometry.boundary_type
+        self.boundary = system_inputs.geometry.boundary
 
         self.sites = system_inputs.geometry.sites
 

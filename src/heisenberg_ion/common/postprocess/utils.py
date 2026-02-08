@@ -71,3 +71,44 @@ def combine_dataset_stats(data_1, data_2):
     data_error = numerator / denominator
 
     return data_mean, data_error
+
+
+def ed_energy(evals, T):
+
+    beta = 1.0 / T
+
+    energy = 0.0
+    partition = 0.0
+
+    for i in range(len(evals)):
+        energy += np.exp(-beta * evals[i]) * evals[i]
+        partition += np.exp(-beta * evals[i])
+
+    energy /= partition
+
+    return energy
+
+
+def compute_histogram_from_shot_data(N, num_shots, shot_data):
+
+    num_bits = 2**N
+    freqs = np.zeros(num_bits)
+    for i in range(num_shots):
+        bit_str = 0
+        for j in range(N):
+            signed_spin_config = shot_data[i, j]
+            bit_i_j = int(0.5 * (signed_spin_config + np.abs(signed_spin_config)))
+            bit_str += (2 ** (j)) * (bit_i_j)
+        freqs[bit_str] += 1.0 / num_shots
+
+    return freqs
+
+
+def kl_divergence(hist1, hist2, num_bits):
+
+    kl_divergence = 0.0
+    for j in range(num_bits):
+        if hist1[j] != 0 and hist2[j] != 0:
+            kl_divergence += hist1[j] * (np.log(hist1[j]) - np.log(hist2[j]))
+
+    return kl_divergence

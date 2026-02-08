@@ -27,7 +27,7 @@ class Heatbath(ProbabilityTable):
 
         super().validate_system()
 
-        hamiltonian_name = self.system.hamiltonian_parameter.hamiltonian_name
+        hamiltonian_name = self.system.hamiltonian_parameters.hamiltonian_name
 
         if hamiltonian_name not in self.allowed_hamiltonians:
             raise Exception(

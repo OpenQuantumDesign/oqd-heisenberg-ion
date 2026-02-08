@@ -8,16 +8,16 @@ from .utils import vertex_utils as vu
 
 
 class DirectedLoops(ProbabilityTable):
-    args = {"gamma": float, "ksi": float, "dist_dep_gamma": bool}
+    args = {"gamma": float, "ksi": float, "distance_dependent_offset": bool}
     allowed_hamiltonians = {"XXZ", "XXZh", "XY", "fm_heisenberg_fm_Z", "fm_heisenberg_afm_Z"}
 
-    def __init__(self, system, gamma, ksi, dist_dep_gamma):
+    def __init__(self, system, gamma, ksi, distance_dependent_offset):
 
-        super().__init__(system, gamma=gamma, ksi=ksi, dist_dep_gamma=dist_dep_gamma)
+        super().__init__(system, gamma=gamma, ksi=ksi, distance_dependent_offset=distance_dependent_offset)
 
         self.gamma = gamma
         self.ksi = ksi
-        self.dist_dep_gamma = dist_dep_gamma
+        self.distance_dependent_offset = distance_dependent_offset
 
         self.h_B = self.system.compute_h_B()
 
@@ -49,9 +49,11 @@ class DirectedLoops(ProbabilityTable):
 
         gamma = self.gamma
         ksi = self.ksi
-        dist_dep_gamma = self.dist_dep_gamma
+        distance_dependent_offset = self.distance_dependent_offset
 
-        self.compute_prob_tables_directed_loops(num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, dist_dep_gamma)
+        self.compute_prob_tables_directed_loops(
+            num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, distance_dependent_offset
+        )
 
         return 0
 
@@ -160,9 +162,11 @@ class DirectedLoops(ProbabilityTable):
 
         return 0
 
-    def compute_prob_tables_directed_loops(self, num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, dist_dep_gamma):
+    def compute_prob_tables_directed_loops(
+        self, num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, distance_dependent_offset
+    ):
 
-        self.transition_weights_calculator = LoopTransitionWeights(gamma, Delta, h_B, ksi, dist_dep_gamma)
+        self.transition_weights_calculator = LoopTransitionWeights(gamma, Delta, h_B, ksi, distance_dependent_offset)
 
         for bond in range(num_bonds):
             J_ij = J_ij_vector[bond]
@@ -221,7 +225,7 @@ class DirectedLoops(ProbabilityTable):
 
 
 class LoopTransitionWeights:
-    def __init__(self, gamma, Delta, h_B, ksi, dist_dep_gamma):
+    def __init__(self, gamma, Delta, h_B, ksi, distance_dependent_offset):
 
         keys = ["a", "b", "c", "a_p", "b_p", "c_p", "b_1", "b_2", "b_3", "b_1_p", "b_2_p", "b_3_p"]
         self.transition_weight_container = {key: None for key in keys}
@@ -231,7 +235,7 @@ class LoopTransitionWeights:
 
         self.gamma = gamma
         self.ksi = ksi
-        self.dist_dep_gamma = dist_dep_gamma
+        self.distance_dependent_offset = distance_dependent_offset
 
         if self.h_B < 0.0:
             raise Exception("h_B needs to be greater than or equal to 0")
@@ -312,7 +316,7 @@ class LoopTransitionWeights:
         if self.h_B == 0.0:
             self.offset_b = -(self.Delta / 4.0) * J_ij
             if self.Delta <= -1.0:
-                if self.dist_dep_gamma:
+                if self.distance_dependent_offset:
                     epsilon = self.gamma - (self.Delta / 10.0) * J_ij
                     c_p = self.gamma - (self.Delta / 10.0) * J_ij
                     # epsilon = gamma + 0.1/(r_b_pow_alpha)

@@ -163,6 +163,6 @@ class Heatbath(ProbabilityTable):
         np.savetxt(diag_file_name, self.diag_prob_table, delimiter=",", header=header)
         np.savetxt(vertex_weights_file_name, self.vertex_weights, delimiter=",", header=header)
         np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
-        np.savetxt(loop_update_table_file_name, self.loop_update_prob_table, delimiter=",", header=header)
+        np.savetxt(loop_update_table_file_name, self.heat_bath_prob_table, delimiter=",", header=header)
 
         return 0

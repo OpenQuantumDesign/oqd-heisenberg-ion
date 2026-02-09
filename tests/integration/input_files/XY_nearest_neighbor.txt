@@ -1,0 +1,32 @@
+# All input parameters relevant for the SSE program are provided in this file in a tab-delimited format.
+# Each input field can be specified by a list of values or a single value. 
+# If a list is provided for any system or simulation parameter, as many runs as the length of the list will be started. 
+# If a single value is provided for any parameter, that value will be assumed to be constant across the list of requested simulations. 
+# If any two lists have different lengths, the SSE program will error out. 
+
+boundary	periodic	# Open or Periodic
+interaction_range	nearest_neighbor	# Long Range or Nearest Neighbours
+spatial_dimension	1d	# Only 1d is currently supported. The other option is 2d (for 2d triangular lattices) - still in testing
+lattice_type	rectangular	# Only 'Rectangular' is currently supported. The other type is 'Triangular' - still in testing
+
+# System Parameters
+N	5	# Number of sites - any positive integer
+Delta	0.0	# Anisotropy strength (coefficient of the Z_i Z_j term in the Hamiltonian). Can be any real number
+h	0.0	# External field in the z direction - any real number
+B	0.0
+theta	0
+J	1.0
+
+# Simulation Parameters
+equilibration_steps	10000	# Number of steps used for equilibration. Can be any positive integer
+simulation_steps	10000	# Number of Monte Carlo steps used for computing observables after equilibration. Can be any positive integer 
+operator_list_update_multiplier	1.05	# Operator list size growth proportion after each equilibration step. Can be any real number greater than 1
+
+# SSE Loop Parameters
+loop_type	deterministic	# Can be 'deterministic', 'directed_loop' or 'heatbath' depending on the type of the loops. The 'determininistic' loop type only applies to the XY and the Heisenberg models
+
+# Misc.
+root_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results	# Folder containing inputs and outputs for the calculations
+
+# Initial Configuration Parameters
+initial_configuration_index	1	# 1 or -1 starts the simulation with all spins up or down respectively. 0 picks each spin randomly. -2 uses the configuration provided. Positive integers k > 1 correspond to lattice site i starting with spin up if i mod k = 0

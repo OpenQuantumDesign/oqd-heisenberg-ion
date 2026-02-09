@@ -82,7 +82,10 @@ for i in range(len(alpha_list)):
     norm_energy = 0.0
     for r in range(1, int((N+1)/2)):
         norm += 1.0/(r**(alpha-2))
+        #norm += N/(r**(alpha))
         norm_energy += 1.0/(r**(alpha))
+
+    norm = norm_energy
 
     lsw_energy.append(E0_lsw/norm_energy)
     mf_energy.append(E0_mf/norm_energy)
@@ -189,23 +192,40 @@ plt.plot(alpha_list, [large_alpha_lsw_energy/(N_new)]*len(alpha_list), color='C5
 plt.plot(alpha_list, np.array(lsw_energy)/N, label='LSW', color='C2')
 plt.legend(prop={'size': 10}, bbox_to_anchor=(0.65, 0.7))
 plt.xlabel(r"$\alpha$", fontsize=16)
-plt.ylabel(r"$\tilde{E}/N$", fontsize=16)
-plt.savefig("Renormalized_Energy_per_site.pdf", bbox_inches='tight', dpi=1200)
+plt.ylabel(r"$E/\mathcal{N}_E$", fontsize=16)
+plt.savefig("Kac_normalized_Energy_per_site.pdf", bbox_inches='tight', dpi=1200)
 
 fig, ax1 = plt.subplots()
+ax1.plot(alpha_list, [1/np.pi] * len(alpha_list), color='black', linestyle='dashed', label=r'Exact ($\alpha \rightarrow \infty$)')
+#ax1.plot(alpha_list, mf_stiffness, color='C4', linestyle='dashed', label='MFT')
+ax1.plot(alpha_list, lsw_stiffness, color='C2', label='LSW')
+#ax1.plot(alpha_list, [large_alpha_lsw_rho_2]*len(alpha_list), color='C5', linestyle='dashed', label=r'LSW ($\alpha \rightarrow \infty$)')
 ax1.scatter(alpha_list, np.array(stiffness_SSE_3_list), color='black', label=r'QMC ($\beta={}$)'.format(round(beta_3, 1)))
 ax1.errorbar(alpha_list, np.array(stiffness_SSE_3_list), np.array(stiffness_SSE_3_err_list), fmt='None', capsize=5, color='black')
 ax1.scatter(alpha_list, np.array(stiffness_SSE_2_list), color='C3', label=r'QMC ($\beta={}$)'.format(int(beta_2)))
 ax1.errorbar(alpha_list, np.array(stiffness_SSE_2_list), np.array(stiffness_SSE_2_err_list), fmt='None', capsize=5, color='C3')
 ax1.scatter(alpha_list, np.array(stiffness_SSE_1_list), color='C0', label=r'QMC ($\beta={}$)'.format(int(beta_1)))
 ax1.errorbar(alpha_list, np.array(stiffness_SSE_1_list), np.array(stiffness_SSE_1_err_list), fmt='None', capsize=5)
-ax1.plot(alpha_list, [1/np.pi] * len(alpha_list), color='black', linestyle='dashed', label=r'Exact ($\alpha \rightarrow \infty$)')
-ax1.plot(alpha_list, mf_stiffness, color='C4', linestyle='dashed', label='MFT')
-ax1.plot(alpha_list, lsw_stiffness, color='C2', label='LSW')
-ax1.plot(alpha_list, [large_alpha_lsw_rho_2]*len(alpha_list), color='C5', linestyle='dashed', label=r'LSW ($\alpha \rightarrow \infty$)')
-ax1.legend(prop={'size': 10}, bbox_to_anchor=(0.65, 0.25))
+
+#ax1.legend(prop={'size': 10}, bbox_to_anchor=(0.65, 0.25))
+
+drop_from_top = 14
+left,bottom,width,height = [0.385, 0.25, 0.50, 0.37]
+ax2 = fig.add_axes([left, bottom, width, height])
+ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_3_list)[drop_from_top:], color='black', label=r'SSE ($\beta={}$)'.format(beta_3), s=25)
+ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_3_list)[drop_from_top:], np.array(stiffness_SSE_3_err_list)[drop_from_top:], fmt='None', capsize=5, color='black')
+ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_2_list)[drop_from_top:], color='C3', label=r'SSE ($\beta={}$)'.format(int(beta_2)), s=25)
+ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_2_list)[drop_from_top:], np.array(stiffness_SSE_2_err_list)[drop_from_top:], fmt='None', capsize=5, color='C3')
+ax2.scatter(alpha_list[drop_from_top:], np.array(stiffness_SSE_1_list)[drop_from_top:], color='C0', label=r'SSE ($\beta={}$)'.format(int(beta_1)), s=25)
+ax2.errorbar(alpha_list[drop_from_top:], np.array(stiffness_SSE_1_list)[drop_from_top:], np.array(stiffness_SSE_1_err_list)[drop_from_top:], fmt='None', capsize=5)
+ax2.plot(alpha_list[drop_from_top:], [1/np.pi] * len(alpha_list[drop_from_top:]), color='black', linestyle='dashed')
+#ax2.plot(alpha_list[drop_from_top:], [large_alpha_lsw_rho_2]*len(alpha_list[drop_from_top:]), color='C5', linestyle='dashed')
+ax2.plot(alpha_list[drop_from_top:], lsw_stiffness[drop_from_top:], color='C2')
+ax2.locator_params(axis='x', nbins=8)
 
 ax1.set_xlabel(r"$\alpha$", fontsize=16)
-ax1.set_ylabel(r"$\rho_s/\mathcal{N}_\rho$", fontsize=16)
+ax1.set_ylabel(r"$\rho_s/\mathcal{N}_E$", fontsize=16)
 
-plt.savefig("Renormalized_Superfluid_Density.pdf", bbox_inches='tight', dpi=1200)
+ax1.legend(prop={'size': 10})
+
+plt.savefig("Kac_normalized_Superfluid_Density.pdf", bbox_inches='tight', dpi=1200)

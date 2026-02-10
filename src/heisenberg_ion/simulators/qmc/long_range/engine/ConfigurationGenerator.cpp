@@ -212,7 +212,7 @@ void ConfigurationGenerator::diagonalUpdatesXY(const ProbabilityTables &prob_tab
                                                              prob_tables.max_norm_probabilities.end());
 
     for (int t=0; t<M; t++){
-        double M_minus_n = M - n;
+        double M_minus_n = (double)M - (double)n;
         if (operator_locations.at(t) == 0) {
             double u_1 = metropolis_acceptance_distribution(metropolis_generator_1);
             double acceptance_prob = beta * prob_tables.max_diagonal_norm/M_minus_n;
@@ -980,12 +980,12 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
     int max_n = n;
     int n_sum = 0;
     double avg_n_d = 0.0;
-    int avg_num_samples = 1000;
+    int avg_num_samples = 100;
     int M_new;
 
     logger->info("Starting burn in");
 
-    for (int step=0; step<1000; step++) {
+    for (int step=0; step<5000; step++) {
         ConfigurationGenerator::diagonalUpdatesXY(prob_tables);
         if (n > max_n) {
             max_n = n;
@@ -1000,7 +1000,11 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         //M = M_new;
 
         M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
-        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        //M_new = std::max((int)std::round(a_parameter * max_n), M);
+        //M_new = std::max((int)std::round(a_parameter*(avg_n_d) + beta*prob_tables.max_diagonal_norm), M);
+        if (M_new > M) {
+            ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        }
         M = M_new;
 
         //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), n + 1);
@@ -1020,7 +1024,10 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
     avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
 
     M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
-    ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+    //M_new = std::max((int)std::round(a_parameter*(avg_n_d) + beta*prob_tables.max_diagonal_norm), M);
+    if (M_new > M) {
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+    }
     M = M_new;
 
     //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
@@ -1049,7 +1056,10 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         //M = M_new;
 
         M_new = std::max((int)std::round(a_parameter * avg_n_d), M);
-        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        //M_new = std::max((int)std::round(a_parameter*(avg_n_d) + beta*prob_tables.max_diagonal_norm), M);
+        if (M_new > M) {
+            ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        }
         M = M_new;
 
         //M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);

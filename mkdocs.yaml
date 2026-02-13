@@ -1,0 +1,54 @@
+site_name: Heisenberg Ion
+repo_url: https://github.com/OpenQuantumDesign/oqd-heisenberg-ion/
+repo_name: oqd-heisenberg-ion
+
+nav:
+  - Home: index.md
+  - User Guide: 
+    - Overview: user_guide/overview.md
+    - Input Format: user_guide/input_format.md
+    - Output Format: user_guide/output_format.md
+    - Probability Tables: user_guide/prob_tables.md
+    - Examples: user_guide/examples.md
+  - Development Guide:
+    - Overview: dev_guide/overview.md
+    - Interface: dev_guide/interface.md
+    - Pre-Process: dev_guide/preproc.md
+    - Engines: dev_guide/engines.md
+    - Post-Process: dev_guide/postproc.md
+  - Algorithms: 
+    - Stochastic Series Expansion: algorithms/sse.md
+    - List of SSE Algorithms: algorithms/list_sse_algos.md
+    - Exact Diagonalization: algorithms/ed.md
+
+  - Community: 
+    - Contribute: community/contribute.md
+    - Features in Development: community/feat_dev.md
+
+theme:
+  name: material
+  logo: img/oqd-icon.png
+  favicon: img/oqd-icon.png
+  features:
+    - navigation.tabs
+    - content.code.copy
+  icon:
+    repo: simple/git
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      linenums: false
+      anchor_linenums: true
+      linenums_style: pymdownx-inline
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+

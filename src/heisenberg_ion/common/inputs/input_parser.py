@@ -35,7 +35,7 @@ input_schema = {
     },
     "interaction_type": {
         "DataType": "categorical",
-        "Categories": ["power_law", "input_matrix"],
+        "Categories": ["power_law", "matrix_input"],
         "ParameterType": "system",
         "ConvertValCase": True,
     },
@@ -60,6 +60,7 @@ input_schema = {
     "N": {"DataType": int, "ParameterType": "system", "ConvertValCase": False},
     "Delta": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "alpha": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
+    "interaction_matrix_file": {"DataType": str, "ParameterType": "system", "ConvertValCase": False},
     "h": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "J": {"DataType": float, "ParameterType": "system", "ConvertValCase": False},
     "T": {"DataType": float, "ParameterType": "sampling", "ConvertValCase": False},

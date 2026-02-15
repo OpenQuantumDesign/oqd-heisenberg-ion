@@ -16,7 +16,7 @@ The following categorical inputs always need to be specified:
 | spatial_dimension | Lattice dimension | 1d |
 | lattice_type | Type of geometry | rectangular |
 
-All of the above parameters can be specified as strings. For a list 
+All of the above parameters can be specified as strings.
 
 ### Numerical Hamiltonian Specifications
 Depending on the Hamiltonian specified, more parameters might be required to configure the system. The following table lists all the numerical inputs that can be used to define the Hamiltonian:  

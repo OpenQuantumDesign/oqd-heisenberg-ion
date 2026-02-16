@@ -5,7 +5,18 @@ from heisenberg_ion.common.driver.base import Driver
 
 
 class LongRangeQMC(Driver):
+    """
+    Driver subclass for long range QMC
+    """
+
     def __init__(self, simulation_folder, simulator_inputs):
+        """
+        builds and compiles the C++ engine if needed after extracting the build directory and input file for the QMC engine
+
+        Args:
+            simulation_folder (str): simulation output folder
+            simulator_inputs (dict): specifies either the binaries or the cpp source directory
+        """
 
         super().__init__(simulation_folder)
 
@@ -21,6 +32,12 @@ class LongRangeQMC(Driver):
             self.compile_source()
 
     def build_from_cmake(self, cpp_source):
+        """
+        method for calling cmake via Python subprocess
+
+        Args:
+            cpp_source (str): path pointing to the C++ source code
+        """
 
         configure_command = ["cmake", cpp_source, "-DCMAKE_BUILD_TYPE=Release"]
         try:
@@ -31,6 +48,9 @@ class LongRangeQMC(Driver):
             print("STDERR:{}".format(error.stderr))
 
     def compile_source(self):
+        """
+        method for compiling the C++ source code
+        """
 
         compile_command = ["cmake", "--build", ".", "-j"]
         try:
@@ -41,6 +61,12 @@ class LongRangeQMC(Driver):
             print("STDERR:{}".format(error.stderr))
 
     def simulate(self):
+        """
+        method for calling the C++ engine for simulating the system, via a Python subprocess call
+
+        Returns:
+            (int): exit code, 0 if the simulation terminates gracefully
+        """
 
         if self.bin_dir is not None:
             copy_command = ["cp", "-r", self.bin_dir, self.build_dir]

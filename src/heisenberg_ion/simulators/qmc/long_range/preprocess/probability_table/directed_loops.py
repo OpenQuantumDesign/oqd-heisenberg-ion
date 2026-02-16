@@ -8,10 +8,24 @@ from .utils import vertex_utils as vu
 
 
 class DirectedLoops(ProbabilityTable):
+    """
+    ProbabilityTable subclass for directed loops sampling
+    See: https://journals.aps.org/pre/abstract/10.1103/PhysRevE.66.046701 for details
+    """
+
     args = {"gamma": float, "ksi": float, "distance_dependent_offset": bool}
     allowed_hamiltonians = {"XXZ", "XXZh", "XY", "fm_heisenberg_fm_Z", "fm_heisenberg_afm_Z"}
 
     def __init__(self, system, gamma, ksi, distance_dependent_offset):
+        """
+        constructor computes the field contribution per bond, sets member variables and populates the directed loop probability tables
+
+        Args:
+            system (System): object representing the system to be simulated
+            gamma (float): offset added to weights reduce bounces
+            ksi (float): offset added in the presence of a large field to reduce bounces
+            distance_dependent_offset (bool): determines whether a distance dependant offset should be used
+        """
 
         super().__init__(system, gamma=gamma, ksi=ksi, distance_dependent_offset=distance_dependent_offset)
 
@@ -24,6 +38,12 @@ class DirectedLoops(ProbabilityTable):
         self.build()
 
     def validate_system(self):
+        """
+        validates the systema associated with the instance of the ProbabilityTable object
+
+        Raises:
+            Exception: if, for the specified hamiltonian name, directed loop sampling can not be used
+        """
 
         super().validate_system()
 
@@ -36,6 +56,9 @@ class DirectedLoops(ProbabilityTable):
             )
 
     def build(self):
+        """
+        populates the directed loop probability tables
+        """
 
         num_bonds = self.system.geometry.num_bonds
 
@@ -55,9 +78,13 @@ class DirectedLoops(ProbabilityTable):
             num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, distance_dependent_offset
         )
 
-        return 0
-
     def initialize_tables(self, num_bonds):
+        """
+        initializes the probability tables needed for directed loops sampling
+
+        Args:
+            num_bonds (int): number of interacting bonds in the lattice
+        """
 
         num_rows = vu.num_vertices * vu.num_legs_indices
 
@@ -68,8 +95,6 @@ class DirectedLoops(ProbabilityTable):
 
         self.spectrum_offset = 0.0
         self.max_diag_norm = 0.0
-
-        return 0
 
     def set_vertex_enum_transition_weights_map(self):
 
@@ -97,8 +122,6 @@ class DirectedLoops(ProbabilityTable):
         exit_leg_weights_le_0_v_3 = ["b_3_p", None, "c_p", "b_p"]  # l_e = 0
         self.vertex_weight_label_map[vertex_enum] = [exit_leg_weights_le_0_v_3]
 
-        return 0
-
     def update_directed_loop_probs(self, vertex_enum, l_e, l_x, bond, transition_weight):
 
         init_composite_leg_index, init_row_index = self.get_composite_row_prob_index(vertex_enum, l_e, l_x)
@@ -119,8 +142,6 @@ class DirectedLoops(ProbabilityTable):
         new_vertex_enum, new_l_e, new_l_x = self.get_symmetric_indices(vertex_enum, l_e, l_x, vu.composed_swaps_mapping)
         new_composite_leg_index, new_row_index = self.get_composite_row_prob_index(new_vertex_enum, new_l_e, new_l_x)
         self.directed_loop_prob_table[new_row_index, bond] = self.directed_loop_prob_table[init_row_index, bond]
-
-        return 0
 
     def get_composite_row_prob_index(self, vertex_enum, entrance_leg_enum, exit_leg_enum):
 
@@ -160,8 +181,6 @@ class DirectedLoops(ProbabilityTable):
 
                     self.update_directed_loop_probs(int(vertex_enum), l_e, l_x, bond, l_x_weight)
 
-        return 0
-
     def compute_prob_tables_directed_loops(
         self, num_bonds, J_ij_vector, gamma, h_B, Delta, ksi, distance_dependent_offset
     ):
@@ -196,9 +215,13 @@ class DirectedLoops(ProbabilityTable):
 
         self.max_over_states[:] /= self.max_diag_norm
 
-        return 0
-
     def write_to_files(self, out_dir):
+        """
+        writes the probability tables to csv files for SSE engine
+
+        Args:
+            out_dir (str): directory path for writing probability tables
+        """
 
         super().write_to_files(out_dir)
 
@@ -221,10 +244,13 @@ class DirectedLoops(ProbabilityTable):
         np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
         np.savetxt(loop_update_table_file_name, self.directed_loop_prob_table, delimiter=",", header=header)
 
-        return 0
-
 
 class LoopTransitionWeights:
+    """
+    contains the logic for computing the transition weights in the directed loop SSE method
+    See https://journals.aps.org/pre/abstract/10.1103/PhysRevE.66.046701 for details
+    """
+
     def __init__(self, gamma, Delta, h_B, ksi, distance_dependent_offset):
 
         keys = ["a", "b", "c", "a_p", "b_p", "c_p", "b_1", "b_2", "b_3", "b_1_p", "b_2_p", "b_3_p"]
@@ -246,15 +272,11 @@ class LoopTransitionWeights:
         self.transition_weight_container["b"] = b
         self.transition_weight_container["c"] = c
 
-        return 0
-
     def populate_primed_transition_weights(self, a_p, b_p, c_p):
 
         self.transition_weight_container["a_p"] = a_p
         self.transition_weight_container["b_p"] = b_p
         self.transition_weight_container["c_p"] = c_p
-
-        return 0
 
     def populate_unprimed_bounce_weights(self, b_1, b_2, b_3):
 
@@ -262,15 +284,11 @@ class LoopTransitionWeights:
         self.transition_weight_container["b_2"] = b_2
         self.transition_weight_container["b_3"] = b_3
 
-        return 0
-
     def populate_primed_bounce_weights(self, b_1_p, b_2_p, b_3_p):
 
         self.transition_weight_container["b_1_p"] = b_1_p
         self.transition_weight_container["b_2_p"] = b_2_p
         self.transition_weight_container["b_3_p"] = b_3_p
-
-        return 0
 
     def tranisiton_weights_small_field(self, Delta_over_four_J_ij, Delta_positive, Delta_negative):
 
@@ -308,8 +326,6 @@ class LoopTransitionWeights:
         self.populate_primed_transition_weights(a_p, b_p, c_p)
         self.populate_unprimed_bounce_weights(b_1, b_2, b_3)
         self.populate_primed_bounce_weights(b_1_p, b_2_p, b_3_p)
-
-        return 0
 
     def transition_weights_negative_Delta(self, Delta_over_four_J_ij, Delta_positive, Delta_negative, J_ij):
 
@@ -389,8 +405,6 @@ class LoopTransitionWeights:
         self.populate_unprimed_bounce_weights(b_1, b_2, b_3)
         self.populate_primed_bounce_weights(b_1_p, b_2_p, b_3_p)
 
-        return 0
-
     def transition_weights_large_field(self, Delta_positive, Delta_negative, J_ij):
 
         self.offset_b = self.h_B
@@ -436,8 +450,6 @@ class LoopTransitionWeights:
         self.populate_unprimed_bounce_weights(b_1, b_2, b_3)
         self.populate_primed_bounce_weights(b_1_p, b_2_p, b_3_p)
 
-        return 0
-
     def compute_transition_weights(self, J_ij):
 
         Delta_over_four_J_ij = (self.Delta / 4.0) * J_ij
@@ -451,5 +463,3 @@ class LoopTransitionWeights:
             self.transition_weights_negative_Delta(Delta_over_four_J_ij, Delta_positive, Delta_negative, J_ij)
         else:
             self.transition_weights_large_field(Delta_positive, Delta_negative, J_ij)
-
-        return 0

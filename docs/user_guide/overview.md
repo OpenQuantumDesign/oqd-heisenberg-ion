@@ -26,24 +26,24 @@ ED corresponds to constructing the entire $2^N \times 2^N$ ($N$ is the total num
 
 ## Quantum Monte Carlo
 
-QMC is a statistical approach for studying the equilibrium properties of a many-body system. For systems without frustration, such as the isotropic Heisenberg model with nearest-neighbor interactions, it is widely believed that the SSE variant of QMC scales polynomially. For Technical details about the Heisenberg Ion SSE approach, see [Algorithms](../algorithms/sse.md). For a complete list of the Hamiltonians and their supported SSE algorithms in Heisenberg Ion, see [Hamiltonian Types](hamiltonian_types.md).  
+QMC is a statistical approach for studying the equilibrium properties of a many-body system. For systems without frustration, such as the isotropic Heisenberg model with nearest-neighbor interactions, it is widely believed that the SSE variant of QMC scales polynomially. For Technical details about the Heisenberg Ion SSE approach, see [Algorithms](../algorithms/sse.md). For a complete list of the Hamiltonians and their supported SSE algorithms in Heisenberg Ion, see [Hamiltonian Types](hamiltonian_types.md). We have two QMC engines implemented in Heisenberg Ion. The first targets long range interactions and uses a C++ backend. The other is implemented using Python and simulates isotropic variants of the Heisenberg model, as well as the XY model in the presence of nearest neighbor interactions.  
 
 
 ## General Workflow
 
-The general approach for using any of the simulators in the Heisenberg Ion is the same. The workflow can be divided into the following categories: 
+The general approach for using any of the simulators in the Heisenberg Ion is the same. The workflow can be divided into the following sequential steps: 
 
 ### Input Specification  
-This includes defining the inputs and passing them to the package. These are then parsed to determine the workflow settings. Validation is owned by the components being used by the program. This allows for lightweight pre-processing and a modular, workflow agnostic design. Details about specifying the inputs can be found in the [Input Specification](input_specs.md) section. 
+This includes defining the inputs and passing them to the package. These are then parsed to determine the workflow settings. Model specific validation checks are owned by the components being used by the program, typically called by the preprocessor. Details about specifying the inputs can be found in the [Input Specification](input_specs.md) section. 
 
 ### Preprocessing  
-This involves preparing the input files for the simulator specified by the user. Since the simulators are considerably different in the inputs they require (e.g. we need to produce probability tables for QMC with long range interaction but not for nearest neighbor interactions), this is implemented polymorphically. Details about the different preprocessors can be found in the [Development Guide](../dev_guide/preproc.md). 
+This involves preparing the input files for the simulator specified by the user. Since the simulators can be considerably different in the inputs they require (e.g. we need to produce probability tables for QMC with long range interaction but not for nearest neighbor interactions), this is implemented polymorphically. Details about the different preprocessors can be found in the [API Reference](../api/preproc/preprocessor.md). 
 
 ### Drivers  
-Our QMC implementation uses C++ for optimal performance, and our ED calculator uses a Julia backend. The driver layer uses a command line subprocess to interface with these engines as needed. For nearest-neighbor QMC, the driver simply calls the relevant implementation class in Python. As with the preprocessors, each simulator carries its own driver implemented as a subclass of the base driver class. Details can be found in the [Development Guide](../dev_guide/drivers.md). 
+Our QMC implementation uses C++ for optimal performance, and our ED calculator uses a Julia backend. The driver layer uses a command line subprocess to call these engines. For nearest-neighbor QMC, the driver simply calls the relevant implementation class in Python. As with the preprocessors, each simulator carries its own driver implemented as a subclass of the base driver class. Details can be found in the [API Reference](../api/drivers.md). 
 
 ### Engines  
-These modules contain the algorithmic simulation logic. Currently, we support three simulator engines: long-range QMC, nearest-neighbor QMC and ED. The output data files in each case are produced by the engine layer. For implementation details, see the [Development Guide](../dev_guide/engines.md) and for technical details, see the relevant sections of the [Algorithms](../algorithms/overview.md) tab. Details about the output format can be found in the Output Format section of the User Guide. 
+These modules contain the algorithmic simulation logic. Currently, we support three simulator engines: long-range QMC, nearest-neighbor QMC and ED. The output data files in each case are produced by the engine layer. For technical details, see the relevant sections of the [Algorithms](../algorithms/sse.md) tab. Details about the output format can be found in the [Output Files](../user_guide/output_format.md) section. 
 
 ### Postprocessing  
-Since the post-processing can differ significantly between workflows, we offer some lightweight post-processing utilities. This includes statistical utilities for the QMC outputs, and simple equilibrium property calculators for the ED data. Some post-processing examples can be found in the [Examples](../user_guide/examples.md) section of the User Guide. Details can be found in the [Development Guide](../dev_guide/postproc.md). 
+Since the post-processing can differ significantly between workflows, we offer some lightweight post-processing utilities. This includes statistical utilities for the QMC outputs, and simple equilibrium property calculators for the ED data. Some post-processing examples can be found in the [Examples](../user_guide/examples.md) section of the User Guide. Details can be found in the [Development Guide](../api/postproc.md). 

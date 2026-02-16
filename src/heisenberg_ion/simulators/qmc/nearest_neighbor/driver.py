@@ -4,7 +4,18 @@ from .engine.configuration_generator import ConfigurationGenerator
 
 
 class NearestNeighborQMC(Driver):
+    """
+    Driver subclass for nearest neighbor qmc
+    """
+
     def __init__(self, simulation_folder, simulator_inputs):
+        """
+        initializes the nearest neighbor qmc driver and counts the number of parameter sets
+
+        Args:
+            simulation_folder (str): path to the simulation output folder
+            simulator_inputs (list[dict]): list of nearest neighbor qmc parameter sets to be simulated
+        """
 
         super().__init__(simulation_folder)
 
@@ -13,6 +24,12 @@ class NearestNeighborQMC(Driver):
         self.num_parameter_sets = len(simulator_inputs)
 
     def simulate(self):
+        """
+        calls the Python ConfigurationGenerator class, the nearest neighbor qmc engine
+
+        Returns:
+            (int): exit code, 0 if the simulation terminates gracefully
+        """
 
         for i in range(self.num_parameter_sets):
             run_folder = self.sse_inputs[i].run_folder

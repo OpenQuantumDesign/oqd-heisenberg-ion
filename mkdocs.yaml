@@ -4,23 +4,32 @@ repo_name: oqd-heisenberg-ion
 
 nav:
   - Home: index.md
-  - User Guide: 
+  - User Guide:
     - Overview: user_guide/overview.md
     - Hamiltonian Types: user_guide/hamiltonian_types.md
-    - Probability Tables: user_guide/prob_tables.md
     - Input Specification: user_guide/input_specs.md
     - Output Files: user_guide/output_format.md
     - Examples: user_guide/examples.md
-  - Development Guide:
-    - Overview: dev_guide/overview.md
-    - Interface: dev_guide/interface.md
-    - Pre-Process: dev_guide/preproc.md
-    - Engines: dev_guide/engines.md
-    - Post-Process: dev_guide/postproc.md
   - Algorithms: 
-    - Overview: algorithms/overview.md
     - Stochastic Series Expansion: algorithms/sse.md
     - Exact Diagonalization: algorithms/ed.md
+  - API Reference:
+    - Overview: api/overview.md
+    - Interface: api/interface.md
+    - Pre-Process:
+      - Input Parser: api/preproc/input_parser.md
+      - System: 
+        - Base: api/preproc/system/base.md
+        - Hamiltonian: api/preproc/system/hamiltonian.md
+        - Geometry: api/preproc/system/geometry.md
+        - Interactions: api/preproc/system/interactions.md
+      - Preprocessor Base: api/preproc/preprocessor.md
+      - Long Range Quantum Monte Carlo: api/preproc/long_range_qmc.md
+      - Probability Tables: api/preproc/probability_tables.md
+      - Nearest-Neighbor Quantum Monte Carlo: api/preproc/nearest_neighbor_qmc.md
+      - Exact Diagonalization: api/preproc/exact_diagonalization.md
+    - Drivers: api/drivers.md
+    - Post-Process: api/postproc.md
   - Community: 
     - Contribute: community/contribute.md
     - Features in Development: community/feat_dev.md
@@ -47,8 +56,33 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.magiclink
 
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+plugins:
+  - mkdocstrings:
+        handlers:
+          python:
+            options:
+              show_source: true
+              show_root_heading: true
+              show_symbol_type_heading: true
+              show_symbol_type_toc: true
+              show_submodules: true
+              docstring_style: "google"
+              docstring_section_style: "list"
+              show_signature: false
+              show_return_name: false
+              show_signature_annotations: false
+              signature_crossrefs: true
+              separate_signature: false
+              group_by_category: true
+              members_order: "source"
+            paths: [src]
+            import:
+              - https://docs.python.org/3/objects.inv
+              - https://numpy.org/doc/stable/objects.inv
+              - https://matplotlib.org/stable/objects.inv

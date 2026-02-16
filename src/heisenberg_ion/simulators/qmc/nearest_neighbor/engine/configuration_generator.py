@@ -6,6 +6,10 @@ from . import vertex_types as vt
 
 
 class ConfigurationGenerator:
+    """
+    implements the nearest neighbor SSE algorithm. For details, see https://journals.aps.org/pre/abstract/10.1103/PhysRevE.66.046701
+    """
+
     def __init__(self, system_inputs, sampling_inputs, run_folder):
 
         self.run_folder = run_folder

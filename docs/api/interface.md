@@ -5,4 +5,4 @@
 ::: heisenberg_ion.interface.orchestrator
 
 ### Input File Reader
-::: heisenberg_ion.common.inputs.input_file_reader
+::: heisenberg_ion.common.inputs.input_reader

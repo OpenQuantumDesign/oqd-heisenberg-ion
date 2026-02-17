@@ -150,7 +150,7 @@ class LongRangeOpenChain(Geometry):
 
         super().__init__()
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "open"
         self.interaction_range = "long_range"
@@ -210,7 +210,7 @@ class LongRangePeriodicChain(Geometry):
 
         super().__init__()
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "long_range"
@@ -275,7 +275,7 @@ class LongRangeOpenTriangular(Geometry):
 
         super().__init__()
 
-        self.spatial_dimension = 2
+        self.spatial_dimension = "2d"
 
         self.boundary = "periodic"
         self.interaction_range = "long_range"
@@ -345,7 +345,7 @@ class NearestNeighborPeriodicChain(Geometry):
             N (int): number of sites
         """
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"
@@ -402,7 +402,7 @@ class NearestNeighborOpenChain(Geometry):
             N (int): number of sites
         """
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"

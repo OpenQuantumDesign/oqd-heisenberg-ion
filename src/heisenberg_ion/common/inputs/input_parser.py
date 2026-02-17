@@ -168,7 +168,7 @@ class InputParser:
             (bool): parameter value
         """
 
-        if config_settings[key] is bool:
+        if isinstance(config_settings[key], bool):
             return config_settings[key]
         else:
             if config_settings[key].capitalize() == "True":

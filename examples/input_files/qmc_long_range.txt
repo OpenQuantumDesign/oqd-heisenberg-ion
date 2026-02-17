@@ -8,7 +8,7 @@ interaction_type	power_law
 alpha	1.0
 spatial_dimension	1d
 lattice_type	rectangular
-N	11
+N	11,12,13
 J	1.0
 
 # Simulation Parameters
@@ -20,11 +20,9 @@ loop_type	deterministic
 
 # Misc.
 root_folder	./results
-output_folder_name	long_range_qmc
-uuid	xy_example
 track_spin_configurations	True
 write_final_spin_configuration	False
-number_of_threads	3
+number_of_threads	1
 
 # Initial Configuration Parameters
 initial_configuration_index	0

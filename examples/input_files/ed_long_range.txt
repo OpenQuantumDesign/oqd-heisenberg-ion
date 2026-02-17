@@ -1,0 +1,16 @@
+simulator	exact_diagonalization
+
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	long_range
+interaction_type	power_law
+alpha	1.0
+spatial_dimension	1d
+lattice_type	rectangular
+N	4,5,6
+J	1.0
+theta	0.0
+
+# Misc.
+root_folder	./results

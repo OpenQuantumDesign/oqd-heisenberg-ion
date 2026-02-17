@@ -1,0 +1,26 @@
+simulator	nearest_neighbor_qmc
+
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	nearest_neighbor
+spatial_dimension	1d
+lattice_type	rectangular
+N	11,12,13
+J	1.0
+
+# Simulation Parameters
+T	0.1
+equilibration_steps	100000
+simulation_steps	100000
+operator_list_update_multiplier	1.1
+loop_type	deterministic
+
+# Misc.
+root_folder	./results
+track_spin_configurations	True
+write_final_spin_configuration	False
+
+# Initial Configuration Parameters
+initial_configuration_index	0
+initial_operator_list_size	-1

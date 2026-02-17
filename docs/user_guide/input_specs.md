@@ -53,6 +53,9 @@ If one of the QMC simulators are selected (long_range_qmc or nearest_neighbor_qm
 
 A complete list of QMC algorithms and their target Hamiltonians can be found in the List of SSE Algorithms section of the Algorithns tab.  
 
+### Conflicting Inputs
+Note that if contradictory inputs are specified for the Hamiltonian, (for instance if the input `hamiltonian_name` is `XY` and `Delta` is specified to be `1.0`), the system specification defaults to properties defined by the `hamiltonian_name` (the provided value of `Delta` is ignored). The same is true for specifying the interactions. If the `interaction_range` is set to `nearest_neighbor` and the `interaction_type` is specified to be `power_law`, the latter is ignored. Similarly, conflicting inputs pertaining to QMC sampler settings are resolved via the `loop_type` parameter. 
+
 ### Directory Specification
 In addition to simulation parameters, we also need to provide the output directories (which can be specified as strings). The following tables lists all directory parameters: 
 
@@ -60,8 +63,8 @@ In addition to simulation parameters, we also need to provide the output directo
 |-----------|-------------|
 | root_folder | Root folder in which the outputs will be stored. Always required |
 | bin_folder | Directory containing the C++ binaries. If not provided, the Python driver will attempt to compile the C++ program itself. Only required for long_range_qmc |
-| cpp_source_folder | C++ source files for the long range QMC implementation. Either the bin_folder or this must be provided if using long_range_qmc. The Python driver uses this to locate the source files if compiling itself |
-| julia_path | Julia source files for the ED simulator. Only needed if the simulator is exact_diagonalization |
+| cpp_source_folder | C++ source files for the long range QMC implementation. If neither the bin_folder nor the cpp_source_folder is provided, the preprocessor attempts to locate the Cpp source files |
+| julia_path | Path to Julia binaries for the ED simulator. Only needed if the simulator is exact_diagonalization |
 | uuid | The UUID corresponding to each simulation. If not provided, a unique ID for each simulation is produced by the preprocessor |
 | output_folder_name | The top-level output folder for the entire program execution. If not provided, the datetime stamp of execution is used to create this directory |
 
@@ -78,7 +81,7 @@ alpha	1.0,2.0,3.0,4.0
 loop_type	deterministic
 ```
 
-The above example specifies 4 long range QMC runs for the long range XY model with power law interactions using the deterministic loop SSE algorithm. The 4 parameter sets are: $(N, \alpha) = (4,1.0), (5,2.0), (6,3.0), (7,4.0)$. It should be noted that for certain parameters, multple values would not be meaningful. These parameters are as follows:  
+The above example specifies 4 long range QMC runs for the long range XY model with power law interactions using the deterministic loop SSE algorithm. The 4 parameter sets are: $(N, \alpha) = (4,1.0), (5,2.0), (6,3.0), (7,4.0)$. It should be noted that for certain parameters, multple values would not be meaningful and so providing multiple inputs for those fields results in an exception. These parameters are as follows:  
 
 ```
 simulator
@@ -90,10 +93,87 @@ output_folder_name
 
 
 ## Example Parameter Settings
+In this section, we provide example input specifications for ED and QMC. 
 
 ### Exact Diagonalization
+```
+simulator	exact_diagonalization
+
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	long_range
+interaction_type	power_law
+alpha	1.0
+spatial_dimension	1d
+lattice_type	rectangular
+N	4,5,6
+J	1.0
+theta	0.0
+
+# Output Parameters
+root_folder	./results
+```
 
 ### Long Range Quantum Monte Carlo
+```
+simulator	long_range_qmc
+
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	long_range
+interaction_type	power_law
+alpha	1.0
+spatial_dimension	1d
+lattice_type	rectangular
+N	11,12,13
+J	1.0
+
+# Simulation Parameters
+T	0.05
+equilibration_steps	100000
+simulation_steps	100000
+operator_list_update_multiplier	1.05
+loop_type	deterministic
+number_of_threads	1
+
+# Output Parameters
+root_folder	./results
+track_spin_configurations	True
+write_final_spin_configuration	False
+
+# Initial Configuration Parameters
+initial_configuration_index	0
+initial_operator_list_size	-1
+```
 
 ### Nearest Neighbor Quantum Monte Carlo
+```
+simulator	nearest_neighbor_qmc
 
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	nearest_neighbor
+spatial_dimension	1d
+lattice_type	rectangular
+N	11,12,13
+J	1.0
+
+# Simulation Parameters
+T	0.1
+equilibration_steps	100000
+simulation_steps	100000
+operator_list_update_multiplier	1.1
+loop_type	deterministic
+
+# Output Parameters
+root_folder	./results
+track_spin_configurations	True
+write_final_spin_configuration	False
+
+# Initial Configuration Parameters
+initial_configuration_index	0
+initial_operator_list_size	-1
+```

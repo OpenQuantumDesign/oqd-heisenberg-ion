@@ -41,6 +41,8 @@ class ExactDiagonalization(Preprocessor):
 
         self.configure_simulation()
 
+        return self.driver_inputs
+
     def configure_simulation(self):
         """
         Configures all the parameter sets sequentially. Then writes the input file for the engine.
@@ -84,7 +86,6 @@ class ExactDiagonalization(Preprocessor):
             system.interactions.write_to_file(J_ij_file_path)
             misc_args["J_ij_file"] = J_ij_file_path
 
-
         self.processed_configs.append(input_config.simulation_config)
 
     def extract_cli_requirements(self):
@@ -100,28 +101,3 @@ class ExactDiagonalization(Preprocessor):
                 raise Exception("No Julia path provided\n")
 
         self.driver_inputs = {"julia_path": julia_path}
-
-
-"""
-class EDParameters:
-
-    def __init__(self, system, run_folder, theta):
-
-        self.system = system
-        self.run_folder = run_folder
-        self.theta = theta
-
-        if self.system.interaction_range == "long_range":
-            self.write_J_ij_file()
-
-
-    def write_J_ij_file(self, system, run_folder):
-
-        self.J_ij_file = os.path.join(run_folder, "J_ij_matrix.csv")
-
-        if self.interaction_name == "power_law":
-            system.interaction.write_to_file(self.J_ij_file)
-
-        elif system.interaction_name == "matrix_input":
-            sh.copy2(system.interaction.file_path, self.J_ij_file)
-"""

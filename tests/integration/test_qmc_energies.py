@@ -24,7 +24,7 @@ def test_long_range_qmc(hamiltonian_name, alpha, tmp_path):
     test_file_dir = Path(__file__).parent
     T = "0.005"
 
-    input_file = os.path.join(test_file_dir, "/input_files/" + hamiltonian_name + "_long_range.txt")
+    input_file = os.path.join(test_file_dir, "input_files/" + hamiltonian_name + "_long_range.txt")
     # out_dir = os.path.join(test_file_dir, "results/long_range_qmc")
     out_dir = str(tmp_path)
     uuid = "test_calculation"
@@ -90,7 +90,7 @@ def test_nearest_neighbor_qmc(hamiltonian_name, tmp_path):
         N = "5"
         init_config = "1"
 
-    input_file = os.path.join(test_file_dir, "/input_files/" + hamiltonian_name + "_long_range.txt")
+    input_file = os.path.join(test_file_dir, "input_files/" + hamiltonian_name + "_nearest_neighbor.txt")
     # out_dir = os.path.join(test_file_dir, "results/nearest_neighbor_qmc")
     out_dir = str(tmp_path)
     uuid = "test_calculation"

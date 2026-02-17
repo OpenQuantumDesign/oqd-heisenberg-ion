@@ -1,35 +1,64 @@
+import copy
+from collections.abc import Sequence
+
 from .utils import convert_to_snake_case
 
 
-class InputFileReader:
+class InputReader:
     """
-    Reads the tab-delimited input file and contains the parameters in a list of dicts. Each dict represents a parameter set
+    Extracts provided inputs and generates a list of parameter sets, with each parameter set represented as a dict.
+    Inputs need to be provided either in a tab-delimited file or as key word arguments
     """
 
-    def __init__(self, input_file_path, **kwargs):
+    def __init__(self, simulator=None, input_file_path=None):
         """
-        InputFileReader constructor. Extracts parameter sets from file.
+        initializes the InputReader
 
         Args:
-            input_file_path (str): path to input file specifying parameter sets
+            input_file_path (str, optional): path to input file. Defaults to None.
         """
 
         self.input_file = input_file_path
+        if simulator is not None:
+            self.simulator = convert_to_snake_case(simulator)
 
         self.num_parameter_sets = 1
 
         self.is_param_iterable = {}
-        input_config = self.extract_key_value_inputs()
 
-        self.override_file_inputs(input_config, **kwargs)
+        self.parameter_set_list = []
+
+    def read_kwarg_inputs(self, **kwargs):
+        """
+        Extracts inputs from key word arguments and builds list of parameter sets
+
+        Args:
+            **kwargs (dict): input key word arguments provided by user
+        """
+
+        input_config = self.extract_kwarg_inputs(**kwargs)
+
+        self.extract_parameter_set_list(input_config)
+
+    def read_inputs_from_file(self, **overrides):
+        """
+        Extracts inputs from file and builds list of parameter sets
+
+        Args:
+            **overrides (dict): input key word arguments provided by user as overrides
+        """
+
+        input_config = self.extract_file_key_value_inputs()
+
+        input_config = self.override_file_inputs(input_config, **overrides)
 
         self.extract_parameter_set_list(input_config)
 
         self.simulator = convert_to_snake_case(self.parameter_set_list[0]["simulator"])
 
-    def extract_key_value_inputs(self):
+    def extract_file_key_value_inputs(self):
         """
-         Method for extracting key value pairs seperated by a tab from input file
+        Reads input file to generate a dict of key value pairs specifying parameters. Each value is a list of parameters
 
         Returns:
             (dict): containing the key value pairs from the tab delimited input file
@@ -51,7 +80,25 @@ class InputFileReader:
                 key = line_data[0]
                 data = line_data[1].strip().split(",")
 
-                self.record_input(input_config, key, data)
+                input_config = self.record_input(input_config, key, data)
+
+        return input_config
+
+    def extract_kwarg_inputs(self, **kwargs):
+        """
+        Uses key word arguments to generate a dict of key value pairs specifying parameters. Each value is a list of parameters
+
+        Returns:
+            (dict): containing the key value pairs from the tab delimited input file
+        """
+
+        input_config = {}
+
+        for key, val in kwargs.items():
+            if isinstance(val, Sequence) and not isinstance(val, str):
+                input_config = self.record_input(input_config, key, val)
+            else:
+                input_config = self.record_input(input_config, key, [val])
 
         return input_config
 
@@ -122,8 +169,14 @@ class InputFileReader:
         Args:
             input_config (dict): contains the key value pairs specifying the parameter set
         """
-
-        self.parameter_set_list = [{} for i in range(self.num_parameter_sets)]
+        if not self.parameter_set_list:
+            for i in range(self.num_parameter_sets):
+                self.parameter_set_list.append({})
+        elif len(self.parameter_set_list) == 1:
+            for i in range(len(self.parameter_set_list), self.num_parameter_sets):
+                self.parameter_set_list.append(copy.deepcopy(self.parameter_set_list[0]))
+        elif len(self.parameter_set_list) != self.num_parameter_sets:
+            raise Exception("Inconsistent numbers of parameter sets encountered")
 
         for key, val in input_config.items():
             if len(val) == 1:

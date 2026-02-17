@@ -206,12 +206,8 @@ end
 
 function write_simulation_specs(parameter_set)
 
-    simulation_spec_file_path = parameter_set.output_folder + "/simulation_specs.txt"
-    open(simulation_spec_file_path) do f
-        for (key, val) in pairs(parameter_set)
-            println(key + "\t" + val + "\n")
-        end
-    end
+    simulation_spec_file_path = parameter_set[:run_folder] * "/simulation_specs.txt"
+    writedlm(simulation_spec_file_path, parameter_set)
 end
 
 
@@ -234,7 +230,9 @@ function extract_inputs(input_file_path)
 
     input_parameters = Dict{Symbol,Vector}()
 
-    num_parameter_sets = 0
+    set_single_input_keys = Set([])
+
+    num_parameter_sets = 1
     simulation_folder = 0
     simulation_folder_found = false
     open(input_file_path) do f
@@ -246,8 +244,17 @@ function extract_inputs(input_file_path)
                 simulation_folder_found = true
                 simulation_folder = val
             else
-                val_entries = split(val, "\t")
-                num_parameter_sets = length(val_entries)
+                val_entries = split(val, ",")
+                count_entries = length(val_entries)
+
+                if count_entries == 1
+                    push!(set_single_input_keys, Symbol(key))
+                elseif num_parameter_sets == 1
+                    num_parameter_sets = count_entries
+                elseif (num_parameter_sets - count_entries) != 0
+                    error("Inconsistent numbers of parameters found")
+                end
+
                 input_parameters[Symbol(key)] = val_entries
             end
         end
@@ -262,7 +269,11 @@ function extract_inputs(input_file_path)
     for i = 1:num_parameter_sets
         single_parameter_set = Dict{Symbol,String}()
         for (key, val_list) in input_parameters
-            single_parameter_set[key] = val_list[i]
+            if key in set_single_input_keys
+                single_parameter_set[key] = val_list[1]
+            else
+                single_parameter_set[key] = val_list[i]
+            end
         end
         push!(parameter_sets, single_parameter_set)
     end
@@ -278,6 +289,7 @@ function execute_simulations(parameter_sets)
 
     for i = 1:num_parameter_sets
         kwargs = parameter_sets[i]
+        write_simulation_specs(kwargs)
         evals, evecs = diagonalize_hamiltonian(; kwargs...)
         write_results(kwargs[:run_folder], evals, evecs)
     end

@@ -24,9 +24,7 @@ class ExactDiagonalization(Preprocessor):
 
         # self.driver_inputs = []
 
-        self.build()
-
-    def build(self):
+    def preprocess(self):
         """
         Preprocesses the simulation parameter sets, and validates root output folder and uuids.
         Also populates the ED Driver inputs.

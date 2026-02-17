@@ -24,9 +24,7 @@ class NearestNeighborQMC(Preprocessor):
 
         self.driver_inputs = []
 
-        self.build()
-
-    def build(self):
+    def preprocess(self):
         """
         configures the input parameter sets for the nearest neighbor qmc calculation,
         checks that a single root folder is specified, creates the simulation output folder

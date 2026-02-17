@@ -36,6 +36,7 @@ class Orchestrator:
         simulator = file_inputs.simulator
 
         preprocessor = PreprocessorFactory.create(simulator, file_inputs.parameter_set_list)
+        driver_inputs = preprocessor.preprocess()
 
         driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()
@@ -54,6 +55,7 @@ class Orchestrator:
         parameter_set_list = [kwargs]
 
         preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
+        driver_inputs = preprocessor.preprocess()
 
         driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
         driver.simulate()

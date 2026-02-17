@@ -26,9 +26,7 @@ class LongRangeQMC(Preprocessor):
         self.bin_folder = None
         self.cpp_source_folder = None
 
-        self.build()
-
-    def build(self):
+    def preprocess(self):
         """
         validates user inputs that need to be unique and creates the simulation output folder. Extracts the inputs for the long range QMC driver
         and executes the parameter set configuration logic

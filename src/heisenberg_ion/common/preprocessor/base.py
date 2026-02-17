@@ -33,7 +33,7 @@ class Preprocessor:
 
         self.driver_inputs = None
 
-    def build(self):
+    def preprocess(self):
         """
         Each subclass must implement a build method
         """

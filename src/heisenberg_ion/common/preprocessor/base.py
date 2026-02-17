@@ -55,7 +55,7 @@ class Preprocessor:
         else:
             self.output_folder_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-        self.simulation_folder = os.path.join(self.root_folder, self.output_folder_name)
+        self.simulation_folder = os.path.abspath(os.path.join(self.root_folder, self.output_folder_name))
 
         os.mkdir(self.simulation_folder)
 

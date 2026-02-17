@@ -45,6 +45,8 @@ class LongRangeQMC(Preprocessor):
 
         self.configure_simulation()
 
+        return self.driver_inputs
+
     def configure_simulation(self):
         """
         configures the inputs corresponding to each parameter set requested and writes the input file for the QMC engine
@@ -70,18 +72,15 @@ class LongRangeQMC(Preprocessor):
         misc_args = input_config.simulation_config["misc"]
         run_id = self.get_run_id(misc_args)
         misc_args["uuid"] = run_id
-        parameter_args["uuid"] = run_id
-        parameter_args["output_folder_name"] = self.output_folder_name
+        misc_args["output_folder_name"] = self.output_folder_name
 
         misc_args["simulation_folder"] = self.simulation_folder
-        parameter_args["simulation_folder"] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
         misc_args["run_folder"] = run_folder
-        parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        parameter_args = system.update_parameters(parameter_args)
+        system_args = system.update_parameters(system_args)
 
         sampling_args = input_config.simulation_config["sampling"]
         prob_table_type = sampling_args["loop_type"]
@@ -89,6 +88,8 @@ class LongRangeQMC(Preprocessor):
         prob_table_args = ProbabilityTableFactory.extract_args(prob_table_type, **sampling_args)
         probability_table = ProbabilityTableFactory.create(prob_table_type, system, **prob_table_args)
         probability_table.write_to_files(run_folder)
+
+        self.processed_configs.append(input_config.simulation_config)
 
     def extract_cli_requirements(self):
         """

@@ -32,10 +32,11 @@ class Preprocessor:
         self.simulation_folder = None
 
         self.driver_inputs = None
+        self.processed_configs = []
 
     def preprocess(self):
         """
-        Each subclass must implement a build method
+        Each subclass must implement a preprocess method
         """
 
         pass
@@ -185,14 +186,14 @@ class Preprocessor:
         writes a tab-delimited input file for the engine using the parameter set values
         """
 
-        simulation_folder = self.simulation_folder
-        sse_input_file = os.path.join(simulation_folder, "inputs.txt")
+        sse_input_file = os.path.join(self.simulation_folder, "inputs.txt")
 
         with open(sse_input_file, "w") as f:
-            for key in self.parameter_set_list[0].keys():
-                text_line = key + "\t" + str(self.parameter_set_list[0][key])
-                for i in range(1, self.num_parameter_sets):
-                    if key not in self.keys_single_parameters:
-                        text_line += "," + str(self.parameter_set_list[i][key])
-                text_line += "\n"
-                f.write(text_line)
+            for param_group_name, param_group in self.processed_configs[0].items():
+                for key in param_group.keys():
+                    text_line = key + "\t" + str(self.processed_configs[0][param_group_name][key])
+                    for i in range(1, self.num_parameter_sets):
+                        if key not in self.keys_single_parameters:
+                            text_line += "," + str(self.processed_configs[i][param_group_name][key])
+                    text_line += "\n"
+                    f.write(text_line)

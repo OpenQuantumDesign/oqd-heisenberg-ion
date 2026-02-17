@@ -69,30 +69,23 @@ class ExactDiagonalization(Preprocessor):
         misc_args = input_config.simulation_config["misc"]
         run_id = self.get_run_id(misc_args)
         misc_args["uuid"] = run_id
-        parameter_args["uuid"] = run_id
-        parameter_args["output_folder_name"] = self.output_folder_name
+        misc_args["output_folder_name"] = self.output_folder_name
 
         misc_args["simulation_folder"] = self.simulation_folder
-        parameter_args["simulation_folder"] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
         misc_args["run_folder"] = run_folder
-        parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
-        parameter_args = system.update_parameters(parameter_args)
+        system_args = system.update_parameters(system_args)
 
         if system.interaction_range == "long_range":
             J_ij_file_path = os.path.join(run_folder, "J_ij_file.csv")
             system.interactions.write_to_file(J_ij_file_path)
             misc_args["J_ij_file"] = J_ij_file_path
-            parameter_args["J_ij_file"] = J_ij_file_path
 
-        # theta = system_args['theta']
 
-        # ed_parameters = EDParameters(system, run_folder, theta)
-
-        # self.driver_inputs.append(ed_parameters)
+        self.processed_configs.append(input_config.simulation_config)
 
     def extract_cli_requirements(self):
         """

@@ -1,0 +1,31 @@
+simulator	long_range_qmc
+
+# System Parameters
+hamiltonian_name	XY
+boundary	periodic
+interaction_range	long_range
+interaction_type	power_law
+alpha	1.0
+spatial_dimension	1d
+lattice_type	rectangular
+N	11
+J	1.0
+
+# Simulation Parameters
+T	0.05
+equilibration_steps	100000
+simulation_steps	100000
+operator_list_update_multiplier	1.05
+loop_type	deterministic
+
+# Misc.
+root_folder	./results
+output_folder_name	long_range_qmc
+uuid	xy_example
+track_spin_configurations	True
+write_final_spin_configuration	False
+number_of_threads	3
+
+# Initial Configuration Parameters
+initial_configuration_index	0
+initial_operator_list_size	-1

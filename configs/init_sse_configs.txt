@@ -1,6 +1,0 @@
-N   3
-M   5
-n   3
-W   0
-Operator Locations List 0,1,0,6,1
-Spin Configurations List    -1,1,-1

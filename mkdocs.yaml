@@ -1,0 +1,128 @@
+site_name: Open Quantum Design - Heisenberg Ion
+repo_url: https://github.com/OpenQuantumDesign/oqd-heisenberg-ion/
+repo_name: oqd-heisenberg-ion
+copyright: Copyright &copy; 2024 Open Quantum Design
+
+use_directory_urls: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/OpenQuantumDesign
+      name: Open Quantum Design GitHub
+    - icon: fontawesome/solid/globe
+      link: https://openquantumdesign.org
+      name: Open Quantum Design Website
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Overview: user_guide/overview.md
+    - Hamiltonian Types: user_guide/hamiltonian_types.md
+    - Input Specification: user_guide/input_specs.md
+    - Output Files: user_guide/output_format.md
+  - Algorithms: 
+    - Stochastic Series Expansion: algorithms/sse.md
+    - Exact Diagonalization: algorithms/ed.md
+    - References: algorithms/refs.md
+  - API Reference:
+    - Interface: api/interface.md
+    - Pre-Process:
+      - Input Parser: api/preproc/input_parser.md
+      - System: 
+        - Base: api/preproc/system/base.md
+        - Hamiltonian: api/preproc/system/hamiltonian.md
+        - Geometry: api/preproc/system/geometry.md
+        - Interactions: api/preproc/system/interactions.md
+      - Preprocessor Base: api/preproc/preprocessor.md
+      - Long Range Quantum Monte Carlo: api/preproc/long_range_qmc.md
+      - Probability Tables: api/preproc/probability_tables.md
+      - Nearest-Neighbor Quantum Monte Carlo: api/preproc/nearest_neighbor_qmc.md
+      - Exact Diagonalization: api/preproc/exact_diagonalization.md
+    - Drivers: api/drivers.md
+    - Post-Process: api/postproc.md
+  - Features in Development: feat_dev.md
+
+theme:
+  name: material
+  logo: img/oqd-icon.png
+  favicon: img/oqd-icon.png
+  icon:
+    repo: simple/git
+  features:
+  - search.suggest
+  - search.highlight
+  - content.tabs.link
+  - content.tooltips
+  - content.code.annotate
+  - content.code.copy
+  - content.code.select
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.sections
+  - navigation.top
+  - navigation.prune
+  - toc.follow
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      linenums: false
+      anchor_linenums: true
+      linenums_style: pymdownx-inline
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.magiclink
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search
+  - mkdocstrings:
+        handlers:
+          python:
+            options:
+              show_source: true
+              show_root_heading: true
+              show_symbol_type_heading: true
+              show_symbol_type_toc: true
+              show_submodules: true
+              docstring_style: "google"
+              docstring_section_style: "list"
+              show_signature: false
+              show_return_name: false
+              show_signature_annotations: false
+              signature_crossrefs: true
+              separate_signature: false
+              group_by_category: true
+              members_order: "source"
+            paths: [src]
+            import:
+              - https://docs.python.org/3/objects.inv
+              - https://numpy.org/doc/stable/objects.inv
+              - https://matplotlib.org/stable/objects.inv

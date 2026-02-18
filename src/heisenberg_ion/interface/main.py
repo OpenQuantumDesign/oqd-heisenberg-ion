@@ -14,6 +14,15 @@ def extract_override_arguments(args):
 
 
 def main(argv=None):
+    """
+    main entry point of the package when called from the command line
+
+    Args:
+        argv (list[str], optional): list of command line arguments. Defaults to None.
+
+    Returns:
+        (int): exit code, equals 0 if program executes successfully
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", "-i", required=True, help="Path to input file.")

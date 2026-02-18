@@ -3,9 +3,16 @@ import numpy as np
 
 # ---------------------------------- Base Geometry Class  ----------------------------------
 class Geometry:
+    """
+    Geometry base class to determine lattice properties
+    """
+
     args = {}
 
     def __init__(self):
+        """
+        constructor specifies the member variables that determine the lattice properties
+        """
 
         self.spatial_dimension = None
 
@@ -25,17 +32,30 @@ class Geometry:
         self.bipartite = False
 
     def initialize_tables(self):
+        """
+        initialize the geometry table, distances and sites as numpy arrays
+        """
 
         self.geometry_table = np.zeros((self.num_bonds, 3))
         self.distances = np.zeros(self.num_bonds)
         self.sites = np.zeros((self.num_bonds, 2), dtype=int)
 
-        return 0
-
     def build(self):
+        """
+        Each Geometry subclass should implement a build function to populate the geometry tables
+        """
         pass
 
     def update_parameters(self, parameter_dict):
+        """
+        updates a given parameters set with lattice properties
+
+        Args:
+            parameter_dict (dict): single parameter set
+
+        Returns:
+            (dict): updated parameter set
+        """
 
         parameter_dict["spatial_dimension"] = self.spatial_dimension
         parameter_dict["boundary"] = self.boundary
@@ -49,13 +69,37 @@ class Geometry:
 # Make register and create factory classmethods so subclasses can be added to the registry
 # and instantiated agnostically
 class GeometryFactory:
+    """
+    Factory for generating the required instance of the Geometry subclass. Carries a registry of Geometry subclasses
+
+    Raises:
+        Exception: if requested geometry subclass is not found
+    """
+
     registry = {}
 
     def register(cls, name, subclass):
+        """
+        adds the specified subclass to the registry
+
+        Args:
+            name (str): name to be used for subclass
+            subclass (Type[Geometry]): Geometry subclass to be registered
+        """
 
         cls.registry[name] = subclass
 
     def extract_args(cls, name, **kwargs):
+        """
+        extracts the arguments associated with a given subclass
+
+        Args:
+            name (str): subclass name (must exist in registry)
+            **kwargs (dict): key word arguments. Must contain inputs for the specific subclass
+
+        Returns:
+            (dict): contains the subclass arguments as key value pairs
+        """
 
         arg_vals = {}
         for key, arg_dtype in cls.registry[name].args.items():
@@ -64,9 +108,21 @@ class GeometryFactory:
         return arg_vals
 
     def create(cls, name, **kwargs):
+        """
+        creates an instance of the subclass specified
+
+        Args:
+            name (str): name of requested subclass
+
+        Raises:
+            Exception: if the requested Geometry is not found in the registry
+
+        Returns:
+            (Geometry): instance of the the requested subclass
+        """
 
         if name not in cls.registry:
-            raise ValueError(f"Geometry implementation not found for geometry name: {name}")
+            raise Exception(f"Geometry implementation not found for geometry name: {name}")
         else:
             return cls.registry[name](**kwargs)
 
@@ -78,13 +134,23 @@ GeometryFactory.extract_args = classmethod(GeometryFactory.extract_args)
 
 # ------------------ Long Range 1d Chain With Open Boundaries ------------------
 class LongRangeOpenChain(Geometry):
+    """
+    implements a 1d lattice with long range interactions and open boundaries
+    """
+
     args = {"N": int}
 
     def __init__(self, N):
+        """
+        sets the member variables without constructing the tables.
+
+        Args:
+            N (int): number of sites
+        """
 
         super().__init__()
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "open"
         self.interaction_range = "long_range"
@@ -99,9 +165,15 @@ class LongRangeOpenChain(Geometry):
         # self.build()
 
     def initialize_tables(self):
+        """
+        initializes the geometry tables
+        """
         return super().initialize_tables()
 
     def build(self):
+        """
+        populates the geometry tables
+        """
 
         self.initialize_tables()
 
@@ -119,18 +191,26 @@ class LongRangeOpenChain(Geometry):
 
                 b += 1
 
-        return 0
-
 
 # ------------------ Long Range 1d Chain With Periodic Boundaries ------------------
 class LongRangePeriodicChain(Geometry):
+    """
+    implements a 1d lattice with long range interactions and periodic boundaries
+    """
+
     args = {"N": int}
 
     def __init__(self, N):
+        """
+        sets the member variables without constructing the tables.
+
+        Args:
+            N (int): number of sites
+        """
 
         super().__init__()
 
-        self.spatial_dimension = 1
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "long_range"
@@ -145,9 +225,15 @@ class LongRangePeriodicChain(Geometry):
         # self.build()
 
     def initialize_tables(self):
+        """
+        initializes the geometry tables
+        """
         return super().initialize_tables()
 
     def build(self):
+        """
+        populates the geometry tables
+        """
 
         self.initialize_tables()
 
@@ -169,18 +255,27 @@ class LongRangePeriodicChain(Geometry):
 
                 b += 1
 
-        return 0
-
 
 # ------------------ Long Range 2d Triangular Lattice With Open Boundaries ------------------
 class LongRangeOpenTriangular(Geometry):
+    """
+    implements a 2d triangular lattice with long range interactions and periodic boundaries (needs to be tested further)
+    """
+
     args = {"N1": int, "N2": int}
 
     def __init__(self, N1, N2):
+        """
+        sets the member variables without constructing the tables.
+
+        Args:
+            N1 (int): number of sites in the first spatial dimension
+            N2 (int): number of sites in the second spatial dimension
+        """
 
         super().__init__()
 
-        self.spatial_dimension = 2
+        self.spatial_dimension = "2d"
 
         self.boundary = "periodic"
         self.interaction_range = "long_range"
@@ -195,9 +290,15 @@ class LongRangeOpenTriangular(Geometry):
         # self.build()
 
     def initialize_tables(self):
+        """
+        initializes the geometry tables
+        """
         return super().initialize_tables()
 
     def build(self):
+        """
+        populates the geometry tables
+        """
 
         self.initialize_tables()
 
@@ -228,15 +329,23 @@ class LongRangeOpenTriangular(Geometry):
 
                             b += 1
 
-        return 0
-
 
 class NearestNeighborPeriodicChain(Geometry):
+    """
+    implements a 1d lattice with nearest neighbor interactions and periodic boundaries
+    """
+
     args = {"N": int}
 
     def __init__(self, N):
+        """
+        sets the member variables without constructing the tables.
 
-        self.spatial_dimension = 1
+        Args:
+            N (int): number of sites
+        """
+
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"
@@ -256,9 +365,15 @@ class NearestNeighborPeriodicChain(Geometry):
         # self.build()
 
     def initialize_tables(self):
+        """
+        initializes the geometry tables
+        """
         return super().initialize_tables()
 
     def build(self):
+        """
+        populates the geometry tables
+        """
 
         self.initialize_tables()
 
@@ -273,11 +388,21 @@ class NearestNeighborPeriodicChain(Geometry):
 
 
 class NearestNeighborOpenChain(Geometry):
+    """
+    implements a 1d lattice with nearest neighbor interactions and open boundaries
+    """
+
     args = {"N": int}
 
     def __init__(self, N):
+        """
+        sets the member variables without constructing the tables.
 
-        self.spatial_dimension = 1
+        Args:
+            N (int): number of sites
+        """
+
+        self.spatial_dimension = "1d"
 
         self.boundary = "periodic"
         self.interaction_range = "nearest_neighbor"
@@ -294,9 +419,15 @@ class NearestNeighborOpenChain(Geometry):
         # self.build()
 
     def initialize_tables(self):
+        """
+        initializes the geometry tables
+        """
         return super().initialize_tables()
 
     def build(self):
+        """
+        populates the geometry tables
+        """
 
         self.initialize_tables()
 

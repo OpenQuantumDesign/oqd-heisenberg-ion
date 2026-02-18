@@ -1,10 +1,20 @@
 from ..common.driver.factory import DriverFactory
-from ..common.inputs.input_file_reader import InputFileReader
+from ..common.inputs.input_reader import InputReader
 from ..common.preprocessor.factory import PreprocessorFactory
 
 
 class Orchestrator:
+    """
+    Responsible for managing the entire workflow of the package. Sequentially reads the inputs, calls the preprocessor, driver and simulator
+    """
+
     def __init__(self, **kwargs):
+        """
+        constructor for the Orchestrator class. Determines whether inputs should be read from file or are provided as key word arguments
+
+        Args:
+            **kwargs (dict): key word arguments. An input file is expected if one of the keys is 'input_file'
+        """
 
         if "input_file" in kwargs:
             self.build_from_file(**kwargs)
@@ -12,25 +22,47 @@ class Orchestrator:
             self.build_from_parameters(**kwargs)
 
     def build_from_file(self, input_file, **kwargs):
+        """
+        used if input file needs to be read for the simulation.
 
-        file_inputs = InputFileReader(input_file, **kwargs)
+        Args:
+            input_file (str): path to the input file
+
+        Returns:
+            (int): 0 if the program executes to completion
+        """
+
+        file_inputs = InputReader(input_file_path=input_file)
+        file_inputs.read_inputs_from_file(**kwargs)
         simulator = file_inputs.simulator
 
         preprocessor = PreprocessorFactory.create(simulator, file_inputs.parameter_set_list)
+        driver_inputs = preprocessor.preprocess()
 
-        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
         driver.simulate()
 
         return 0
 
     def build_from_parameters(self, **kwargs):
+        """
+        used if the simulation inputs are provided as key word arguments
+
+        Returns:
+            (int): 0 if the program executes to completion
+        """
 
         simulator = kwargs["simulator"]
-        parameter_set_list = [kwargs]
+
+        inputs = InputReader()
+        inputs.read_kwarg_inputs(**kwargs)
+
+        parameter_set_list = inputs.parameter_set_list
 
         preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
+        driver_inputs = preprocessor.preprocess()
 
-        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, preprocessor.driver_inputs)
+        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
         driver.simulate()
 
         return 0

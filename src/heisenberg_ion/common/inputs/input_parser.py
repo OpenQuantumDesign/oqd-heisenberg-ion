@@ -88,7 +88,18 @@ input_schema = {
 
 
 class InputParser:
+    """
+    Parses the provided list of inputs for a single parameter set.
+    Converts strings to required types using the data schema and builds the input configurations for the driver
+    """
+
     def __init__(self, **config_settings):
+        """
+        constructs an instance of InputParser. Builds the input_config settings for the driver layer
+
+        Args:
+            **config_settings (dict): key word arguments specifying a single parameter set with str values
+        """
 
         self.dtype_parsers = {
             str: self.extract_string,
@@ -105,20 +116,60 @@ class InputParser:
         self.build_input_config(config_settings)
 
     def extract_integer(self, config_settings, key):
+        """
+        converts str to int for parameter specified by key
+
+        Args:
+            config_settings (dict): contains the key value pairs that define the simulation parameter set
+            key (str): parameter key
+
+        Returns:
+            (int): parameter value
+        """
 
         return int(config_settings[key])
 
     def extract_float(self, config_settings, key):
+        """
+        converts str to float for parameter specified by key
+
+        Args:
+            config_settings (dict): contains the key value pairs that define the simulation parameter set
+            key (str): parameter key
+
+        Returns:
+            (float): parameter value
+        """
 
         return float(config_settings[key])
 
     def extract_string(self, config_settings, key):
+        """
+        extracts str parameter specified by key
+
+        Args:
+            config_settings (dict): contains the key value pairs that define the simulation parameter set
+            key (str): parameter key
+
+        Returns:
+            (str): parameter value
+        """
 
         return config_settings[key]
 
     def extract_bool(self, config_settings, key):
+        """
+        converts str to bool for parameter specified by key
 
-        if config_settings[key] is bool:
+        Args:
+            config_settings (dict): contains the key value pairs that define the simulation parameter set
+            key (str): parameter key
+
+        Returns:
+            (bool): parameter value
+        """
+
+        if isinstance(config_settings[key], bool):
             return config_settings[key]
         else:
             if config_settings[key].capitalize() == "True":
@@ -132,6 +183,19 @@ class InputParser:
                 )
 
     def extract_categorical(self, config_settings, key):
+        """
+        extracts categorical parameter specified by key. Checks if the provided value is allowed by schema
+
+        Args:
+            config_settings (dict): contains the key value pairs that define the simulation parameter set
+            key (str): parameter key
+
+        Raises:
+            ValueError: if value associated with key is unrecognized by schema
+
+        Returns:
+            (str): parameter value
+        """
 
         val = config_settings[key]
 
@@ -145,6 +209,13 @@ class InputParser:
             )
 
     def build_input_config(self, config_settings):
+        """
+        builds the entire input configuration corresponding to the parameter set with correct types
+
+        Args:
+            config_settings (dict): key word arguments specifying a single parameter set with str values
+
+        """
 
         for key in config_settings.keys():
             dtype = self.input_schema[key]["DataType"]
@@ -157,5 +228,3 @@ class InputParser:
                 self.simulation_config[param_type] = {}
 
             self.simulation_config[param_type][key] = val
-
-        return 0

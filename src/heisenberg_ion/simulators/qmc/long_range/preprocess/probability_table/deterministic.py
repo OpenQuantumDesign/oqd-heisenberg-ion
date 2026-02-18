@@ -6,10 +6,24 @@ from .base import ProbabilityTable
 
 
 class Deterministic(ProbabilityTable):
+    """
+    ProbabilityTable subclass for deterministic sampling
+
+    Raises:
+        Exception: raised if deterministic probability tables are requested for an unsupported hamiltonian type
+        ValueError: raised if the spectrum offset is requested but the hamiltonian type is not consistent with sampling type
+    """
+
     args = {}
     allowed_hamiltonians = {"XY", "fm_heisenberg_afm_Z", "fm_heisenberg_fm_Z"}
 
     def __init__(self, system):
+        """
+        validates inputs and constructs the probability tables
+
+        Args:
+            system (System): object representing the system to be simulated
+        """
 
         super().__init__(system)
 
@@ -18,6 +32,12 @@ class Deterministic(ProbabilityTable):
         self.build()
 
     def validate_system(self):
+        """
+        validates the system associated with the ProbabilityTable instance
+
+        Raises:
+            Exception: if hamiltonian name does not match the allowed hamiltonians for deterministic sampling
+        """
 
         super().validate_system()
 
@@ -30,13 +50,23 @@ class Deterministic(ProbabilityTable):
             )
 
     def build(self):
+        """
+        populates the probability tables for deterministic sampling
+        """
 
         self.compute_max_over_states(self.system.geometry.num_bonds, self.system.interactions.J_ij_vector)
         self.compute_spectrum_offset(self.system.hamiltonian_parameters.hamiltonian_name)
 
-        return 0
-
     def compute_spectrum_offset(self, hamiltonian_name):
+        """
+        computes the spectrum offset associated with the hamiltonian for SSE
+
+        Args:
+            hamiltonian_name (str): represents the name of the Hamiltonian
+
+        Raises:
+            ValueError: if the spectrum is requested and the Hamiltonian can not be used with deterministic sampling
+        """
 
         if hamiltonian_name == "XY":
             self.spectrum_offset = self.max_diag_norm
@@ -48,9 +78,15 @@ class Deterministic(ProbabilityTable):
                 "Allowed types are {}".format(hamiltonian_name, self.allowed_hamiltonians)
             )
 
-        return 0
-
     def compute_max_over_states(self, num_bonds, J_ij_vector):
+        """
+        computes the max norm probability table required for diagonal updates in the two-step method.
+        See: https://scipost.org/submissions/2107.00766v1/ and https://journals.aps.org/pre/abstract/10.1103/PhysRevE.66.046701 for details
+
+        Args:
+            num_bonds (int): number of interacting bonds in the lattice
+            J_ij_vector (numpy.ndarray[float]): num_bonds x 1 array containing the coupling strengths
+        """
 
         max_over_states = np.zeros(num_bonds)
         max_diag_norm = 0.0
@@ -64,9 +100,13 @@ class Deterministic(ProbabilityTable):
         self.max_over_states = max_over_states / max_diag_norm
         self.max_diag_norm = max_diag_norm
 
-        return 0
-
     def write_to_files(self, out_dir):
+        """
+        writes the probability tables to files for deterministic sampling
+
+        Args:
+            out_dir (str): file path for writing probability tables
+        """
 
         super().write_to_files(out_dir)
 
@@ -83,5 +123,3 @@ class Deterministic(ProbabilityTable):
         )
 
         np.savetxt(max_over_states_file_name, self.max_over_states, delimiter=",", header=header)
-
-        return 0

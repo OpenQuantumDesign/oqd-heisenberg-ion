@@ -4,6 +4,18 @@ import numpy as np
 
 
 def combine_different_runs(data_1, data_2, drop_samples_1, drop_samples_2):
+    """
+    concatenates two data sets
+
+    Args:
+        data_1 (numpy.ndarray[float]): T1 x 1 array containing the first data set
+        data_2 (numpy.ndarray[float]): T2 x 1 array containing the second data set
+        drop_samples_1 (int): number of samples to drop from the top in data1
+        drop_samples_2 (int): number of samples to drop from the top in data2
+
+    Returns:
+        (numpy.ndarray[float]): (T3 x 1) array containing the concatenated data set
+    """
 
     data_3 = []
     data_1 = data_1[drop_samples_1:]
@@ -19,6 +31,17 @@ def combine_different_runs(data_1, data_2, drop_samples_1, drop_samples_2):
 
 
 def statistics_binning(arr, auto_corr_drop, eq_drop):
+    """
+    Uses binning to post process QMC estimator data
+
+    Args:
+        arr (numpy.ndarray[float]): T x 1 array of QMC data where T is the number of simulation steps
+        auto_corr_drop (int): number of points to remove for auto-correlation
+        eq_drop (int): number of points to remove for equilibration
+
+    Returns:
+        (tuple[float,float]): mean and standard error of QMC data
+    """
 
     arr2 = arr[eq_drop:]
     arr3 = arr2[0::auto_corr_drop]
@@ -29,6 +52,15 @@ def statistics_binning(arr, auto_corr_drop, eq_drop):
 
 
 def error_propagation(data):
+    """
+    computes statistical standard error of array
+
+    Args:
+        data (numpy.ndarray[float]): T x 1 array containing the data
+
+    Returns:
+        (float): standard error
+    """
 
     ndim = len(data)
     error = np.std(data, ddof=0) / np.sqrt(ndim)
@@ -37,6 +69,19 @@ def error_propagation(data):
 
 
 def max_error_binning(data, dim):
+    """
+    helper function containing the binning error logic
+
+    Args:
+        data (numpy.ndarray[float]): T x 1 array containing the data
+        dim (int): number of binning levels
+
+    Raises:
+        Exception: if dim is less than 1 because of insufficient data
+
+    Returns:
+        (float): binning error
+    """
 
     if dim <= 1:
         raise Exception("Not enough points MC steps were used for the binning method\n")
@@ -74,6 +119,16 @@ def combine_dataset_stats(data_1, data_2):
 
 
 def ed_energy(evals, T):
+    """
+    computes the equilibrium energy from exact diagonalization calculations at given temperature
+
+    Args:
+        evals (numpy.ndarray[float]): T x 1 array containing the energies for each state
+        T (float): temperature
+
+    Returns:
+        (float): equilibrium energy
+    """
 
     beta = 1.0 / T
 
@@ -90,6 +145,17 @@ def ed_energy(evals, T):
 
 
 def compute_histogram_from_shot_data(N, num_shots, shot_data):
+    """
+    computes the histogram associated with shot data
+
+    Args:
+        N (int): number of sites in the lattice
+        num_shots (int): number of data points
+        shot_data (numpy.ndarray[int]): T x N array of shot data. shot_data[t,k] represents the spin configuration at time t and site k
+
+    Returns:
+        (numpy.ndarray[float]): (T x 1) array containing the histogram frequences where T is the number of possible bitstrings given N
+    """
 
     num_bits = 2**N
     freqs = np.zeros(num_bits)
@@ -105,6 +171,17 @@ def compute_histogram_from_shot_data(N, num_shots, shot_data):
 
 
 def kl_divergence(hist1, hist2, num_bits):
+    """
+    computes the KL divergence between two histograms
+
+    Args:
+        hist1 (numpy.ndarray[float]): T x 1 array containing the histogram frequences of the first distribution
+        hist2 (numpy.ndarray[float]): T x 1 array containing the histogram frequences of the second distribution
+        num_bits (int): Number of unique measurements in histograms
+
+    Returns:
+        (float): KL divergence between data sets
+    """
 
     kl_divergence = 0.0
     for j in range(num_bits):

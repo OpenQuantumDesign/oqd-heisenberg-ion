@@ -6,17 +6,30 @@ from .preprocess.sampling_params import SamplingParameters, SSEParameters
 
 
 class NearestNeighborQMC(Preprocessor):
+    """
+    Preprocessor subclass for nearest neighbor QMC. Configures the parameter sets and writes the input file containing the preprocessor updated parameter sets.
+    """
+
     allowed_hamiltonians = {"afm_heisenberg_fm_Z", "XY", "fm_heisenberg_fm_Z"}
 
     def __init__(self, parameter_set_list):
+        """
+        executes the preprocessing logic for nearest neighbor qmc
+
+        Args:
+            parameter_set_list (list[dict]): list of unparsed parameters sets
+        """
 
         super().__init__(parameter_set_list)
 
         self.driver_inputs = []
 
-        self.build()
-
-    def build(self):
+    def preprocess(self):
+        """
+        configures the input parameter sets for the nearest neighbor qmc calculation,
+        checks that a single root folder is specified, creates the simulation output folder
+        and validates the uuids.
+        """
 
         self.check_single_input("root_folder")
         self.root_folder = self.parameter_set_list[0]["root_folder"]
@@ -27,7 +40,12 @@ class NearestNeighborQMC(Preprocessor):
 
         self.configure_simulation()
 
+        return self.driver_inputs
+
     def configure_simulation(self):
+        """
+        configures the input parameter sets and writes a tab delimited file containing the configured parameters
+        """
 
         for i in range(self.num_parameter_sets):
             parameter_set = self.parameter_set_list[i]
@@ -37,6 +55,12 @@ class NearestNeighborQMC(Preprocessor):
         self.write_input_file()
 
     def configure_parameter_set(self, parameter_args):
+        """
+        configures a single parameter set, specifies and creates the parameter set output folder, defines and validates the system and the sampling parameters for nearest neighbor qmc
+
+        Args:
+            parameter_args (dict): unparsed parameter set
+        """
 
         input_config = InputParser(**parameter_args)
         system_args = input_config.simulation_config["system"]
@@ -44,22 +68,19 @@ class NearestNeighborQMC(Preprocessor):
         misc_args = input_config.simulation_config["misc"]
         run_id = self.get_run_id(misc_args)
         misc_args["uuid"] = run_id
-        parameter_args["uuid"] = run_id
-        parameter_args["output_folder_name"] = self.output_folder_name
+        misc_args["output_folder_name"] = self.output_folder_name
 
         misc_args["simulation_folder"] = self.simulation_folder
-        parameter_args["simulation_folder"] = self.simulation_folder
 
         run_folder = self.create_run_folder(misc_args)
         misc_args["run_folder"] = run_folder
-        parameter_args["run_folder"] = run_folder
 
         system = System(**system_args)
         system.geometry.build()
 
         self.validate_system(system)
 
-        parameter_args = system.update_parameters(parameter_args)
+        system_args = system.update_parameters(system_args)
 
         simulation_args = input_config.simulation_config["simulation"]
         sampling_args = input_config.simulation_config["sampling"]
@@ -72,9 +93,21 @@ class NearestNeighborQMC(Preprocessor):
 
         self.driver_inputs.append(simulation_parameters)
 
-        return 0
+        self.processed_configs.append(input_config.simulation_config)
 
     def validate_system(self, system):
+        """
+        validates the system for nearest neighbor qmc
+
+        Args:
+            system (System): object defining the system to be simulated
+
+        Raises:
+            Exception: if the specified Hamiltonian is not allowed for the nearest neighbor qmc simulator
+            Exception: if the hamiltonian is anti-ferromagnetic and the geometry is not bipartite
+            Exception: if J <= 0 and the hamiltonian is not anti-ferromagnetic
+            Exception: if the interaction range is not nearest neighbor
+        """
 
         if system.model_name not in self.allowed_hamiltonians:
             raise Exception(

@@ -8,10 +8,22 @@ from .utils import vertex_utils as vu
 
 
 class Heatbath(ProbabilityTable):
+    """
+    ProbabilityTable subclass for heatbath sampling
+    See: https://journals.aps.org/pre/abstract/10.1103/PhysRevE.66.046701 for details
+    """
+
     args = {"gamma": float}
     allowed_hamiltonians = {"XXZ", "XXZh", "XY", "fm_heisenberg_fm_Z", "fm_heisenberg_afm_Z"}
 
     def __init__(self, system, gamma):
+        """
+        constructor computes the field contribution per bond, sets member variables and populates the heatbath probability tables
+
+        Args:
+            system (System): object representing the system to be simulated
+            gamma (float): offset added to weights reduce bounces
+        """
 
         super().__init__(system, gamma=gamma)
 
@@ -24,6 +36,12 @@ class Heatbath(ProbabilityTable):
         self.build()
 
     def validate_system(self):
+        """
+        validates the systema associated with the instance of the ProbabilityTable object
+
+        Raises:
+            Exception: if, for the specified hamiltonian name, heatbath sampling can not be used
+        """
 
         super().validate_system()
 
@@ -36,6 +54,9 @@ class Heatbath(ProbabilityTable):
             )
 
     def build(self):
+        """
+        populates the heatbath probability tables
+        """
 
         num_bonds = self.system.geometry.num_bonds
         J_ij_vector = self.system.interactions.J_ij_vector
@@ -49,6 +70,12 @@ class Heatbath(ProbabilityTable):
         return 0
 
     def initialize_tables(self, num_bonds):
+        """
+        initializes the probability tables needed for heatbath sampling
+
+        Args:
+            num_bonds (int): number of interacting bonds in the lattice
+        """
 
         self.num_rows = vu.num_vertices * vu.num_legs_indices
         self.heat_bath_prob_table = np.zeros((self.num_rows, num_bonds))
@@ -143,6 +170,12 @@ class Heatbath(ProbabilityTable):
         return 0
 
     def write_to_files(self, out_dir):
+        """
+        writes the probability tables to csv files for SSE engine
+
+        Args:
+            out_dir (str): directory path for writing probability tables
+        """
 
         super().write_to_files(out_dir)
 

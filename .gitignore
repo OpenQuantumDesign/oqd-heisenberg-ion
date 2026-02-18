@@ -6,9 +6,9 @@ scratch/
 *.pdf
 *.png
 *.csv
-*.ipynb
 /tests/integration/results
 **/__pycache__
 **/build
 **/.idea
 **/heisenberg_ion.egg-info
+/examples/results

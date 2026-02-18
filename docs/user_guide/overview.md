@@ -1,3 +1,7 @@
+!!! Note
+    Heisenberg Ion is still under active development so breaking changes are possible.
+    See [Features in development](../feat_dev.md) for details.
+
 ## Hamiltonian
 
 Heisenberg Ion is a Quantum Monte Carlo (QMC) Stochastic Series Expansion (SSE) and Exact Diagonalization (ED) simulator for the anisotropic Heisenberg model with a longitudinal field, defined by the Hamiltonian:

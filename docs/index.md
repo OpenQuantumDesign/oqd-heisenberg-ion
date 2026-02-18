@@ -5,6 +5,10 @@ hide:
 
 # Docs
 
+!!! Note
+    Heisenberg Ion is still under active development so breaking changes are possible.
+    See [Features in development](feat_dev.md) for details.
+
 ## Introduction
 Welcome to Heisenberg Ion, our open source quantum many-body physics simulator targeting lattice systems that can be natively realized in trapped ion architectures. We currently support Exact Diagonalization (ED) and Quantum Monte Carlo (QMC) Stochastic Series Expansion (SSE) engines for long range anisotropic Heisenberg models in the presence of external fields. 
 

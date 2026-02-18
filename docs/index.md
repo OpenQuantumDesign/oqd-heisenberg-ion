@@ -41,4 +41,4 @@ Then, install the package using pip:
 pip install heisenberg-ion
 ```
 
-For general user-level documentation, see the User Guide. For more detailed dev docs, see the Developer Guide. A description of the SSE algorithmic approaches used in this package can be found in the Algorithms section. To contribute, please visit the Community page and the Github repository for a list of open issues. 
+See the User Guide and the example files in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the [Algorithms](algorithms/sse.md) section. 

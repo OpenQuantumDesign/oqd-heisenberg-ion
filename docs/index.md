@@ -16,29 +16,39 @@ While Heisenberg Ion is primarily a python package, it uses a C++ engine for lar
 Our ED calculator uses a Julia backend. 
 Both of these simulators are wrapped in a lightweight Python preprocessor responsible for driving the required engine, as specified by the user.  
 
-## Language Dependencies
-The Heisenberg Ion library has the following language dependencies:  
-- Python 3.10+  
-- Clang 17+ or GCC 14+ (C++ Compiler)  
-- CMake 3.12+  
-- Julia 1.12+  
+## Dependencies
 
-## Python Dependencies
+### Runtime Dependencies
+- Python 3.10+  
+- Julia 1.12+   
+- CMake 3.12+  
+- Clang 17+ or GCC 14+ (C++ Compiler) 
+CMake and a C++ compiler are required for building the long range QMC source code 
+
+### Python Packages
 This package also requires a number of Python libraries:  
 - Numpy  
 - Scipy  
 - Matplotlib  
-These are installed automatically by pip as part of the Heisenberg Ion package install.  
+These are installed automatically by pip as part of the Heisenberg Ion package install
+
+### C++ Dependencies
+- spdlog 
+This is fetched and compiled automatically by CMake while building the C++ source if required
 
 ## Getting Started
-To use this package, first clone the Heisenberg Ion repository which can be done via the following terminal command:  
+To use this package, first clone the Heisenberg Ion repository:  
 ```
 git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
 ```
 
-Then, install the package using pip:  
+Then, install the package:  
 ```
 pip install heisenberg-ion
 ```
 
-See the User Guide and the example files in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the [Algorithms](algorithms/sse.md) section. 
+### Documentation 
+Documentation is developed using MkDocs. To install documentation-related dependencies:
+`pip install -e ".[docs]"`
+
+See the [User Guide](user_guide/overview.md) and the example files in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the [Algorithms](algorithms/sse.md) section. 

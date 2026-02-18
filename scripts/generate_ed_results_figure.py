@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
-# alpha_list = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 alpha_list = [50.0]
 N_list = [5, 7, 9, 11, 13]
 h = 0.0
@@ -41,17 +40,17 @@ for k in range(len(alpha_list)):
 
         theta_str = round(theta, 3)
 
-        comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
+        comparison_file = "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
             N, Delta, h, J, J, alpha
         )
         state_index, evals, mag_z, mag_x = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
-        comp_file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+        comp_file_1 = "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
             N, Delta, h, J, J, alpha, theta_str
         )
         state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(
             comp_file_1, skiprows=1, delimiter=",", unpack=True
         )
-        comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+        comp_file_2 = "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
             N, Delta, h, J, J, alpha, -theta_str
         )
         state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(
@@ -97,14 +96,6 @@ for k in range(len(alpha_list)):
         rho = (E_phi / N + E_minus_phi / N - 2.0 * E_zero / N) / (theta**2)
 
         exact_results.append(rho)
-
-        # exact_results.append(1.0/np.pi + np.pi/(6.0 * N**2))
-
-        # exact_results.append(1.0/(N*np.sin(np.pi/N)))
-
-        # E_exact_free_fermion = - J / np.pi - np.pi/(6.0 * N**2)
-
-        # energy_exact_results.append(-np.cos(theta/N)/(N*np.sin(np.pi/N)))
         energy_exact_results.append(E_zero / N)
         print(alpha)
 
@@ -130,7 +121,6 @@ for i in range(N_list[0], 1000):
     extrapolated_energy.append(E_over_N_extrapolated)
 
 print(stiffness_ED_list)
-# exact_result = [1.0/(N*np.sin(np.pi/N)) for N in N_list]
 plt.figure()
 plt.rcParams["mathtext.fontset"] = "stix"
 plt.scatter(one_over_N, exact_results, color="black", marker="s", s=55, label="FFS")
@@ -147,7 +137,6 @@ plt.errorbar([0.0], [popt[1]], [np.sqrt(np.diag(pcov))[1]], capsize=5, color="C0
 plt.legend(prop={"size": 12})
 plt.xlabel(r"$1/N$", fontsize=16)
 plt.ylabel(r"$\rho_s$", fontsize=16)
-# plt.title("Superfluid Density vs N")
 plt.savefig("Superfluid Density ED.pdf", dpi=1200, bbox_inches="tight")
 
 plt.figure()

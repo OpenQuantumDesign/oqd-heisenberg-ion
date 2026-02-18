@@ -6,9 +6,7 @@ from heisenberg_ion.common.postprocess import utils as stats
 
 N = 101
 h = 0.0
-alpha_list = []
-alpha_list_2 = [0.0 + i * 0.1 for i in range(81)]
-alpha_list += alpha_list_2
+alpha_list = [0.0 + i * 0.1 for i in range(81)]
 print(alpha_list)
 
 J = 1.0
@@ -32,13 +30,6 @@ energy_SSE_2_err_list = []
 energy_SSE_3_list = []
 energy_SSE_3_err_list = []
 
-mag_z_SSE_1_list = []
-mag_z_SSE_1_err_list = []
-mag_z_SSE_2_list = []
-mag_z_SSE_2_err_list = []
-mag_z_SSE_3_list = []
-mag_z_SSE_3_err_list = []
-
 stiffness_SSE_1_list = []
 stiffness_SSE_1_err_list = []
 stiffness_SSE_2_list = []
@@ -47,7 +38,7 @@ stiffness_SSE_3_list = []
 stiffness_SSE_3_err_list = []
 
 init_start_config = 1
-start_config = init_start_config
+start_config = 1
 
 loop_type = "deterministic"
 dist_dep_offset = 0
@@ -56,7 +47,6 @@ gamma = 0.0
 Delta = 0.0
 hamiltonian_type = int(Delta)
 eq_drop = 0
-num_bonds = int(N * (N - 1) / 2)
 
 lsw_stiffness = []
 lsw_energy = []
@@ -66,6 +56,42 @@ mf_stiffness = []
 folder = "SSE"
 auto_corr_drop = 2
 theta = 0.01 * (1 / (N - 1))
+
+
+def process_qmc_data(T, alpha, energy_list, energy_err_list, stiffness_list, stiffness_err_list, norm=1.0):
+
+    # Updates input lists in place
+
+    file = "Results/{}/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
+        folder,
+        N,
+        hamiltonian_type,
+        Delta,
+        h,
+        alpha,
+        gamma,
+        dist_dep_offset,
+        boundary,
+        T,
+        loop_type,
+        start_config,
+        init_start_config,
+    )
+
+    qmc_data = np.loadtxt(file, delimiter=",", skiprows=2)
+
+    energy_array = qmc_data[:, 1] / norm
+    stiffness_array = qmc_data[:, 3] / norm
+
+    energy = stats.statistics_binning(energy_array, 2, 0)
+    stiffness = stats.statistics_binning(stiffness_array, 2, 0)
+
+    stiffness_list.append(stiffness[0])
+    stiffness_err_list.append(stiffness[1])
+
+    energy_list.append(energy[0])
+    energy_err_list.append(energy[1])
+
 
 for i in range(len(alpha_list)):
     alpha = round(alpha_list[i], 1)
@@ -77,155 +103,33 @@ for i in range(len(alpha_list)):
     rho_mf = lsw.rho_mf(N, alpha, theta, J)
 
     norm = 0.0
-    norm_energy = 0.0
     for r in range(1, int((N + 1) / 2)):
-        norm += 1.0 / (r ** (alpha - 2))
-        # norm += N/(r**(alpha))
-        norm_energy += 1.0 / (r ** (alpha))
+        norm += 1.0 / (r ** (alpha))
 
-    norm = norm_energy
-
-    lsw_energy.append(E0_lsw / norm_energy)
-    mf_energy.append(E0_mf / norm_energy)
+    lsw_energy.append(E0_lsw / norm)
+    mf_energy.append(E0_mf / norm)
 
     mf_stiffness.append(rho_mf / norm)
     lsw_stiffness.append(rho_lsw / norm)
 
-    file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/{}/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
-        folder,
-        N,
-        hamiltonian_type,
-        Delta,
-        h,
-        alpha,
-        gamma,
-        dist_dep_offset,
-        boundary,
-        T_1,
-        loop_type,
-        start_config,
-        init_start_config,
+    process_qmc_data(
+        T_1, alpha, energy_SSE_1_list, energy_SSE_1_err_list, stiffness_SSE_1_list, stiffness_SSE_1_err_list, norm
     )
-    step_number_1, energy_arr_1, magnetization_arr_1, stiffness_arr_1, s_k_pi_arr_1 = np.loadtxt(
-        file_1, delimiter=",", skiprows=2, unpack=True
+    process_qmc_data(
+        T_2, alpha, energy_SSE_2_list, energy_SSE_2_err_list, stiffness_SSE_2_list, stiffness_SSE_2_err_list, norm
+    )
+    process_qmc_data(
+        T_3, alpha, energy_SSE_3_list, energy_SSE_3_err_list, stiffness_SSE_3_list, stiffness_SSE_3_err_list, norm
     )
 
-    drop_1 = int(step_number_1[-1] / 2)
 
-    print(step_number_1[-1])
-
-    energy_array = energy_arr_1 / norm_energy
-    stiffness_array = np.array(stiffness_arr_1) / norm
-
-    energy = stats.statistics_binning(energy_array, auto_corr_drop, eq_drop)
-    mag_z_exp = stats.statistics_binning(magnetization_arr_1, auto_corr_drop, eq_drop)
-    stiffness = stats.statistics_binning(stiffness_array, auto_corr_drop, eq_drop)
-
-    stiffness_SSE_1_list.append(stiffness[0])
-    stiffness_SSE_1_err_list.append(stiffness[1])
-
-    energy_SSE_1_list.append(energy[0])
-    energy_SSE_1_err_list.append(energy[1])
-
-    mag_z_SSE_1_list.append(mag_z_exp[0])
-    mag_z_SSE_1_err_list.append(mag_z_exp[1])
-
-    file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
-        N,
-        hamiltonian_type,
-        Delta,
-        h,
-        alpha,
-        gamma,
-        dist_dep_offset,
-        boundary,
-        T_2,
-        loop_type,
-        start_config,
-        init_start_config,
-    )
-    step_number_1, energy_arr_1, magnetization_arr_1, stiffness_arr_1, s_k_pi_arr_1 = np.loadtxt(
-        file_1, delimiter=",", skiprows=2, unpack=True
-    )
-
-    drop_1 = int(step_number_1[-1] / 2)
-    auto_corr_drop = 2
-
-    energy_array = energy_arr_1 / norm_energy
-    stiffness_array = np.array(stiffness_arr_1) / norm
-
-    energy = stats.statistics_binning(energy_array, auto_corr_drop, eq_drop)
-    mag_z_exp = stats.statistics_binning(magnetization_arr_1, auto_corr_drop, eq_drop)
-    stiffness = stats.statistics_binning(stiffness_array, auto_corr_drop, eq_drop)
-
-    stiffness_SSE_2_list.append(stiffness[0])
-    stiffness_SSE_2_err_list.append(stiffness[1])
-
-    energy_SSE_2_list.append(energy[0])
-    energy_SSE_2_err_list.append(energy[1])
-
-    mag_z_SSE_2_list.append(mag_z_exp[0])
-    mag_z_SSE_2_err_list.append(mag_z_exp[1])
-
-    file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
-        N,
-        hamiltonian_type,
-        Delta,
-        h,
-        alpha,
-        gamma,
-        dist_dep_offset,
-        boundary,
-        T_3,
-        loop_type,
-        start_config,
-        init_start_config,
-    )
-    step_number_1, energy_arr_1, magnetization_arr_1, stiffness_arr_1, s_k_pi_arr_1 = np.loadtxt(
-        file_1, delimiter=",", skiprows=2, unpack=True
-    )
-
-    drop_1 = int(step_number_1[-1] / 2)
-    auto_corr_drop = 2
-
-    energy_array = energy_arr_1 / norm_energy
-    stiffness_array = np.array(stiffness_arr_1) / norm
-
-    energy = stats.statistics_binning(energy_array, auto_corr_drop, eq_drop)
-    mag_z_exp = stats.statistics_binning(magnetization_arr_1, auto_corr_drop, eq_drop)
-    stiffness = stats.statistics_binning(stiffness_array, auto_corr_drop, eq_drop)
-
-    stiffness_SSE_3_list.append(stiffness[0])
-    stiffness_SSE_3_err_list.append(stiffness[1])
-
-    energy_SSE_3_list.append(energy[0])
-    energy_SSE_3_err_list.append(energy[1])
-
-    mag_z_SSE_3_list.append(mag_z_exp[0])
-    mag_z_SSE_3_err_list.append(mag_z_exp[1])
-
-norm = 0.0
 alpha_new = 50
 N_new = 1001
-for r in range(1, int((N_new + 1) / 2)):
-    norm += 1.0 / (r ** (alpha_new - 2))
-    norm_energy += 1.0 / (r ** (alpha_new))
-
 theta = 0.01 * (1 / (1001))
-
 large_alpha_lsw_energy = lsw.E_0_LSW_NN(N_new, 1.0)
-
-large_alpha_lsw_rho = lsw.rho_2(N_new, alpha_new, theta, 1.0) / norm
-
-large_alpha_lsw_rho_2 = -large_alpha_lsw_energy / (N_new)
-print(large_alpha_lsw_rho_2)
-print(large_alpha_lsw_rho)
-print(100 * (large_alpha_lsw_rho_2 - large_alpha_lsw_rho) / large_alpha_lsw_rho)
 
 plt.figure()
 plt.rcParams["mathtext.fontset"] = "stix"
-# plt.scatter(alpha_list, np.array(energy_SSE_3_list)/N, label=r'$\beta={}$'.format(beta_3), color='black')
-# plt.errorbar(alpha_list, np.array(energy_SSE_3_list)/N, np.array(energy_SSE_3_err_list)/N, fmt='None', capsize=5, color='black')
 plt.scatter(alpha_list, np.array(energy_SSE_2_list) / N, label=r"QMC ($\beta={}$)".format(int(beta_2)), color="C3")
 plt.errorbar(
     alpha_list, np.array(energy_SSE_2_list) / N, np.array(energy_SSE_2_err_list) / N, fmt="None", capsize=5, color="C3"
@@ -263,9 +167,7 @@ ax1.plot(
     linestyle="dashed",
     label=r"Exact ($\alpha \rightarrow \infty$)",
 )
-# ax1.plot(alpha_list, mf_stiffness, color='C4', linestyle='dashed', label='MFT')
 ax1.plot(alpha_list, lsw_stiffness, color="C2", label="LSW")
-# ax1.plot(alpha_list, [large_alpha_lsw_rho_2]*len(alpha_list), color='C5', linestyle='dashed', label=r'LSW ($\alpha \rightarrow \infty$)')
 ax1.scatter(
     alpha_list, np.array(stiffness_SSE_3_list), color="black", label=r"QMC ($\beta={}$)".format(round(beta_3, 1))
 )
@@ -278,8 +180,6 @@ ax1.errorbar(
 )
 ax1.scatter(alpha_list, np.array(stiffness_SSE_1_list), color="C0", label=r"QMC ($\beta={}$)".format(int(beta_1)))
 ax1.errorbar(alpha_list, np.array(stiffness_SSE_1_list), np.array(stiffness_SSE_1_err_list), fmt="None", capsize=5)
-
-# ax1.legend(prop={'size': 10}, bbox_to_anchor=(0.65, 0.25))
 
 drop_from_top = 25
 drop_from_bottom = -30
@@ -335,7 +235,6 @@ ax2.plot(
     color="black",
     linestyle="dashed",
 )
-# ax2.plot(alpha_list[drop_from_top:drop_from_bottom], [large_alpha_lsw_rho_2]*len(alpha_list[drop_from_top:drop_from_bottom]), color='C5', linestyle='dashed')
 ax2.plot(alpha_list[drop_from_top:drop_from_bottom], lsw_stiffness[drop_from_top:drop_from_bottom], color="C2")
 ax2.locator_params(axis="x", nbins=8)
 

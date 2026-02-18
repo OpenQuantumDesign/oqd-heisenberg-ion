@@ -26,7 +26,7 @@ operator_list_update_multiplier	1.05	# Operator list size growth proportion afte
 loop_type	deterministic	# Can be 'deterministic', 'directed_loop' or 'heatbath' depending on the type of the loops. The 'determininistic' loop type only applies to the XY and the Heisenberg models
 
 # Misc.
-root_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results	# Folder containing inputs and outputs for the calculations
+root_folder	/tests/integration/results	# Folder containing inputs and outputs for the calculations
 track_spin_configurations	False	# bool - Determines whether shot data collected across Monte Carlo steps. 
 write_final_spin_configuration	False	# bool - Determines whether final SSE configurations need to be written to a file
 

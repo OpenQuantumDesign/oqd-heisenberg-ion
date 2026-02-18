@@ -26,7 +26,7 @@ operator_list_update_multiplier	1.05	# Operator list size growth proportion afte
 loop_type	deterministic	# Can be 'deterministic', 'directed_loop' or 'heatbath' depending on the type of the loops. The 'determininistic' loop type only applies to the XY and the Heisenberg models
 
 # Misc.
-root_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results	# Folder containing inputs and outputs for the calculations
+root_folder	tests/integration/results	# Folder containing inputs and outputs for the calculations
 
 # Initial Configuration Parameters
 initial_configuration_index	1	# 1 or -1 starts the simulation with all spins up or down respectively. 0 picks each spin randomly. -2 uses the configuration provided. Positive integers k > 1 correspond to lattice site i starting with spin up if i mod k = 0

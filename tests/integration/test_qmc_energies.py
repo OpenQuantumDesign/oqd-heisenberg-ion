@@ -74,9 +74,7 @@ def test_long_range_qmc_exp_J_ij(tmp_path):
     # print(test_file_dir)
     hamiltonian_name = "XY"
     T = "0.005"
-    interaction_matrix_file = (
-        "/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/input_files/Experimental_J_ij_mu_1.01_N_5.csv"
-    )
+    interaction_matrix_file = os.path.join(test_file_dir, "input_files/interaction_matrix.csv")
 
     input_file = os.path.join(test_file_dir, "input_files/" + hamiltonian_name + "_long_range.txt")
     print(input_file)

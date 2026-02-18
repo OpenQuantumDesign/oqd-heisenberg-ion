@@ -30,8 +30,7 @@ ksi	0.0	# directed_loop probability table parameter.
 distance_dependent_offset	False	# bool - Directed loop probability table parameter.
 
 # Misc.
-root_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results	# Folder containing inputs and outputs for the calculations
-cpp_source_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/src/heisenberg_ion/simulators/qmc/long_range/engine	# Cpp source folder for long range qmc
+root_folder	/tests/integration/results	# Folder containing inputs and outputs for the calculations
 number_of_threads	1	# Number of CPU threads to use. This parameter is optional. Setting it to 1 uses a single thread all simulations are executed serially. Setting it to a positive integers will divide 
 track_spin_configurations	False	# bool - Determines whether shot data collected across Monte Carlo steps. 
 write_final_spin_configuration	False	# bool - Determines whether final SSE configurations need to be written to a file

@@ -20,8 +20,7 @@ operator_list_update_multiplier	1.05
 loop_type	deterministic
 
 # Misc.
-root_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results
-cpp_source_folder	/Users/shaeermoeed/Github/Heisenberg_Ion/src/heisenberg_ion/simulators/qmc/long_range/engine
+root_folder	/tests/integration/results
 number_of_threads	2
 track_spin_configurations	False
 write_final_spin_configuration	False

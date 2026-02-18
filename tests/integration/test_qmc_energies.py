@@ -68,6 +68,64 @@ def test_long_range_qmc(hamiltonian_name, alpha, tmp_path):
     assert qmc_energy_mean == pytest.approx(ground_state_energy, abs=0.05)
 
 
+def test_long_range_qmc_exp_J_ij(tmp_path):
+
+    test_file_dir = Path(__file__).parent
+    # print(test_file_dir)
+    hamiltonian_name = "XY"
+    T = "0.005"
+    interaction_matrix_file = (
+        "/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/input_files/Experimental_J_ij_mu_1.01_N_5.csv"
+    )
+
+    input_file = os.path.join(test_file_dir, "input_files/" + hamiltonian_name + "_long_range.txt")
+    print(input_file)
+    # out_dir = os.path.join(test_file_dir, "results/long_range_qmc")
+    out_dir = str(tmp_path)
+    uuid = "test_calculation"
+    print(interaction_matrix_file)
+
+    qmc_out_folder = "long_range_qmc" + "_" + hamiltonian_name + "_results"
+    return_code_qmc = simulate(
+        input_file=input_file,
+        root_folder=out_dir,
+        output_folder_name=qmc_out_folder,
+        hamiltonian_name=hamiltonian_name,
+        interaction_type="matrix_input",
+        interaction_matrix_file=interaction_matrix_file,
+        simulator="long_range_qmc",
+        uuid=uuid,
+        T=T,
+    )
+
+    assert return_code_qmc == 0
+
+    ed_out_folder = "ed" + "_" + hamiltonian_name + "_results"
+    return_code_ed = simulate(
+        input_file=input_file,
+        root_folder=out_dir,
+        output_folder_name=ed_out_folder,
+        hamiltonian_name=hamiltonian_name,
+        interaction_type="matrix_input",
+        interaction_matrix_file=interaction_matrix_file,
+        simulator="exact_diagonalization",
+        uuid=uuid,
+        T=T,
+    )
+
+    assert return_code_ed == 0
+
+    qmc_energy_mean, qmc_energy_err = compute_qmc_energy(out_dir, qmc_out_folder, uuid)
+    ground_state_energy = compute_ed_energy(out_dir, ed_out_folder, uuid, T)
+
+    print(qmc_energy_mean + qmc_energy_err)
+    print(qmc_energy_mean - qmc_energy_err)
+
+    print(ground_state_energy)
+
+    assert qmc_energy_mean == pytest.approx(ground_state_energy, abs=0.05)
+
+
 @pytest.mark.parametrize(
     ["hamiltonian_name"],
     [

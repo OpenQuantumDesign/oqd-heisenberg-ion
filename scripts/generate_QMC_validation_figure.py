@@ -50,6 +50,38 @@ loop_type = "deterministic"
 dist_dep_offset = 0
 J = 1.0
 theta = 0.02
+auto_corr_drop = 2
+
+
+def ed_properties(beta, evals, evals_theta, evals_minus_theta, energy_list, stiffness_list):
+
+    energy_theta = 0.0
+    energy_zero = 0.0
+    energy_minus_theta = 0.0
+    partition_theta = 0.0
+    partition_zero = 0.0
+    partition_minus_theta = 0.0
+    for i in range(len(evals)):
+        energy_theta += np.exp(-beta * evals_theta[i]) * evals_theta[i]
+        partition_theta += np.exp(-beta * evals_theta[i])
+        energy_zero += np.exp(-beta * evals[i]) * evals[i]
+        partition_zero += np.exp(-beta * evals[i])
+        energy_minus_theta += np.exp(-beta * evals_minus_theta[i]) * evals_minus_theta[i]
+        partition_minus_theta += np.exp(-beta * evals_minus_theta[i])
+
+    energy_theta /= partition_theta
+    energy_zero /= partition_zero
+    energy_minus_theta /= partition_minus_theta
+    free_energy_theta = (-1.0 / beta) * np.log(partition_theta)
+    free_energy_zero = (-1.0 / beta) * np.log(partition_zero)
+    free_energy_minus_theta = (-1.0 / beta) * np.log(partition_minus_theta)
+    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
+    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
+    spin_stiffness = second_derivative
+
+    energy_list.append(energy_zero / N)
+    stiffness_list.append(spin_stiffness)
+
 
 for i in range(len(T_list)):
     T = T_list[i]
@@ -71,18 +103,12 @@ for i in range(len(T_list)):
         start_config,
         init_start_config,
     )
-    step_number_1, energy_arr_1, magnetization_arr_1, stiffness_arr_1, s_k_pi_arr_1 = np.loadtxt(
-        file_1, delimiter=",", skiprows=2, unpack=True
-    )
+    qmc_data = np.loadtxt(file_1, delimiter=",", skiprows=2)
 
-    drop_1 = int(step_number_1[-1] / 2)
-    auto_corr_drop = 2
-
-    energy_array = energy_arr_1
-    stiffness_array = stiffness_arr_1
+    energy_array = qmc_data[:, 1]
+    stiffness_array = qmc_data[:, 3]
 
     energy = stats.statistics_binning(energy_array, auto_corr_drop, eq_drop)
-    mag_z_exp = stats.statistics_binning(magnetization_arr_1, auto_corr_drop, eq_drop)
     stiffness = stats.statistics_binning(stiffness_array, auto_corr_drop, eq_drop)
 
     stiffness_SSE_list.append(stiffness[0])
@@ -91,57 +117,30 @@ for i in range(len(T_list)):
     energy_SSE_list.append(energy[0] / N)
     energy_SSE_err_list.append(energy[1] / N)
 
-    print(step_number_1[-1])
+comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
+    N, Delta, h, J, J, alpha
+)
+state_index, evals = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
 
+comp_file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+    N, Delta, h, J, J, alpha, theta
+)
+state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(
+    comp_file_1, skiprows=1, delimiter=",", unpack=True
+)
 
-# beta_ED_list = np.linspace(beta_list[0], beta_list[-1], 100, True)
+comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+    N, Delta, h, J, J, alpha, -theta
+)
+state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(
+    comp_file_2, skiprows=1, delimiter=",", unpack=True
+)
+
 beta_ED_list = np.array(beta_list)
 for i in range(len(beta_ED_list)):
     beta = beta_ED_list[i]
 
-    comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha
-    )
-    state_index, evals = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
-    comp_file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha, theta
-    )
-    state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(
-        comp_file_1, skiprows=1, delimiter=",", unpack=True
-    )
-    comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha, -theta
-    )
-    state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(
-        comp_file_2, skiprows=1, delimiter=",", unpack=True
-    )
-
-    energy_theta = 0.0
-    energy_zero = 0.0
-    energy_minus_theta = 0.0
-    partition_theta = 0.0
-    partition_zero = 0.0
-    partition_minus_theta = 0.0
-    for i in range(len(evals)):
-        energy_theta += np.exp(-beta * evals_theta[i]) * evals_theta[i]
-        partition_theta += np.exp(-beta * evals_theta[i])
-        energy_zero += np.exp(-beta * evals[i]) * evals[i]
-        partition_zero += np.exp(-beta * evals[i])
-        energy_minus_theta += np.exp(-beta * evals_minus_theta[i]) * evals_minus_theta[i]
-        partition_minus_theta += np.exp(-beta * evals_minus_theta[i])
-
-    energy_theta /= partition_theta
-    energy_zero /= partition_zero
-    energy_minus_theta /= partition_minus_theta
-    free_energy_theta = (-1.0 / beta) * np.log(partition_theta)
-    free_energy_zero = (-1.0 / beta) * np.log(partition_zero)
-    free_energy_minus_theta = (-1.0 / beta) * np.log(partition_minus_theta)
-    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
-    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
-    spin_stiffness = second_derivative
-    stiffness_ED_list.append(spin_stiffness)
-
-    energy_ED_list.append(energy_zero / N)
+    ed_properties(beta, evals, evals_theta, evals_minus_theta, energy_ED_list, stiffness_ED_list)
 
 
 beta_ED_list_2 = np.linspace(beta_list[0], beta_list[-1], 100, True)
@@ -150,49 +149,7 @@ energy_ED_list_2 = []
 for i in range(len(beta_ED_list_2)):
     beta = beta_ED_list_2[i]
 
-    comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha
-    )
-    state_index, evals = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
-    comp_file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha, theta
-    )
-    state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(
-        comp_file_1, skiprows=1, delimiter=",", unpack=True
-    )
-    comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-        N, Delta, h, J, J, alpha, -theta
-    )
-    state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(
-        comp_file_2, skiprows=1, delimiter=",", unpack=True
-    )
-
-    energy_theta = 0.0
-    energy_zero = 0.0
-    energy_minus_theta = 0.0
-    partition_theta = 0.0
-    partition_zero = 0.0
-    partition_minus_theta = 0.0
-    for i in range(len(evals)):
-        energy_theta += np.exp(-beta * evals_theta[i]) * evals_theta[i]
-        partition_theta += np.exp(-beta * evals_theta[i])
-        energy_zero += np.exp(-beta * evals[i]) * evals[i]
-        partition_zero += np.exp(-beta * evals[i])
-        energy_minus_theta += np.exp(-beta * evals_minus_theta[i]) * evals_minus_theta[i]
-        partition_minus_theta += np.exp(-beta * evals_minus_theta[i])
-
-    energy_theta /= partition_theta
-    energy_zero /= partition_zero
-    energy_minus_theta /= partition_minus_theta
-    free_energy_theta = (-1.0 / beta) * np.log(partition_theta)
-    free_energy_zero = (-1.0 / beta) * np.log(partition_zero)
-    free_energy_minus_theta = (-1.0 / beta) * np.log(partition_minus_theta)
-    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
-    second_derivative = (free_energy_theta / N + free_energy_minus_theta / N - 2.0 * free_energy_zero / N) / (theta**2)
-    spin_stiffness = second_derivative
-    stiffness_ED_list_2.append(spin_stiffness)
-
-    energy_ED_list_2.append(energy_zero / N)
+    ed_properties(beta, evals, evals_theta, evals_minus_theta, energy_ED_list_2, stiffness_ED_list_2)
 
 fig, ax1 = plt.subplots()
 plt.rcParams["mathtext.fontset"] = "stix"
@@ -201,7 +158,6 @@ if alpha == 10.0:
 else:
     left, bottom, width, height = [0.47, 0.35, 0.33, 0.33]
 ax2 = fig.add_axes([left, bottom, width, height])
-
 
 ax1.errorbar(beta_list, stiffness_SSE_list, stiffness_SSE_err_list, capsize=5, fmt="None")
 ax1.scatter(beta_ED_list, stiffness_ED_list, color="C3", label="ED")

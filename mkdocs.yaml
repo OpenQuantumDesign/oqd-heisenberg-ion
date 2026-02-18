@@ -1,6 +1,18 @@
-site_name: Heisenberg Ion
+site_name: Open Quantum Design - Heisenberg Ion
 repo_url: https://github.com/OpenQuantumDesign/oqd-heisenberg-ion/
 repo_name: oqd-heisenberg-ion
+copyright: Copyright &copy; 2024 Open Quantum Design
+
+use_directory_urls: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/OpenQuantumDesign
+      name: Open Quantum Design GitHub
+    - icon: fontawesome/solid/globe
+      link: https://openquantumdesign.org
+      name: Open Quantum Design Website
 
 nav:
   - Home: index.md
@@ -9,12 +21,11 @@ nav:
     - Hamiltonian Types: user_guide/hamiltonian_types.md
     - Input Specification: user_guide/input_specs.md
     - Output Files: user_guide/output_format.md
-    - Examples: user_guide/examples.md
   - Algorithms: 
     - Stochastic Series Expansion: algorithms/sse.md
     - Exact Diagonalization: algorithms/ed.md
+    - References: algorithms/refs.md
   - API Reference:
-    - Overview: api/overview.md
     - Interface: api/interface.md
     - Pre-Process:
       - Input Parser: api/preproc/input_parser.md
@@ -30,19 +41,44 @@ nav:
       - Exact Diagonalization: api/preproc/exact_diagonalization.md
     - Drivers: api/drivers.md
     - Post-Process: api/postproc.md
-  - Community: 
-    - Contribute: community/contribute.md
-    - Features in Development: community/feat_dev.md
+  - Features in Development: feat_dev.md
 
 theme:
   name: material
   logo: img/oqd-icon.png
   favicon: img/oqd-icon.png
-  features:
-    - navigation.tabs
-    - content.code.copy
   icon:
     repo: simple/git
+  features:
+  - search.suggest
+  - search.highlight
+  - content.tabs.link
+  - content.tooltips
+  - content.code.annotate
+  - content.code.copy
+  - content.code.select
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.sections
+  - navigation.top
+  - navigation.prune
+  - toc.follow
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
 markdown_extensions:
   - pymdownx.arithmatex:
@@ -57,12 +93,16 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.magiclink
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist
 
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
+  - search
   - mkdocstrings:
         handlers:
           python:

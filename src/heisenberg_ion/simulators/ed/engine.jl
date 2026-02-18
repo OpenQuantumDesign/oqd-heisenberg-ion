@@ -299,7 +299,6 @@ end
 function main()
 
     input_file_path = ARGS[1]
-    #input_file_path = "/Users/shaeermoeed/Github/Heisenberg_Ion/tests/integration/results/2026_02_05_20_07_40/inputs.txt"
     parameter_sets = extract_inputs(input_file_path)
     execute_simulations(parameter_sets)
 

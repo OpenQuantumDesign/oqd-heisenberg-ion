@@ -1,4 +1,5 @@
 import copy
+import os
 from collections.abc import Sequence
 
 from .utils import convert_to_snake_case
@@ -18,7 +19,7 @@ class InputReader:
             input_file_path (str, optional): path to input file. Defaults to None.
         """
 
-        self.input_file = input_file_path
+        self.input_file = os.path.abspath(input_file_path)
         if simulator is not None:
             self.simulator = convert_to_snake_case(simulator)
 

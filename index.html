@@ -888,11 +888,24 @@ This is fetched and compiled automatically by CMake while building the C++ sourc
 <p>Then, install the package:<br />
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip install oqd-heisenberg-ion
 </span></code></pre></div></p>
+<p>Execute an example long range QMC calculation with the following:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
+</span></code></pre></div></p>
+<p>Note that the above command expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:<br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>examples/input_files
+</span></code></pre></div></p>
+<p>The above calculation creates a folder titled <code>results</code> in the project root. A different output folder can be provided as a command line override as follows: 
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt -o root_folder [output folder path]
+</span></code></pre></div></p>
+<p>Details about configuring inputs for each of the simulators can be found in the <a href="user_guide/input_specs/">Input Specification</a> section. Also, see the <a href="user_guide/overview/">User Guide</a> and the example notebook in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the <a href="algorithms/sse/">Algorithms</a> section.</p>
 <h3 id="documentation">Documentation</h3>
 <p>Documentation is developed using MkDocs. To install documentation-related dependencies, use:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip install -e &quot;.[docs]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip install -e &quot;.[docs]
 </span></code></pre></div>
-<p>See the <a href="user_guide/overview/">User Guide</a> and the example files in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the <a href="algorithms/sse/">Algorithms</a> section. </p>
+<p>The documentation server can be deployed locally using: </p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cp -r examples/ docs/examples/
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mkdocs serve
+</span></code></pre></div>
 
 
 

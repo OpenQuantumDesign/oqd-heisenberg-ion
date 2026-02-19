@@ -4,7 +4,6 @@ scratch/
 /ProbabilityDensities
 .vscode/settings.json
 *.pdf
-*.png
 *.csv
 *.txt
 *.log

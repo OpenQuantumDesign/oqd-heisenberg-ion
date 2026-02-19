@@ -89,7 +89,7 @@ for i in range(len(T_list)):
     init_start_config = 1
     start_config = init_start_config
     boundary = 1
-    file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
+    file_1 = "Results/SSE/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
         N,
         hamiltonian_type,
         Delta,
@@ -117,20 +117,24 @@ for i in range(len(T_list)):
     energy_SSE_list.append(energy[0] / N)
     energy_SSE_err_list.append(energy[1] / N)
 
-comparison_file = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
+comparison_file = "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_0.0_Heisenberg_PBC.csv".format(
     N, Delta, h, J, J, alpha
 )
 state_index, evals = np.loadtxt(comparison_file, skiprows=1, delimiter=",", unpack=True)
 
-comp_file_1 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-    N, Delta, h, J, J, alpha, theta
+comp_file_1 = (
+    "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+        N, Delta, h, J, J, alpha, theta
+    )
 )
 state_index_theta, evals_theta, mag_z_theta, mag_x_theta = np.loadtxt(
     comp_file_1, skiprows=1, delimiter=",", unpack=True
 )
 
-comp_file_2 = "/Users/shaeermoeed/Github/Heisenberg_Ion/Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
-    N, Delta, h, J, J, alpha, -theta
+comp_file_2 = (
+    "Results/Exact_Diagonalization/ED_N_{}_Delta_{}_h_{}_Jx_{}_Jy_{}_alpha_{}_B_0.0_theta_{}_Heisenberg_PBC.csv".format(
+        N, Delta, h, J, J, alpha, -theta
+    )
 )
 state_index_minus_theta, evals_minus_theta, mag_z_minus_theta, mag_x_minus_theta = np.loadtxt(
     comp_file_2, skiprows=1, delimiter=",", unpack=True

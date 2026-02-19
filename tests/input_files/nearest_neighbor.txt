@@ -1,0 +1,34 @@
+simulator	nearest_neighbor_qmc
+boundary	periodic	
+interaction_range	nearest_neighbor	
+spatial_dimension	1d	
+lattice_type	rectangular	
+
+# System Parameters
+N	4	
+theta	0.0
+
+# Simulation Parameters
+equilibration_steps	100	
+simulation_steps	100	
+operator_list_update_multiplier	1.1	
+T	0.1
+
+# SSE Loop Parameters
+loop_type	deterministic	
+
+# Misc.
+root_folder	tests/regression/regression_files
+output_folder_name	nearest_neighbor_qmc	
+
+# Initial Configuration Parameters
+initial_configuration_index	1	
+
+# Seeds
+initial_config_seed	845886
+disconnected_spin_flip_seed	255995
+off_diagonal_update_seed	893908
+metropolis_insert_seed	222288
+metropolis_remove_seed	625433
+diagonal_update_seed	419814
+exit_leg_seed	525338

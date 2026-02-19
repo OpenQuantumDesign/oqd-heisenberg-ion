@@ -39,7 +39,8 @@ def main(argv=None):
 
     override_dict = extract_override_arguments(args)
 
-    Orchestrator(input_file=args.input, **override_dict)
+    sim_workflow = Orchestrator(input_file=args.input, **override_dict)
+    sim_workflow.simulate()
 
     return 0
 

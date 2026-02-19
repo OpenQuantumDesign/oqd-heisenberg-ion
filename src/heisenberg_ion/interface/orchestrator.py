@@ -23,13 +23,10 @@ class Orchestrator:
 
     def build_from_file(self, input_file, **kwargs):
         """
-        used if input file needs to be read for the simulation.
+        used to call the preprocessor if input file needs to be read for the simulation.
 
         Args:
             input_file (str): path to the input file
-
-        Returns:
-            (int): 0 if the program executes to completion
         """
 
         file_inputs = InputReader(input_file_path=input_file)
@@ -39,17 +36,11 @@ class Orchestrator:
         preprocessor = PreprocessorFactory.create(simulator, file_inputs.parameter_set_list)
         driver_inputs = preprocessor.preprocess()
 
-        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
-        driver.simulate()
-
-        return 0
+        self.driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
 
     def build_from_parameters(self, **kwargs):
         """
-        used if the simulation inputs are provided as key word arguments
-
-        Returns:
-            (int): 0 if the program executes to completion
+        used to call the preprocessor if the simulation inputs are provided as key word arguments
         """
 
         simulator = kwargs["simulator"]
@@ -62,7 +53,16 @@ class Orchestrator:
         preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
         driver_inputs = preprocessor.preprocess()
 
-        driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
-        driver.simulate()
+        self.driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
+
+    def simulate(self):
+        """
+        simulates the entire workflow
+
+        Returns:
+            (int): the exit code, 0 when the program executes to completion
+        """
+
+        self.driver.simulate()
 
         return 0

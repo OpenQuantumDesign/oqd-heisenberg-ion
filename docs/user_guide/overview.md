@@ -1,6 +1,6 @@
 !!! Note
     Heisenberg Ion is still under active development so breaking changes are possible.
-    See [Features in development](../feat_dev.md) for details.
+    See [Features in Development](../feat_dev.md) for details.
 
 ## Hamiltonian
 

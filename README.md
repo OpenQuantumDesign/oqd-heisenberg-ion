@@ -50,7 +50,7 @@ The above calculation creates a folder titled ```results``` in the project root.
 oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt -o root_folder [output folder path]
 ```
 
-Details about configuring inputs for each of the simulators can be found in the documentation. Also, the example notebook exhibits different approaches for specifying the input parameters. 
+Details about configuring inputs for each of the simulators can be found in the [documentation](https://openquantumdesign.github.io/oqd-heisenberg-ion/). Also, the example notebook exhibits different approaches for specifying the input parameters. 
 
 ### Documentation 
 Documentation is developed using MkDocs. To install documentation-related dependencies, use:

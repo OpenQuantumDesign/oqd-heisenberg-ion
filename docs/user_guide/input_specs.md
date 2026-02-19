@@ -53,6 +53,20 @@ If one of the QMC simulators are selected (long_range_qmc or nearest_neighbor_qm
 
 A complete list of QMC algorithms and their target Hamiltonians can be found in the List of SSE Algorithms section of the Algorithns tab.  
 
+### Monte Carlo Seeds
+We can also optionally specify seeds to initialize the random number generator needed for QMC. The following table lists the different seeds that can be provided to the SSE |simulators:
+
+| Seed Name   | Description |  
+|-------------|-------------|
+initial_config_seed | Used if the initial_config_index is set to 0 to randomly pick the starting configuration of each spin | 
+disconnected_spin_flip_seed | In SSE, disconnected spins can be flipped independently. This seed initializes the generator used for those spin flips |
+off_diagonal_update_seed | Needed to seed the off-diagonal update random number generators |
+metropolis_insert_seed | Needed to seed the generator used in the Metropolis step of diagonal operator insertions |
+metropolis_remove_seed | Needed to seed the generator used in the Metropolis step of diagonal operator insertions |
+diagonal_update_seed | Only used for long range QMC. Needed to sample the bond index for operator insertions in diagonal updates |
+exit_leg_seed | Only needed for XY, XXZ and XXZh hamiltonian types. Used to initialize generator for selecting exit legs while constructing loops |
+metropolis_bond_generator_seed | Only needed for XXZ and XXZh hamiltonian types. Used to probabilistically insert operators at a given bond in diagonal update step in the two-step scheme |
+
 ### Conflicting Inputs
 Note that if contradictory inputs are specified for the Hamiltonian, (for instance if the input `hamiltonian_name` is `XY` and `Delta` is specified to be `1.0`), the system specification defaults to properties defined by the `hamiltonian_name` (the provided value of `Delta` is ignored). The same is true for specifying the interactions. If the `interaction_range` is set to `nearest_neighbor` and the `interaction_type` is specified to be `power_law`, the latter is ignored. Similarly, conflicting inputs pertaining to QMC sampler settings are resolved via the `loop_type` parameter. 
 
@@ -146,6 +160,15 @@ write_final_spin_configuration	False
 # Initial Configuration Parameters
 initial_configuration_index	0
 initial_operator_list_size	-1
+
+# Seeds
+initial_config_seed	845886
+disconnected_spin_flip_seed	255995
+off_diagonal_update_seed	893908
+metropolis_insert_seed	222288
+metropolis_remove_seed	625433
+diagonal_update_seed	419814
+exit_leg_seed	525338
 ```
 
 ### Nearest Neighbor Quantum Monte Carlo
@@ -176,4 +199,13 @@ write_final_spin_configuration	False
 # Initial Configuration Parameters
 initial_configuration_index	0
 initial_operator_list_size	-1
+
+# Seeds
+initial_config_seed	845886
+disconnected_spin_flip_seed	255995
+off_diagonal_update_seed	893908
+metropolis_insert_seed	222288
+metropolis_remove_seed	625433
+diagonal_update_seed	419814
+exit_leg_seed	525338
 ```

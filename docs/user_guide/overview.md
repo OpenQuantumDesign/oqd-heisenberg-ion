@@ -30,7 +30,7 @@ ED corresponds to constructing the entire $2^N \times 2^N$ ($N$ is the total num
 
 ## Quantum Monte Carlo
 
-QMC is a statistical approach for studying the equilibrium properties of a many-body system. For systems without frustration, such as the isotropic Heisenberg model with nearest-neighbor interactions, it is widely believed that the SSE variant of QMC scales polynomially. For Technical details about the Heisenberg Ion SSE approach, see [Algorithms](../algorithms/sse.md). For a complete list of the Hamiltonians and their supported SSE algorithms in Heisenberg Ion, see [Hamiltonian Types](hamiltonian_types.md). We have two QMC engines implemented in Heisenberg Ion. The first targets long range interactions and uses a C++ backend. The other is implemented using Python and simulates isotropic variants of the Heisenberg model, as well as the XY model in the presence of nearest neighbor interactions.  
+QMC is a statistical approach for studying the equilibrium properties of a many-body system. For systems without frustration, such as the isotropic Heisenberg model with nearest-neighbor interactions, it is widely believed that the SSE variant of QMC scales polynomially. For technical details about the Heisenberg Ion SSE approach, see [Algorithms](../algorithms/sse.md). For a complete list of the Hamiltonians and their supported SSE algorithms in Heisenberg Ion, see [Hamiltonian Types](hamiltonian_types.md). We have two QMC engines implemented in Heisenberg Ion. The first targets long range interactions and uses a C++ backend. The other is implemented using Python and simulates isotropic variants of the Heisenberg model, as well as the XY model in the presence of nearest neighbor interactions.  
 
 
 ## General Workflow

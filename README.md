@@ -35,6 +35,23 @@ Then, install the package:
 pip install oqd-heisenberg-ion
 ```
 
+Execute an example long range QMC calculation with the following:
+```
+oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
+```
+
+Note that the above command expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:  
+```
+examples/input_files
+```
+
+The above calculation creates a folder titled ```results``` in the project root. A different output folder can be provided as a command line override as follows: 
+```
+oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt -o root_folder [output folder path]
+```
+
+Details about configuring inputs for each of the simulators can be found in the [Input Specification](user_guide/input_specs.md) section. Also, see the [User Guide](user_guide/overview.md) and the example notebook in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the [Algorithms](algorithms/sse.md) section.
+
 ### Documentation 
 Documentation is developed using MkDocs. To install documentation-related dependencies, use:
 

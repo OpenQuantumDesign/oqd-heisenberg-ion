@@ -209,3 +209,5 @@ metropolis_remove_seed	625433
 diagonal_update_seed	419814
 exit_leg_seed	525338
 ```
+
+More examples of input file can be found in the repository root under ```examples/input_files```. Other approaches for specifying inputs are exhibited in the example notebook ```examples/long_range_XY.ipynb```.

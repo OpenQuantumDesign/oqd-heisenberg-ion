@@ -20,8 +20,9 @@ class LongRangeQMC(Driver):
 
         super().__init__(simulation_folder)
 
-        self.input_file = os.path.join(simulation_folder, "inputs.txt")
-        self.build_dir = os.path.join(simulation_folder, "build")
+        self.input_file = os.path.join(os.path.abspath(simulation_folder), "inputs.txt")
+        self.build_dir = os.path.join(os.path.abspath(simulation_folder), "build")
+        print(self.build_dir)
         os.mkdir(self.build_dir)
 
         self.bin_dir = simulator_inputs["bin_folder"]
@@ -46,6 +47,7 @@ class LongRangeQMC(Driver):
             print("Build from cmake failed with exit code: {}\n".format(error.returncode))
             print("STDOUT: {}".format(error.stdout))
             print("STDERR:{}".format(error.stderr))
+            raise
 
     def compile_source(self):
         """
@@ -59,6 +61,7 @@ class LongRangeQMC(Driver):
             print("Compile failed with exit code: {}\n".format(error.returncode))
             print("STDOUT: {}".format(error.stdout))
             print("STDERR:{}".format(error.stderr))
+            raise
 
     def simulate(self):
         """
@@ -76,6 +79,7 @@ class LongRangeQMC(Driver):
                 print("Copying binaries run failed with exit code: {}\n".format(error.returncode))
                 print("STDOUT: {}".format(error.stdout))
                 print("STDERR:{}".format(error.stderr))
+                raise
 
         try:
             subprocess.run(

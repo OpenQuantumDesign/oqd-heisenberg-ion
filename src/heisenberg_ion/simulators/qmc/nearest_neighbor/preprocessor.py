@@ -87,7 +87,7 @@ class NearestNeighborQMC(Preprocessor):
         combined_args = simulation_args | sampling_args
 
         sampling_params = SamplingParameters(**combined_args)
-        parameter_args = sampling_params.update_parameters(parameter_args)
+        sampling_args = sampling_params.update_parameters(sampling_args)
 
         simulation_parameters = SSEParameters(system, sampling_params, run_folder)
 

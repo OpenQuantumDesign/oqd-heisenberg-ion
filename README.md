@@ -36,5 +36,12 @@ pip install heisenberg-ion
 Documentation is developed using MkDocs. To install documentation-related dependencies, use:
 
 ```
-pip install -e ".[docs]
+pip install -e ".[docs]"
+```
+
+The documentation server can be deployed locally using: 
+
+```
+cp -r examples/ docs/examples/
+mkdocs serve
 ```

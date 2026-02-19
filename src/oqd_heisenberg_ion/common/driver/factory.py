@@ -1,6 +1,6 @@
-from heisenberg_ion.simulators.ed.driver import ExactDiagonalization
-from heisenberg_ion.simulators.qmc.long_range.driver import LongRangeQMC
-from heisenberg_ion.simulators.qmc.nearest_neighbor.driver import NearestNeighborQMC
+from oqd_heisenberg_ion.simulators.ed.driver import ExactDiagonalization
+from oqd_heisenberg_ion.simulators.qmc.long_range.driver import LongRangeQMC
+from oqd_heisenberg_ion.simulators.qmc.nearest_neighbor.driver import NearestNeighborQMC
 
 
 class DriverFactory:

@@ -3,9 +3,9 @@ import os
 
 import numpy as np
 
-from heisenberg_ion.common.driver.factory import DriverFactory
-from heisenberg_ion.common.inputs.input_reader import InputReader
-from heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
+from oqd_heisenberg_ion.common.driver.factory import DriverFactory
+from oqd_heisenberg_ion.common.inputs.input_reader import InputReader
+from oqd_heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
 
 data_for_json = []
 

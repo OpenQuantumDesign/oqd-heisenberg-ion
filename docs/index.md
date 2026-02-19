@@ -44,7 +44,7 @@ git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
 
 Then, install the package:  
 ```
-pip install heisenberg-ion
+pip install oqd-heisenberg-ion
 ```
 
 ### Documentation 

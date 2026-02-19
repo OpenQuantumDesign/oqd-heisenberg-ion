@@ -1,8 +1,8 @@
 ### Main
-::: heisenberg_ion.interface.main
+::: oqd_heisenberg_ion.interface.main
 
 ### Orchestrator
-::: heisenberg_ion.interface.orchestrator
+::: oqd_heisenberg_ion.interface.orchestrator
 
 ### Input File Reader
-::: heisenberg_ion.common.inputs.input_reader
+::: oqd_heisenberg_ion.common.inputs.input_reader

@@ -1,1 +1,1 @@
-::: heisenberg_ion.simulators.preprocess.system.hamiltonian
+::: oqd_heisenberg_ion.simulators.preprocess.system.hamiltonian

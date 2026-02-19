@@ -4,9 +4,9 @@ import os
 import numpy as np
 import pytest
 
-from heisenberg_ion.common.driver.factory import DriverFactory
-from heisenberg_ion.common.inputs.input_reader import InputReader
-from heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
+from oqd_heisenberg_ion.common.driver.factory import DriverFactory
+from oqd_heisenberg_ion.common.inputs.input_reader import InputReader
+from oqd_heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
 
 with open(os.path.abspath("tests/regression/regression_results.json"), "r") as f:
     regression_data = json.load(f)

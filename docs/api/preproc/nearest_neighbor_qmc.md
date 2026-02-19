@@ -1,2 +1,2 @@
-::: heisenberg_ion.simulators.qmc.nearest_neighbor.preprocessor
-::: heisenberg_ion.simulators.qmc.nearest_neighbor.preprocess
+::: oqd_heisenberg_ion.simulators.qmc.nearest_neighbor.preprocessor
+::: oqd_heisenberg_ion.simulators.qmc.nearest_neighbor.preprocess

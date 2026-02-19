@@ -1,1 +1,1 @@
-::: heisenberg_ion.simulators.qmc.long_range.preprocessor
+::: oqd_heisenberg_ion.simulators.qmc.long_range.preprocessor

@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from heisenberg_ion.common.driver.base import Driver
+from oqd_heisenberg_ion.common.driver.base import Driver
 
 
 class LongRangeQMC(Driver):

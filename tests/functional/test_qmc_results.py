@@ -3,10 +3,10 @@ import os
 import numpy as np
 import pytest
 
-from heisenberg_ion.common.driver.factory import DriverFactory
-from heisenberg_ion.common.inputs.input_reader import InputReader
-from heisenberg_ion.common.postprocess import utils as post_proc
-from heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
+from oqd_heisenberg_ion.common.driver.factory import DriverFactory
+from oqd_heisenberg_ion.common.inputs.input_reader import InputReader
+from oqd_heisenberg_ion.common.postprocess import utils as post_proc
+from oqd_heisenberg_ion.common.preprocessor.factory import PreprocessorFactory
 
 
 def compute_qmc_energy(preprocessor_qmc):

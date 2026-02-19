@@ -1,6 +1,6 @@
-from heisenberg_ion.simulators.ed.preprocessor import ExactDiagonalization
-from heisenberg_ion.simulators.qmc.long_range.preprocessor import LongRangeQMC
-from heisenberg_ion.simulators.qmc.nearest_neighbor.preprocessor import NearestNeighborQMC
+from oqd_heisenberg_ion.simulators.ed.preprocessor import ExactDiagonalization
+from oqd_heisenberg_ion.simulators.qmc.long_range.preprocessor import LongRangeQMC
+from oqd_heisenberg_ion.simulators.qmc.nearest_neighbor.preprocessor import NearestNeighborQMC
 
 
 class PreprocessorFactory:

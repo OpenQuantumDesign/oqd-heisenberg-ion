@@ -1,1 +1,1 @@
-::: heisenberg_ion.common.inputs.input_parser
+::: oqd_heisenberg_ion.common.inputs.input_parser

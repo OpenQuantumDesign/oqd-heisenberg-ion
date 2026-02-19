@@ -1,3 +1,31 @@
+Metadata-Version: 2.4
+Name: oqd-heisenberg-ion
+Version: 0.1.0
+License: Apache 2.0
+Project-URL: Homepage, https://github.com/OpenQuantumDesign/Heisenberg_Ion
+Project-URL: Repository, https://github.com/OpenQuantumDesign/Heisenberg_Ion
+Keywords: quantum,computing,qmc,ed,atomic
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research 
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib
+Requires-Dist: numpy
+Requires-Dist: scipy
+Provides-Extra: docs
+Requires-Dist: pymdown-extensions; extra == "docs"
+Requires-Dist: mkdocstrings; extra == "docs"
+Requires-Dist: mkdocs-material; extra == "docs"
+Requires-Dist: mkdocstrings-python; extra == "docs"
+Requires-Dist: mdx_truly_sane_lists; extra == "docs"
+Provides-Extra: tests
+Requires-Dist: pytest; extra == "tests"
+Dynamic: license-file
+
 ## Overview
 This repository contains Stochastic Series Expansion (SSE) Quantum Monte Carlo (QMC) and Exact Diagonalization (ED) simulators targeting the long range XXZ model in the presence of external fields. 
 

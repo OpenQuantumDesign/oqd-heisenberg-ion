@@ -1,1 +1,1 @@
-::: heisenberg_ion.simulators.ed.preprocessor
+::: oqd_heisenberg_ion.simulators.ed.preprocessor

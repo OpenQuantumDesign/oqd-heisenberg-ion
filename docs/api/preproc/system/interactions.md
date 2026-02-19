@@ -1,1 +1,1 @@
-::: heisenberg_ion.simulators.preprocess.system.interactions
+::: oqd_heisenberg_ion.simulators.preprocess.system.interactions

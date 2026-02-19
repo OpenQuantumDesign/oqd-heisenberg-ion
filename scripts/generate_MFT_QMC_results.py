@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from heisenberg_ion.common.postprocess import utils as stats
+from oqd_heisenberg_ion.common.postprocess import utils as stats
 
 N_list = [3, 5, 7, 9, 13, 17, 23, 29, 35, 41, 47, 53, 59, 65, 71, 77, 83, 89, 95, 101, 107, 113, 119, 125]
 h = 0.0

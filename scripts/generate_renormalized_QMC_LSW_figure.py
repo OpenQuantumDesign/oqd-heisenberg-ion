@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from heisenberg_ion.common.postprocess import swt as lsw
-from heisenberg_ion.common.postprocess import utils as stats
+from oqd_heisenberg_ion.common.postprocess import swt as lsw
+from oqd_heisenberg_ion.common.postprocess import utils as stats
 
 N = 101
 h = 0.0

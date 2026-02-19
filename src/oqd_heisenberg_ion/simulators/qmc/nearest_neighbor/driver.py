@@ -1,4 +1,4 @@
-from heisenberg_ion.common.driver.base import Driver
+from oqd_heisenberg_ion.common.driver.base import Driver
 
 from .engine.configuration_generator import ConfigurationGenerator
 

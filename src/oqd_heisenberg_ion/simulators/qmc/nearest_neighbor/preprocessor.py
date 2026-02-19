@@ -32,7 +32,6 @@ class NearestNeighborQMC(Preprocessor):
         """
 
         self.check_single_input("root_folder")
-        self.root_folder = self.parameter_set_list[0]["root_folder"]
 
         self.simulation_folder = self.create_output_folder()
 

@@ -49,6 +49,9 @@ class Preprocessor:
             (str): class attribute simulation_folder, the path to the simulation output folder
         """
 
+        self.root_folder = os.path.abspath(self.parameter_set_list[0]["root_folder"])
+        os.makedirs(self.root_folder, exist_ok=True)
+        
         output_folder_name_provided = self.check_single_input("output_folder_name", True)
 
         if output_folder_name_provided:

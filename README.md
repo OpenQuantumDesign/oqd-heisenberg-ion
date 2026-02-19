@@ -21,6 +21,7 @@ These are installed automatically by pip as part of the Heisenberg Ion package i
 
 ### C++ Dependencies
 - spdlog 
+
 This is fetched and compiled automatically by CMake while building the C++ source if required
 
 ## Getting Started

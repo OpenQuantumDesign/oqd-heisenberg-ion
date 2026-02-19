@@ -18,8 +18,8 @@ class InputReader:
         Args:
             input_file_path (str, optional): path to input file. Defaults to None.
         """
-
-        self.input_file = os.path.abspath(input_file_path)
+        if input_file_path is not None:
+            self.input_file = os.path.abspath(input_file_path)
         if simulator is not None:
             self.simulator = convert_to_snake_case(simulator)
 

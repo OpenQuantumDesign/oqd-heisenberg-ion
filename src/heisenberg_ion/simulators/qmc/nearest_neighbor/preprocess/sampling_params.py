@@ -23,6 +23,18 @@ class SamplingParameters:
         )
         self.initial_configuration_index = self.set_optional_parameter("initial_configuration_index", sampling_args, 0)
 
+        self.initial_config_seed = self.set_optional_parameter("initial_config_seed", sampling_args, 17951893)
+        self.disconnected_spin_flip_seed = self.set_optional_parameter(
+            "disconnected_spin_flip_seed", sampling_args, 674604219
+        )
+        self.off_diagonal_update_seed = self.set_optional_parameter(
+            "off_diagonal_update_seed", sampling_args, 961025794
+        )
+        self.metropolis_insert_seed = self.set_optional_parameter("metropolis_insert_seed", sampling_args, 148014634)
+        self.metropolis_remove_seed = self.set_optional_parameter("metropolis_remove_seed", sampling_args, 148014634)
+        self.diagonal_update_seed = self.set_optional_parameter("diagonal_update_seed", sampling_args, 734634223)
+        self.exit_leg_seed = self.set_optional_parameter("exit_leg_seed", sampling_args, 2345346346)
+
     def set_optional_parameter(self, key, sampling_args, default_val):
         """
         checks if specified optional sampling parameters for nearest neighbor QMC is provided, if an input is not provided, a default value is returned
@@ -54,6 +66,14 @@ class SamplingParameters:
         parameter_dict["initial_operator_list_size"] = self.initial_operator_list_size
         parameter_dict["operator_list_update_multiplier"] = self.operator_list_update_multiplier
         parameter_dict["initial_configuration_index"] = self.initial_configuration_index
+
+        parameter_dict["initial_config_seed"] = self.initial_config_seed
+        parameter_dict["metropolis_insert_seed"] = self.metropolis_insert_seed
+        parameter_dict["metropolis_remove_seed"] = self.metropolis_remove_seed
+        parameter_dict["disconnected_spin_flip_seed"] = self.disconnected_spin_flip_seed
+        parameter_dict["off_diagonal_update_seed"] = self.off_diagonal_update_seed
+        parameter_dict["exit_leg_seed"] = self.exit_leg_seed
+        parameter_dict["diagonal_update_seed"] = self.diagonal_update_seed
 
         return parameter_dict
 

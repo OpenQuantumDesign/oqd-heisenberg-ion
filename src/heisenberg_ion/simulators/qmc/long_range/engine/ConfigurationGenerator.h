@@ -52,24 +52,24 @@ private:
 
     std::mt19937_64 initial_config_generator;
     std::mt19937_64 diagonal_update_generator;
-    std::mt19937_64 off_diagonal_update_generator;
+    std::mt19937_64 exit_leg_generator;
     std::mt19937_64 disconnected_spin_flip_generator;
     std::mt19937_64 off_diagonal_spin_flip_generator;
-    std::mt19937_64 loop_start_pos_generator;
-    std::mt19937_64 metropolis_generator_1;
-    std::mt19937_64 metropolis_generator_2;
-    std::mt19937_64 metropolis_generator_3;
-    std::mt19937_64 twist_generator;
+    std::mt19937_64 loop_start_position_generator;
+    std::mt19937_64 metropolis_insert_generator;
+    std::mt19937_64 metropolis_bond_generator;
+    std::mt19937_64 metropolis_remove_generator;
+    //std::mt19937_64 twist_generator;
 
-    int init_config_seed= 1;
-    int diagonal_update_seed= 2;
-    int off_diagonal_update_seed= 3;
-    int disconnected_spin_flip_seed= 4;
-    int loop_start_pos_seed= 5;
-    int metropolis_seed_1 = 6;
-    int metropolis_seed_2 = 7;
-    int metropolis_seed_3 = 8;
-    int twist_seed = 9;
+    int initial_config_seed;
+    int diagonal_update_seed;
+    int exit_leg_seed;
+    int disconnected_spin_flip_seed;
+    int off_diagonal_update_seed;
+    int metropolis_insert_seed;
+    int metropolis_bond_generator_seed;
+    int metropolis_remove_seed;
+    //int twist_seed = 9;
 
     std::uniform_real_distribution<double> metropolis_acceptance_distribution =
             std::uniform_real_distribution<double>(0.0,1.0);

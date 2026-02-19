@@ -84,6 +84,14 @@ input_schema = {
     "initial_configuration_index": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
     "initial_configuration_file_path": {"DataType": str, "ParameterType": "simulation", "ConvertValCase": False},
     "initial_operator_list_size": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "initial_config_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "disconnected_spin_flip_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "off_diagonal_update_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "metropolis_insert_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "metropolis_remove_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "metropolis_bond_generator_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "diagonal_update_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
+    "exit_leg_seed": {"DataType": int, "ParameterType": "simulation", "ConvertValCase": False},
 }
 
 

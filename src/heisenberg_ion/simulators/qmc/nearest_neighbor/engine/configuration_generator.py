@@ -38,6 +38,8 @@ class ConfigurationGenerator:
 
         self.sites = system_inputs.geometry.sites
 
+        self.initialize_rngs(sampling_inputs)
+
         self.write_simulation_specs()
 
     def write_simulation_specs(self):
@@ -61,6 +63,20 @@ class ConfigurationGenerator:
 
         return 0
 
+    def initialize_rngs(self, sampling_inputs):
+
+        self.initial_config_generator = np.random.default_rng(sampling_inputs.initial_config_seed)
+        self.disconnected_spin_flip_generator = np.random.default_rng(sampling_inputs.disconnected_spin_flip_seed)
+
+        self.off_diagonal_spin_flip_generator = np.random.default_rng(sampling_inputs.off_diagonal_update_seed)
+
+        self.metropolis_insert_generator = np.random.default_rng(sampling_inputs.metropolis_insert_seed)
+        self.metropolis_remove_generator = np.random.default_rng(sampling_inputs.metropolis_remove_seed)
+
+        self.diagonal_update_generator = np.random.default_rng(sampling_inputs.diagonal_update_seed)
+
+        self.exit_leg_generator = np.random.default_rng(sampling_inputs.exit_leg_seed)
+
     def initialize_spin_array(self):
 
         N = self.N
@@ -70,8 +86,9 @@ class ConfigurationGenerator:
 
         elif self.init_config_index == 0:
             spin_array = np.zeros(N, dtype=int)
+
             for i in range(N):
-                spin_array[i] = np.random.choice([1, -1])
+                spin_array[i] = self.initial_config_generator.choice([1, -1])
 
         elif self.init_config_index > 1:
             spin_array = -1 * np.ones(N, dtype=int)
@@ -169,7 +186,7 @@ class ConfigurationGenerator:
         for s in range(N):
             # Flip disconnected spins with probability 1/2
             if first_vertex_leg[s] == -1:
-                spin_array[s] = np.random.choice([1, -1]) * spin_array[s]
+                spin_array[s] = self.disconnected_spin_flip_generator.choice([1, -1]) * spin_array[s]
             else:
                 # Update connected spins according to the first vertex acting on them
                 # consistency in (1+1)D space ensured by construction
@@ -187,7 +204,7 @@ class ConfigurationGenerator:
 
         if n == 0:
             for s in range(N):
-                spin_array[s] = np.random.choice([1, -1]) * spin_array[s]
+                spin_array[s] = self.disconnected_spin_flip_generator.choice([1, -1]) * spin_array[s]
 
             return Sm_array, spin_array
 
@@ -204,7 +221,7 @@ class ConfigurationGenerator:
                 if disconnected_leg_flags[j_0] == 1:
                     loop_closed = False
                     j = j_0
-                    flip_spins = np.random.choice(2)
+                    flip_spins = self.off_diagonal_spin_flip_generator.choice(2)
 
                     while not loop_closed:
                         disconnected_leg_flags[j] = 0
@@ -243,7 +260,7 @@ class ConfigurationGenerator:
         # For a discussion of the algorithm, see Appendix A of: https://arxiv.org/pdf/cond-mat/0202316
         if n == 0:
             for s in range(N):
-                spin_array[s] = np.random.choice([1, -1]) * spin_array[s]
+                spin_array[s] = self.disconnected_spin_flip_generator.choice([1, -1]) * spin_array[s]
 
             return Sm_array, spin_array
 
@@ -260,7 +277,7 @@ class ConfigurationGenerator:
                 if disconnected_leg_flags[j_0] == 1:
                     loop_closed = False
                     j = j_0
-                    flip_spins = np.random.choice(2)
+                    flip_spins = self.off_diagonal_spin_flip_generator.choice(2)
 
                     while not loop_closed:
                         disconnected_leg_flags[j] = 0
@@ -271,7 +288,9 @@ class ConfigurationGenerator:
 
                         # only one exit leg (can only move horizontally along bars for the isotropic case)
                         vertex_type = vertex_array[p]
-                        l_x = np.random.choice(xy_exit_leg_map[vertex_type * vt.num_legs_per_vertex + l_e, :])
+                        l_x = self.exit_leg_generator.choice(
+                            xy_exit_leg_map[vertex_type * vt.num_legs_per_vertex + l_e, :]
+                        )
 
                         composite_leg_index = vt.num_legs_per_vertex * l_e
 
@@ -299,9 +318,9 @@ class ConfigurationGenerator:
             if Sm_array[t] == 0:
                 # propose adding a diagonal operator
                 acceptance_prob = self.beta * 0.5 * num_bonds / (M - n)
-                u = np.random.uniform(0.0, 1.0)
+                u = self.metropolis_insert_generator.uniform(0.0, 1.0)
                 if u <= acceptance_prob:
-                    b_prime = np.random.choice(
+                    b_prime = self.diagonal_update_generator.choice(
                         num_bonds
                     )  # Gibbs sampling to determine which bond to potentially populate
                     i_b = sites[b_prime, 0]
@@ -322,7 +341,7 @@ class ConfigurationGenerator:
                 else:
                     # propose removing the diagonal operator
                     acceptance_prob = (M - n + 1) / (self.beta * 0.5 * num_bonds)
-                    u = np.random.uniform(0.0, 1.0)
+                    u = self.metropolis_remove_generator.uniform(0.0, 1.0)
                     if u <= acceptance_prob:
                         Sm_array[t] = 0
                         n = n - 1
@@ -337,9 +356,9 @@ class ConfigurationGenerator:
             if Sm_array[t] == 0:
                 # propose adding a diagonal operator
                 acceptance_prob = self.beta * 0.5 * num_bonds / (M - n)
-                u = np.random.uniform(0.0, 1.0)
+                u = self.metropolis_insert_generator.uniform(0.0, 1.0)
                 if u <= acceptance_prob:
-                    b_prime = np.random.choice(
+                    b_prime = self.diagonal_update_generator.choice(
                         num_bonds
                     )  # Gibbs sampling to determine which bond to potentially populate
                     i_b = sites[b_prime, 0]
@@ -359,7 +378,7 @@ class ConfigurationGenerator:
                 else:
                     # propose removing the diagonal operator
                     acceptance_prob = (M - n + 1) / (self.beta * 0.5 * num_bonds)
-                    u = np.random.uniform(0.0, 1.0)
+                    u = self.metropolis_remove_generator.uniform(0.0, 1.0)
                     if u <= acceptance_prob:
                         Sm_array[t] = 0
                         n = n - 1

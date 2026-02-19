@@ -15,14 +15,20 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     num_free_spins = -1;
     num_total_legs = -1;
 
+    off_diagonal_update_seed = sim_params.off_diagonal_update_seed;
+
     // Will be set during equilibration
-    if (hamiltonian_type == 2) {
+    if (hamiltonian_type == 2 or hamiltonian_type == 3) {
         average_cumulative_loop_size = 1;
         max_loop_size = 10;
         N_l = 1;
         count_non_skipped_loop_updates = 0;
         skip_loop_update = true;
-        loop_start_pos_generator.seed(loop_start_pos_seed);
+
+        metropolis_bond_generator_seed = sim_params.metropolis_bond_generator_seed;
+        metropolis_bond_generator.seed(metropolis_bond_generator_seed);
+
+        loop_start_position_generator.seed(off_diagonal_update_seed);
 
         logger->info("SSE loop parameter initialization:");
         logger->info("hamiltonian_type = 2, average_cumulative_loop_size = {}, max_loop_size = {}, N_l = {}",
@@ -30,6 +36,9 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         logger->info("count_non_skipped_loop_updates = {}, skip_loop_update = {}",
             count_non_skipped_loop_updates, skip_loop_update);
 
+    }
+    else {
+        off_diagonal_spin_flip_generator.seed(off_diagonal_update_seed);
     }
 
     num_bonds = sim_params.num_bonds;
@@ -47,21 +56,28 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     equilibration_steps = sim_params.equilibration_steps;
     mc_steps = sim_params.simulation_steps;
 
-    initial_config_generator.seed(init_config_seed);
+    diagonal_update_seed = sim_params.diagonal_update_seed;
     diagonal_update_generator.seed(diagonal_update_seed);
-    disconnected_spin_flip_generator.seed(disconnected_spin_flip_seed);
-    metropolis_generator_1.seed(metropolis_seed_1);
-    metropolis_generator_2.seed(metropolis_seed_2);
-    metropolis_generator_3.seed(metropolis_seed_3);
 
-    if (hamiltonian_type == 0 or hamiltonian_type == 2){
-        off_diagonal_update_generator.seed(off_diagonal_update_seed);
+    disconnected_spin_flip_seed = sim_params.disconnected_spin_flip_seed;
+    disconnected_spin_flip_generator.seed(disconnected_spin_flip_seed);
+
+    metropolis_insert_seed = sim_params.metropolis_insert_seed;
+    metropolis_insert_generator.seed(metropolis_insert_seed);
+
+    metropolis_remove_seed = sim_params.metropolis_remove_seed;
+    metropolis_remove_generator.seed(metropolis_remove_seed);
+    //twist_seed = sim_params.twist_seed;
+
+    if (hamiltonian_type == 0 or hamiltonian_type == 2 or hamiltonian_type == 3){
+        exit_leg_seed = sim_params.off_diagonal_update_seed;
+        exit_leg_generator.seed(exit_leg_seed);
     }
 
     spin_labels = {-1,1};
 
     ConfigurationGenerator::setInitialConfiguration(sim_params);
-    if (init_config_index == -2){
+    if (init_config_index == -2) {
         operator_locations = sim_params.init_operator_locations;
         n = sim_params.init_n;
         init_M = sim_params.init_M;
@@ -83,6 +99,11 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         logger->info("SSE sampling initialization:");
         logger->info("init_config_index = {}, n = {}, init_M = {}, num_winding = {}",
             init_config_index, n, init_M, num_winding);
+    }
+
+    if (init_config_index == 0) {
+        initial_config_seed = sim_params.initial_config_seed;
+        initial_config_generator.seed(initial_config_seed);
     }
 }
 
@@ -156,7 +177,7 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
     for (int t=0; t<M; t++){
         double M_minus_n = M - n;
         if (operator_locations.at(t) == 0) {
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_1);
+            double u_1 = metropolis_acceptance_distribution(metropolis_insert_generator);
             double acceptance_prob = beta * prob_tables.max_diagonal_norm/M_minus_n;
             if (u_1 < acceptance_prob) {
                 int b_prime = diag_update_distribution(diagonal_update_generator);
@@ -165,7 +186,7 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
                 std::vector<int> diag_config = {spin_configuration.at(i_b), spin_configuration.at(j_b),
                                                 spin_configuration.at(i_b), spin_configuration.at(j_b)};
                 int vertex_type = vertex_types.getVertexTypeIndex(diag_config);
-                double u_2 = metropolis_acceptance_distribution(metropolis_generator_2);
+                double u_2 = metropolis_acceptance_distribution(metropolis_bond_generator);
                 double acceptance_prob_2 = prob_tables.diagonal_probabilities.at(vertex_type).at(b_prime);
                 if (u_2 < acceptance_prob_2) {
                     int bond_num = b_prime + 1;
@@ -188,7 +209,7 @@ void ConfigurationGenerator::diagonalUpdatesXXZh(const ProbabilityTables &prob_t
         }
         else {
             double acceptance_prob = (M_minus_n + 1.0)/(beta * prob_tables.max_diagonal_norm);
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_3);
+            double u_1 = metropolis_acceptance_distribution(metropolis_remove_generator);
             if (u_1 < acceptance_prob) {
                 operator_locations.at(t) = 0;
                 n--;
@@ -214,7 +235,7 @@ void ConfigurationGenerator::diagonalUpdatesXY(const ProbabilityTables &prob_tab
     for (int t=0; t<M; t++){
         double M_minus_n = (double)M - (double)n;
         if (operator_locations.at(t) == 0) {
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_1);
+            double u_1 = metropolis_acceptance_distribution(metropolis_insert_generator);
             double acceptance_prob = beta * prob_tables.max_diagonal_norm/M_minus_n;
             if (u_1 < acceptance_prob) {
                 int b_prime = diag_update_distribution(diagonal_update_generator);
@@ -237,7 +258,7 @@ void ConfigurationGenerator::diagonalUpdatesXY(const ProbabilityTables &prob_tab
         }
         else {
             double acceptance_prob = (M_minus_n + 1.0)/(beta * prob_tables.max_diagonal_norm);
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_3);
+            double u_1 = metropolis_acceptance_distribution(metropolis_remove_generator);
             if (u_1 < acceptance_prob) {
                 operator_locations.at(t) = 0;
                 n--;
@@ -263,7 +284,7 @@ void ConfigurationGenerator::diagonalUpdatesIsotropic(const ProbabilityTables &p
     for (int t=0; t<M; t++){
         double M_minus_n = M - n;
         if (operator_locations.at(t) == 0) {
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_1);
+            double u_1 = metropolis_acceptance_distribution(metropolis_insert_generator);
             double acceptance_prob = beta * prob_tables.max_diagonal_norm/M_minus_n;
             if (u_1 < acceptance_prob) {
                 int b_prime = diag_update_distribution(diagonal_update_generator);
@@ -290,7 +311,7 @@ void ConfigurationGenerator::diagonalUpdatesIsotropic(const ProbabilityTables &p
         }
         else {
             double acceptance_prob = (M_minus_n + 1.0)/(beta * prob_tables.max_diagonal_norm);
-            double u_1 = metropolis_acceptance_distribution(metropolis_generator_3);
+            double u_1 = metropolis_acceptance_distribution(metropolis_remove_generator);
             if (u_1 < acceptance_prob) {
                 operator_locations.at(t) = 0;
                 n--;
@@ -399,7 +420,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXXZh(const ProbabilityTables &pro
             skip_loop_update = true;
             loop_size = 0;
 
-            int j_0 = loop_start_pos_dist(loop_start_pos_generator);
+            int j_0 = loop_start_pos_dist(loop_start_position_generator);
             int j_current = j_0;
 
             for (int iter=0;iter<max_loop_size;iter++){
@@ -422,7 +443,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXXZh(const ProbabilityTables &pro
                 }
 
                 std::discrete_distribution<int> exit_leg_dist(out_leg_probs.begin(),out_leg_probs.end());
-                int l_x_index = exit_leg_dist(off_diagonal_update_generator);
+                int l_x_index = exit_leg_dist(exit_leg_generator);
                 int l_x = vertex_types.allowed_exit_legs.at(loc_index + l_x_index);
                 vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
                                                                                      vertex_type);
@@ -493,7 +514,7 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
                     int l_e = j % num_legs_per_vertex;
 
                     int vertex_type = vertex_configuration.at(p);
-                    int exit_leg_index = binary_dist(off_diagonal_update_generator);
+                    int exit_leg_index = binary_dist(exit_leg_generator);
                     int loc_index = num_legs_per_vertex*(num_legs_per_vertex-2)*vertex_type
                             + (num_legs_per_vertex-2)*l_e;
                     int l_x = vertex_types.allowed_exit_legs.at(loc_index + exit_leg_index);
@@ -691,7 +712,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
 
     int max_n = n;
     int avg_n = 0;
-    double avg_num_samples = 1000.0;
+    double avg_num_samples = (double)std::min(1000, equilibration_steps);
     int n_sum = 0;
     int cumulative_loop_size_sum = 1;
     int M_new;

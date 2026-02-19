@@ -43,8 +43,38 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
         writeBoolEntry("distance_dependent_offset", distance_dep_offset, ofs);
     }
 
+    setOptionalIntegerEntry("diagonal_update_seed", input_key_vals["diagonal_update_seed"],
+        diagonal_update_seed, true, 1, 17951893);
+    writeNumericEntry("diagonal_update_seed", diagonal_update_seed, ofs);
+
+    setOptionalIntegerEntry("disconnected_spin_flip_seed", input_key_vals["disconnected_spin_flip_seed"],
+        disconnected_spin_flip_seed, true, 1, 945006057);
+    writeNumericEntry("disconnected_spin_flip_seed", disconnected_spin_flip_seed, ofs);
+
+    setOptionalIntegerEntry("metropolis_insert_seed", input_key_vals["metropolis_insert_seed"],
+        metropolis_insert_seed, true, 1, 961025794);
+    writeNumericEntry("metropolis_insert_seed", metropolis_insert_seed, ofs);
+
+    setOptionalIntegerEntry("metropolis_remove_seed", input_key_vals["metropolis_remove_seed"],
+        metropolis_remove_seed, true, 1, 148014634);
+    writeNumericEntry("metropolis_remove_seed", metropolis_remove_seed, ofs);
+
+    setOptionalIntegerEntry("off_diagonal_update_seed", input_key_vals["off_diagonal_update_seed"],
+        off_diagonal_update_seed, true, 1, 569514279);
+    writeNumericEntry("off_diagonal_update_seed", off_diagonal_update_seed, ofs);
+
+    if (hamiltonian_type == 0 || hamiltonian_type == 2 || hamiltonian_type == 3) {
+        setOptionalIntegerEntry("exit_leg_seed", input_key_vals["exit_leg_seed"],
+        exit_leg_seed, true, 1, 569514279);
+        writeNumericEntry("exit_leg_seed", exit_leg_seed, ofs);
+    }
+
     if (hamiltonian_type == 2 || hamiltonian_type == 3) {
         extractDoubleEntry("Delta", input_key_vals["Delta"], Delta, false);
+
+        setOptionalIntegerEntry("metropolis_bond_generator_seed", input_key_vals["metropolis_bond_generator_seed"],
+        metropolis_bond_generator_seed, true, 1, 177890226);
+        writeNumericEntry("metropolis_bond_generator_seed", metropolis_bond_generator_seed, ofs);
     }
     else {
         Delta = (double)hamiltonian_type;
@@ -114,6 +144,12 @@ SimulationParameters::SimulationParameters(std::map<std::string, std::string> &i
         writeStringEntry("initial_configuration_file_path", init_config_file_path, ofs);
     }
 
+    if (init_config_index == 0) {
+        setOptionalIntegerEntry("initial_config_seed", input_key_vals["initial_config_seed"],
+        initial_config_seed, true, 1, 674604219);
+        writeNumericEntry("initial_config_seed", initial_config_seed, ofs);
+    }
+
     ofs.close();
     logger->flush();
 }
@@ -144,6 +180,36 @@ void SimulationParameters::extractIntegerEntry(const std::string &key_str, const
         std::to_string(min_val) + ".\n");
     }
 
+}
+
+void SimulationParameters::setOptionalIntegerEntry(const std::string &key_str, const std::string &val_str,
+                                                      int &member_var, const bool &enforce_minimum,
+                                                      const int &min_val, const int &default_val) const {
+
+    if (val_str.empty()) {
+        logger->info("No value found for optional key: " + key_str);
+        logger->info("Using default value");
+        logger->flush();
+        member_var = default_val;
+    }
+    else {
+        logger->info("Value found for optional key: " + key_str);
+        size_t pos;
+        member_var = std::stoi(val_str, &pos);
+        if (pos != val_str.length()){
+            logger->error("Value could not be converted to an integer for key: " + key_str);
+            logger->flush();
+            throw std::runtime_error("Value could not be converted to an integer for key: " + key_str + ".\n");
+        }
+
+        if (enforce_minimum && member_var < min_val){
+            logger->error("Value for key: " + key_str + " is below the expected minimum: " +
+            std::to_string(min_val));
+            logger->flush();
+            throw std::runtime_error("Value for key: " + key_str + " is below the expected minimum: " +
+            std::to_string(min_val) + ".\n");
+        }
+    }
 }
 
 void SimulationParameters::extractDoubleEntry(const std::string &key_str, const std::string &val_str,

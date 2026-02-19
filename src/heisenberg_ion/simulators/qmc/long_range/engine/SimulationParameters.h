@@ -57,11 +57,24 @@ public:
     std::vector<int> init_operator_locations;
     double winding;
 
+    int initial_config_seed;
+    int diagonal_update_seed;
+    int exit_leg_seed;
+    int disconnected_spin_flip_seed;
+    int off_diagonal_update_seed;
+    int metropolis_insert_seed;
+    int metropolis_bond_generator_seed;
+    int metropolis_remove_seed;
+
     explicit SimulationParameters(std::map<std::string, std::string> &input_key_vals,
         const std::shared_ptr<spdlog::logger> &logger_ptr);
 
      void extractIntegerEntry(const std::string &key_str, const std::string &val_str, int &member_var,
                              const bool &enforce_minimum, const int &min_val=0) const;
+
+    void setOptionalIntegerEntry(const std::string &key_str, const std::string &val_str,
+                                int &member_var, const bool &enforce_minimum,
+                                const int &min_val, const int &default_val) const;
 
      void extractDoubleEntry(const std::string &key_str, const std::string &val_str, double &member_var,
                             const bool &enforce_minimum, const double &min_val=0.0);

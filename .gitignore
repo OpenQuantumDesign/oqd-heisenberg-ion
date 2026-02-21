@@ -5,7 +5,6 @@ scratch/
 .vscode/settings.json
 *.pdf
 *.csv
-*.txt
 *.log
 /tests/functional/results
 **/__pycache__

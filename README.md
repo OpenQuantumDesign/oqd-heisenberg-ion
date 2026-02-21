@@ -30,9 +30,9 @@ To use this package, first clone the Heisenberg Ion repository:
 git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
 ```
 
-Then, install the package:  
+Then, install the package (after navigating to the local project root):  
 ```
-pip install oqd-heisenberg-ion
+pip install .
 ```
 
 Execute an example long range QMC calculation with the following:
@@ -40,7 +40,7 @@ Execute an example long range QMC calculation with the following:
 oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
 ```
 
-Note that the above command expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:  
+Note that the above commands expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:  
 ```
 examples/input_files
 ```

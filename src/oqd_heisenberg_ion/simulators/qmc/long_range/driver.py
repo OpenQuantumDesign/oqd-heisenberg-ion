@@ -22,7 +22,6 @@ class LongRangeQMC(Driver):
 
         self.input_file = os.path.join(os.path.abspath(simulation_folder), "inputs.txt")
         self.build_dir = os.path.join(os.path.abspath(simulation_folder), "build")
-        print(self.build_dir)
         os.mkdir(self.build_dir)
 
         self.bin_dir = simulator_inputs["bin_folder"]

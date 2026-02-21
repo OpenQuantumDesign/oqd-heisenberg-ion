@@ -1,6 +1,7 @@
 #ifndef cpp_qmc_ESTIMATORS_H
 #define cpp_qmc_ESTIMATORS_H
 #include<vector>
+#include<filesystem>
 #include "SimulationParameters.h"
 
 class Estimators {

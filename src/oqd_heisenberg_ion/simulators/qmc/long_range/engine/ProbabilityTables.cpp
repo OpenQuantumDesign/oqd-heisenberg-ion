@@ -38,7 +38,7 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         while (std::getline(row_stream, entry, ','))
         {
             double table_val = std::stod(entry);
-            if (isnan(table_val))
+            if (std::isnan(table_val))
             {
                 logger->error("Invalid value encountered at line: {}", lineCount);
                 logger->flush();
@@ -99,7 +99,7 @@ std::string ProbabilityTables::readTabularFile(const std::string &file_path,
         while (std::getline(rowStream, entry, ','))
         {
             int table_val = std::stoi(entry);
-            if (isnan(table_val))
+            if (std::isnan(table_val))
             {
                 logger->error("Invalid value encountered at line: {}", lineCount);
                 logger->flush();
@@ -157,7 +157,7 @@ std::string ProbabilityTables::readVectorFile(const std::string &file_path, std:
 
         row_data = std::stod(line);
 
-        if (isnan(row_data))
+        if (std::isnan(row_data))
         {
             logger->error("Invalid value encountered at line: {}", lineCount);
             logger->flush();

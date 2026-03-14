@@ -885,13 +885,13 @@ This is fetched and compiled automatically by CMake while building the C++ sourc
 <p>To use this package, first clone the Heisenberg Ion repository:<br />
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
 </span></code></pre></div></p>
-<p>Then, install the package:<br />
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip install oqd-heisenberg-ion
+<p>Then, install the package after navigating to the local project root:<br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip install .
 </span></code></pre></div></p>
 <p>Execute an example long range QMC calculation with the following:
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
 </span></code></pre></div></p>
-<p>Note that the above command expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:<br />
+<p>Note that the above commands expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:<br />
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>examples/input_files
 </span></code></pre></div></p>
 <p>The above calculation creates a folder titled <code>results</code> in the project root. A different output folder can be provided as a command line override as follows: 
@@ -948,7 +948,7 @@ This is fetched and compiled automatically by CMake while building the C++ sourc
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2024 Open Quantum Design
+      Copyright &copy; 2026 Open Quantum Design
     </div>
   
   

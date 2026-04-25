@@ -50,10 +50,10 @@ class Orchestrator:
 
         parameter_set_list = inputs.parameter_set_list
 
-        preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
-        driver_inputs = preprocessor.preprocess()
+        self.preprocessor = PreprocessorFactory.create(simulator, parameter_set_list)
+        driver_inputs = self.preprocessor.preprocess()
 
-        self.driver = DriverFactory.create(simulator, preprocessor.simulation_folder, driver_inputs)
+        self.driver = DriverFactory.create(simulator, self.preprocessor.simulation_folder, driver_inputs)
 
     def simulate(self):
         """

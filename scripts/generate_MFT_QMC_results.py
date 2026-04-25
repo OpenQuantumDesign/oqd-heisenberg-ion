@@ -42,7 +42,10 @@ for i in range(len(N_list)):
     lmg_stiffness = (N**2 - 1) * (N + 1) / (24.0 * 4.0)
     lmg_energy = -(N**2 - 1) / 8.0
 
-    file_1 = "Results/SSE_18_08_25/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
+    data_folder = "SSE_MFT_Limit_2" if N == 3 or N == 125 else "SSE_MFT_Limit"
+
+    file_1 = "Results/{}/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/qmc_output/estimators.csv".format(
+        data_folder,
         N,
         hamiltonian_type,
         Delta,
@@ -60,7 +63,7 @@ for i in range(len(N_list)):
     energy_arr_1 = qmc_data[:, 1]
     stiffness_arr_1 = qmc_data[:, 3]
 
-    auto_corr_drop = 2
+    auto_corr_drop = 20
 
     energy_array_1 = (energy_arr_1) / (mft_energy)
     energy_array_2 = (energy_arr_1) / lmg_energy
@@ -140,3 +143,53 @@ ax1.set_xlabel(r"$N$", fontsize=16)
 ax1.set_ylabel(r"$\overline{E_0}/E_0^{MF}$", fontsize=16)
 
 plt.savefig("Energy_MFT.pdf", dpi=1200, bbox_inches="tight")
+
+one_over_N_list = [1.0/n for n in N_list]
+one_over_N_exact_list = [1.0/n for n in N_exact_list]
+
+plt.figure()
+plt.rcParams["mathtext.fontset"] = "stix"
+fig, ax1 = plt.subplots()
+left, bottom, width, height = [0.60, 0.22, 0.25, 0.25]
+
+ax2 = fig.add_axes([left, bottom, width, height])
+
+ax2.scatter(one_over_N_list, np.array(stiffness_SSE_2_list)-1, color="C0", label="SSE")
+ax2.errorbar(one_over_N_list, np.array(stiffness_SSE_2_list)-1, np.array(stiffness_SSE_2_err_list), fmt="None", capsize=5)
+ax2.plot(one_over_N_exact_list, [0.0] * len(N_exact_list), color="black", linestyle="dashed")
+ax2.set_xlabel(r"$1/N$", fontsize=10)
+ax2.set_ylabel(r"$\overline{\rho_s}/\rho_s - 1$", fontsize=12)
+
+ax1.plot(one_over_N_exact_list, [1 / N for N in N_exact_list], color="C3", label="Exact")
+ax1.scatter(one_over_N_list, [1 / N for N in N_list], color="C3")
+ax1.scatter(one_over_N_list, np.array(stiffness_SSE_1_list)-1, label="SSE", color="C0")
+ax1.errorbar(one_over_N_list, np.array(stiffness_SSE_1_list)-1, np.array(stiffness_SSE_1_err_list), fmt="None", capsize=5)
+#ax1.plot(one_over_N_exact_list, [0.0] * len(N_exact_list), color="black", linestyle="dashed")
+ax1.legend(prop={"size": 12})
+ax1.set_xlabel(r"$1/N$", fontsize=16)
+ax1.set_ylabel(r"$\overline{\rho_s}/\rho_s^{MF} - 1$", fontsize=16)
+
+plt.savefig("Superfluid_Density_MFT_one_over_N.pdf", dpi=1200, bbox_inches="tight")
+
+plt.figure()
+fig, ax1 = plt.subplots()
+left, bottom, width, height = [0.60, 0.22, 0.25, 0.25]
+
+ax2 = fig.add_axes([left, bottom, width, height])
+
+ax2.scatter(one_over_N_list, np.array(energy_SSE_2_list) - 1, color="C0", label="SSE")
+ax2.errorbar(one_over_N_list, np.array(energy_SSE_2_list) - 1, np.array(energy_SSE_2_err_list), fmt="None", capsize=5)
+ax2.plot(one_over_N_exact_list, [0.0] * len(N_exact_list), color="black", linestyle="dashed")
+ax2.set_xlabel(r"$1/N$", fontsize=10)
+ax2.set_ylabel(r"$\overline{E_0}/E_0 - 1$", fontsize=12)
+
+ax1.plot(one_over_N_exact_list, [1 / N for N in N_exact_list], color="C3", label="Exact")
+ax1.scatter(one_over_N_list, [1 / N for N in N_list], color="C3")
+ax1.scatter(one_over_N_list, np.array(energy_SSE_1_list)-1, label="SSE", color="C0")
+ax1.errorbar(one_over_N_list, np.array(energy_SSE_1_list)-1, np.array(energy_SSE_1_err_list), fmt="None", capsize=5)
+#ax1.plot(one_over_N_exact_list, [0.0] * len(N_exact_list), color="black", linestyle="dashed")
+ax1.legend(prop={"size": 12})
+ax1.set_xlabel(r"$1/N$", fontsize=16)
+ax1.set_ylabel(r"$\overline{E_0}/E_0^{MF} -1$", fontsize=16)
+
+plt.savefig("Energy_MFT_one_over_N.pdf", dpi=1200, bbox_inches="tight")

@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -46,8 +48,7 @@ def process_qmc_data(T, alpha, energy_list, energy_err_list, stiffness_list, sti
 
     # Updates input lists in place
 
-    file = "Results/{}/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
-        folder,
+    required_dir = "N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}".format(
         N,
         hamiltonian_type,
         Delta,
@@ -62,7 +63,17 @@ def process_qmc_data(T, alpha, energy_list, energy_err_list, stiffness_list, sti
         init_start_config,
     )
 
-    qmc_data = np.loadtxt(file, delimiter=",", skiprows=2)
+    start_directory = "./Results"
+    for dirpath, dirnames, filenames in os.walk(start_directory):
+        for dirname in dirnames:
+            if dirname != "ED":
+                simulation_folder = os.path.join(start_directory, dirname)
+                for sim_dirpath, sim_dirnames, sim_filenames in os.walk(simulation_folder):
+                    if required_dir in sim_dirnames:
+                        run_data_dir = os.path.join(simulation_folder, required_dir)
+                        qmc_data_file = os.path.join(run_data_dir, "qmc_output/estimators.csv")
+
+    qmc_data = np.loadtxt(qmc_data_file, delimiter=",", skiprows=2)
 
     energy_array = qmc_data[:, 1] / norm
     stiffness_array = qmc_data[:, 3] / norm

@@ -261,7 +261,7 @@ void simulateParameterSets(std::vector<std::map<std::string, std::string>> param
 
         parameter_set_logger->info("SSE calculation finished. Writing outputs.");
 
-        estimators.outputStepData(sim_params);
+        estimators.outputStepData();
 
         if (sim_params.track_spin_configs) {
             estimators.closeShotDataContainers();

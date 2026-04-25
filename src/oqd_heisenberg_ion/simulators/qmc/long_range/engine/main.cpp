@@ -264,7 +264,8 @@ void simulateParameterSets(std::vector<std::map<std::string, std::string>> param
         estimators.outputStepData(sim_params);
 
         if (sim_params.track_spin_configs) {
-            estimators.outputDiagnostics(sim_params);
+            estimators.closeShotDataContainers();
+            //estimators.outputDiagnostics(sim_params);
         }
 
         if (sim_params.write_final_SSE_configs) {

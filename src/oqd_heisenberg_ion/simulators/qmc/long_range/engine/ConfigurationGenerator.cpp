@@ -691,18 +691,22 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
                                        skip_loop_update, prob_tables.lattice_sites);
 
         if (sim_params.track_spin_configs) {
-            estimators.trackSpinConfigs(spin_configuration);
+            estimators.trackSpinConfigs(spin_configuration, sim_params);
         }
 
         if (step % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
         }
+
+        if ((step+1) % estimators.chunk_size == 0) {
+            estimators.populateShotDataFile(sim_params);
+        }
     }
 
     logger->info("Estimation run finished");
 
-    estimators.outputStepData(sim_params);
+    estimators.outputStepData();
 }
 
 void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTables &prob_tables,
@@ -857,12 +861,16 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         ConfigurationGenerator::randomSpinFlipsXXZ();
 
         if (sim_params.track_spin_configs) {
-            estimators.trackSpinConfigs(spin_configuration);
+            estimators.trackSpinConfigs(spin_configuration, sim_params);
         }
 
         if (step % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
+        }
+
+        if ((step+1) % estimators.chunk_size == 0) {
+            estimators.populateShotDataFile(sim_params);
         }
     }
 
@@ -981,7 +989,11 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         }
 
         if (sim_params.track_spin_configs) {
-            estimators.trackSpinConfigs(spin_configuration);
+            estimators.trackSpinConfigs(spin_configuration, sim_params);
+        }
+
+        if ((step+1) % estimators.chunk_size == 0) {
+            estimators.populateShotDataFile(sim_params);
         }
     }
     logger->info("Estimation run finished");
@@ -1117,13 +1129,17 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
                                                     prob_tables.spectrum_offset, num_winding,
                                                     prob_tables.lattice_sites);
 
-        if (step % 1000 == 0) {
+        if (sim_params.track_spin_configs) {
+            estimators.trackSpinConfigs(spin_configuration, sim_params);
+        }
+
+        if ((step+1) % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
         }
 
-        if (sim_params.track_spin_configs) {
-            estimators.trackSpinConfigs(spin_configuration);
+        if ((step+1) % estimators.chunk_size == 0) {
+            estimators.populateShotDataFile(sim_params);
         }
     }
     logger->info("Estimation run finished");

@@ -666,7 +666,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
         cumulative_loop_size_sum += cumulative_loop_size;
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}, N_l = {}",
                 step, n, M, N_l);
             logger->flush();
@@ -674,12 +674,14 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
     }
 
     logger->info("Equilibration finished");
+    logger->flush();
 
     average_cumulative_loop_size =  cumulative_loop_size_sum / count_non_skipped_loop_updates;
     N_l = std::max(2*avg_n/average_cumulative_loop_size, 1);
     max_loop_size = std::max(100*avg_n,1);
 
     logger->info("Starting estimation run");
+    logger->flush();
 
     for (int step=0; step<mc_steps; step++){
 
@@ -694,7 +696,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
             estimators.trackSpinConfigs(spin_configuration, sim_params);
         }
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
         }
@@ -761,7 +763,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
             break;
         }
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Burn-in step = {}, n = {}, M = {}, N_l = {}",
                 step, n, M, N_l);
             logger->flush();
@@ -825,7 +827,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
         N_l = std::max((int)std::round(N_l_d), 1);
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}, N_l = {}",
                 step, n, M, N_l);
             logger->flush();
@@ -834,6 +836,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     }
 
     logger->info("Equilibration finished");
+    logger->flush();
 
     max_loop_size = std::max(10000*avg_n,1);
 
@@ -848,6 +851,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
     N_l = std::max((int)std::round(N_l_d), 1);
 
     logger->info("Starting estimation run");
+    logger->flush();
 
     for (int step=0; step<mc_steps; step++){
 
@@ -864,7 +868,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
             estimators.trackSpinConfigs(spin_configuration, sim_params);
         }
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
         }
@@ -916,7 +920,7 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         ConfigurationGenerator::offDiagonalUpdatesIsotropic(prob_tables, vertex_types);
         ConfigurationGenerator::flipAllSpins();
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
             logger->flush();
         }
@@ -957,15 +961,15 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
 
         ConfigurationGenerator::flipAllSpins();
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
             logger->flush();
         }
     }
 
     logger->info("Equilibration finished");
-
     logger->info("Starting estimation run");
+    logger->flush();
 
     for (int step=0; step<mc_steps; step++){
 
@@ -983,7 +987,7 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
                                                     prob_tables.spectrum_offset, num_winding,
                                                     prob_tables.lattice_sites);
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Simulation step = {}, n = {}", step, n);
             logger->flush();
         }
@@ -1103,15 +1107,15 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
 
         ConfigurationGenerator::flipAllSpins();
 
-        if (step % 1000 == 0) {
+        if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}", step, n, M);
             logger->flush();
         }
     }
 
     logger->info("Equilibration finished");
-
     logger->info("Starting estimation run");
+    logger->flush();
 
     for (int step=0; step<mc_steps; step++){
 

@@ -261,10 +261,11 @@ void simulateParameterSets(std::vector<std::map<std::string, std::string>> param
 
         parameter_set_logger->info("SSE calculation finished. Writing outputs.");
 
-        estimators.outputStepData(sim_params);
+        estimators.outputStepData();
 
         if (sim_params.track_spin_configs) {
-            estimators.outputDiagnostics(sim_params);
+            estimators.closeShotDataContainers();
+            //estimators.outputDiagnostics(sim_params);
         }
 
         if (sim_params.write_final_SSE_configs) {
@@ -315,12 +316,6 @@ int main(int arg_count, char *args[]) {
         }
 
         global_logger->info("All threads finished");
-
-        // Fix the structure factor calculation and test it
-
-        // Add a logger
-
-        // Expose seeds for all generators
 
     }
 

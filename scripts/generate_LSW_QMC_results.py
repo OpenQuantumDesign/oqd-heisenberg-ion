@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,8 +13,8 @@ alpha_list_2 = [round(0.0 + i * 0.1, 2) for i in range(81)]
 alpha_list += alpha_list_2
 print(alpha_list)
 J = 1.0
-T_1 = 0.005
-beta_1 = J / T_1
+T = 0.005
+beta = J / T
 energy_SSE_2_list = []
 energy_SSE_2_err_list = []
 energy_SSE_3_list = []
@@ -42,13 +44,12 @@ for i in range(len(alpha_list)):
     lsw_energy.append(E0_lsw / norm_energy)
 
     folder = "SSE"
-    beta_1 = 1.0 / T_1
+    beta = 1.0 / T
 
     init_start_config = 1
     start_config = init_start_config
     boundary = 1
-    file_1 = "Results/{}/N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}/MC Step Outputs.csv".format(
-        folder,
+    required_dir = "N_{}_hamiltonian_type_{}_Delta_{}_h_{}_alpha_{}_gamma_{}_ksi_0.0_J_1.0_dist_dep_offset_{}_boundary_{}_T_{}_{}_input_config_{}_initial_input_config_{}".format(
         N,
         hamiltonian_type,
         Delta,
@@ -57,12 +58,23 @@ for i in range(len(alpha_list)):
         gamma,
         dist_dep_offset,
         boundary,
-        T_1,
+        T,
         loop_type,
         start_config,
         init_start_config,
     )
-    qmc_data = np.loadtxt(file_1, delimiter=",", skiprows=2)
+
+    start_directory = "./Results"
+    for dirpath, dirnames, filenames in os.walk(start_directory):
+        for dirname in dirnames:
+            if dirname != "ED":
+                simulation_folder = os.path.join(start_directory, dirname)
+                for sim_dirpath, sim_dirnames, sim_filenames in os.walk(simulation_folder):
+                    if required_dir in sim_dirnames:
+                        run_data_dir = os.path.join(simulation_folder, required_dir)
+                        qmc_data_file = os.path.join(run_data_dir, "qmc_output/estimators.csv")
+
+    qmc_data = np.loadtxt(qmc_data_file, delimiter=",", skiprows=2)
     energy_arr_1 = qmc_data[:, 1]
 
     auto_corr_drop = 2

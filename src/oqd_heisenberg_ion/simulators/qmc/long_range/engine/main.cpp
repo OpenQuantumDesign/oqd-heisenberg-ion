@@ -317,12 +317,6 @@ int main(int arg_count, char *args[]) {
 
         global_logger->info("All threads finished");
 
-        // Fix the structure factor calculation and test it
-
-        // Add a logger
-
-        // Expose seeds for all generators
-
     }
 
     return 0;

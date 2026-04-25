@@ -70,7 +70,7 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
     //twist_seed = sim_params.twist_seed;
 
     if (hamiltonian_type == 0 or hamiltonian_type == 2 or hamiltonian_type == 3){
-        exit_leg_seed = sim_params.off_diagonal_update_seed;
+        exit_leg_seed = sim_params.exit_leg_seed;
         exit_leg_generator.seed(exit_leg_seed);
     }
 

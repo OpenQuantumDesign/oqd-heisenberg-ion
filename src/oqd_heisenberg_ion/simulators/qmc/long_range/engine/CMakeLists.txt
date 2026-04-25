@@ -23,4 +23,7 @@ add_executable(cpp_qmc main.cpp
         SimulationParameters.cpp
         VertexTypes.cpp)
 
+find_package(HDF5)
+
 target_link_libraries(cpp_qmc PRIVATE spdlog::spdlog)
+target_link_libraries(cpp_qmc PRIVATE HDF5::HDF5)

@@ -1204,7 +1204,7 @@ void ConfigurationGenerator::writeFinalConfigurations(const SimulationParameters
     ofs << "\n";
 
     ofs << "Spin Configurations List" << "\t" << spin_configuration.at(0);
-    for (int i=1; i < M; i++) {
+    for (int i=1; i < N; i++) {
         ofs << "," << spin_configuration.at(i);
     }
     ofs << "\n";

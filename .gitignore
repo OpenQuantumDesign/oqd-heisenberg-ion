@@ -6,7 +6,9 @@ scratch/
 *.pdf
 *.csv
 *.log
+*.h5
 /tests/functional/results
+/tests/functional/output_format/results
 **/__pycache__
 **/build
 **/.idea

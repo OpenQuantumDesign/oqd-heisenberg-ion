@@ -186,3 +186,23 @@ class InputReader:
             else:
                 for i in range(self.num_parameter_sets):
                     self.parameter_set_list[i][key] = val[i]
+
+    def write_parameter_sets_to_file(self, file_path):
+        """
+        writes the list of parameter sets to a tab delimited file
+
+        Args:
+            file_path (str): path to the file
+        """
+
+        with open(file_path, "w") as f:
+
+            line = "simulator\t" + self.simulator + "\n"
+            f.write(line)
+
+            for key in self.parameter_set_list[0].keys():
+                line = key + "\t"
+                line += ",".join([str(parameter_set[key]) for parameter_set in self.parameter_set_list])
+                line += "\n"
+
+                f.write(line)

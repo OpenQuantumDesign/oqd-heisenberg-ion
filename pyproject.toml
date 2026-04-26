@@ -44,6 +44,12 @@ tests = ["pytest"]
 where = ["src"]
 include = ["oqd_heisenberg_ion*"]
 
+[tool.setuptools.package-data]
+"oqd_heisenberg_ion" = [
+    "simulators/ed/engine.jl",
+    "simulators/qmc/long_range/engine/*"
+]
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"

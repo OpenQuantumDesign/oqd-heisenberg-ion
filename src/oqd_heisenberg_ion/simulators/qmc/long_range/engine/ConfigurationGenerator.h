@@ -61,14 +61,14 @@ private:
     std::mt19937_64 metropolis_remove_generator;
     //std::mt19937_64 twist_generator;
 
-    int initial_config_seed;
-    int diagonal_update_seed;
-    int exit_leg_seed;
-    int disconnected_spin_flip_seed;
-    int off_diagonal_update_seed;
-    int metropolis_insert_seed;
-    int metropolis_bond_generator_seed;
-    int metropolis_remove_seed;
+    uint64_t initial_config_seed;
+    uint64_t diagonal_update_seed;
+    uint64_t exit_leg_seed;
+    uint64_t disconnected_spin_flip_seed;
+    uint64_t off_diagonal_update_seed;
+    uint64_t metropolis_insert_seed;
+    uint64_t metropolis_bond_generator_seed;
+    uint64_t metropolis_remove_seed;
     //int twist_seed = 9;
 
     std::uniform_real_distribution<double> metropolis_acceptance_distribution =

@@ -6,7 +6,7 @@ This repository contains Stochastic Series Expansion (SSE) Quantum Monte Carlo (
 ### Runtime Dependencies
 - Python 3.10+  
 - Julia 1.12+   
-- CMake 3.12+  
+- CMake 3.24+  
 - Clang 17+ or GCC 14+ (C++ Compiler)  
 
 CMake and a C++ compiler are required for building the long range QMC backend. Julia is needed for our ED implementation

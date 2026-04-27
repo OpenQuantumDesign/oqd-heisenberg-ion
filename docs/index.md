@@ -21,7 +21,7 @@ Both of these simulators are wrapped in a lightweight Python preprocessor respon
 ### Runtime Dependencies
 - Python 3.10+  
 - Julia 1.12+   
-- CMake 3.12+  
+- CMake 3.24+  
 - Clang 17+ or GCC 14+ (C++ Compiler) 
 CMake and a C++ compiler are required for building the long range QMC source code 
 

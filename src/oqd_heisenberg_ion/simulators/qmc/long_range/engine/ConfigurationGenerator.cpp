@@ -31,8 +31,8 @@ ConfigurationGenerator::ConfigurationGenerator(const SimulationParameters &sim_p
         loop_start_position_generator.seed(off_diagonal_update_seed);
 
         logger->info("SSE loop parameter initialization:");
-        logger->info("hamiltonian_type = 2, average_cumulative_loop_size = {}, max_loop_size = {}, N_l = {}",
-            average_cumulative_loop_size, max_loop_size, num_total_legs, N_l);
+        logger->info("hamiltonian_type = {}, average_cumulative_loop_size = {}, max_loop_size = {}, N_l = {}",
+            hamiltonian_type, average_cumulative_loop_size, max_loop_size, N_l);
         logger->info("count_non_skipped_loop_updates = {}, skip_loop_update = {}",
             count_non_skipped_loop_updates, skip_loop_update);
 
@@ -643,42 +643,135 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
                                                             const VertexTypes &vertex_types) {
 
     int max_n = n;
+    int avg_n = 0;
+    double avg_num_samples = (double)std::min(1000, equilibration_steps);
     int n_sum = 0;
-    int cumulative_loop_size_sum = 0;
-    int avg_n;
+    int cumulative_loop_size_sum = 1;
+    int M_new;
+
+    double avg_n_d = 0.0;
+    double avg_cumul_loop_size_d;
+    double prob_non_skip_update;
+    double N_l_d;
+
+    logger->info("Starting burn in");
+
+    for (int step=0; step<equilibration_steps; step++) {
+        ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
+        if (n > max_n) {
+            max_n = n;
+        }
+        n_list.push_back(n);
+        n_sum += n;
+
+        avg_n_d = n_sum / ((double)step+1.0);
+        avg_n = (int)std::round(avg_n_d);
+
+        //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),M);
+        ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+        M = M_new;
+
+        max_loop_size = 10000 * std::max(avg_n, 1);
+        ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
+
+        cumulative_loop_size_sum += cumulative_loop_size;
+        cumulative_loop_size_list.push_back(cumulative_loop_size);
+        avg_cumul_loop_size_d = ((double)cumulative_loop_size_sum)/((double)step+1.0);
+        prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)step+1.0);
+        N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d);
+        N_l = std::max((int)std::round(N_l_d), 1);
+
+        if ((double)cumulative_loop_size_list.size() == avg_num_samples){
+            break;
+        }
+
+        if ((step+1) % 1000 == 0) {
+            logger->info("Burn-in step = {}, n = {}, M = {}, N_l = {}",
+                step, n, M, N_l);
+            logger->flush();
+        }
+    }
+
+    logger->info("Burn in finished");
+
+    avg_cumul_loop_size_d = ConfigurationGenerator::computeAverage(cumulative_loop_size_list,
+                                                                   avg_num_samples);
+    avg_n_d = ConfigurationGenerator::computeAverage(n_list, avg_num_samples);
+    prob_non_skip_update = (double)count_non_skipped_loop_updates/(avg_num_samples);
+
+    avg_n = (int)std::round(avg_n_d);
+    average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
+
+    //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+    //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+    M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
+    ConfigurationGenerator::getNewOperatorLocations(M_new-M);
+
+    M = M_new;
+    count_non_skipped_loop_updates = 0;
+
+    N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
+    N_l = std::max((int)std::round(N_l_d), 1);
 
     logger->info("Starting equilibration");
 
     for (int step=0; step<equilibration_steps; step++){
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
+
         if (n > max_n) {
             max_n = n;
         }
-        n_sum += n;
-        int M_new = std::max((int)(a_parameter * max_n),M);
-        //ConfigurationGenerator::populateOperatorLocations(int (M_new - n));
+
+        avg_n_d = ((avg_n_d * avg_num_samples) - n_list.at(n_list.size() - (int)avg_num_samples)
+                + n)/avg_num_samples;
+        avg_n = (int)std::round(avg_n_d);
+        n_list.push_back(n);
+
+        //M_new = std::max((int)std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d),n+1);
+        //ConfigurationGenerator::populateOperatorLocations(int(M_new - n));
+        M_new = std::max((int) std::round(sim_params.beta * prob_tables.max_diagonal_norm + avg_n_d), M);
         ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
-        avg_n = n_sum / step;
-        average_cumulative_loop_size = cumulative_loop_size_sum / count_non_skipped_loop_updates;
-        max_loop_size = std::max(1000*avg_n,1);
-        N_l = std::max(2*avg_n/average_cumulative_loop_size, 1);
+
+        max_loop_size = std::max(10000*avg_n,1);
+
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
-        cumulative_loop_size_sum += cumulative_loop_size;
+
+        avg_cumul_loop_size_d = ((avg_cumul_loop_size_d * avg_num_samples)
+                                 - cumulative_loop_size_list.at(cumulative_loop_size_list.size()
+                                 - (int)avg_num_samples)
+                                 + cumulative_loop_size)/avg_num_samples;
+
+        average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
+        cumulative_loop_size_list.push_back(cumulative_loop_size);
+        prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)step+1.0);
+        N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
+        N_l = std::max((int)std::round(N_l_d), 1);
 
         if ((step+1) % 1000 == 0) {
             logger->info("Equilibration step = {}, n = {}, M = {}, N_l = {}",
                 step, n, M, N_l);
             logger->flush();
         }
+
     }
 
     logger->info("Equilibration finished");
     logger->flush();
 
-    average_cumulative_loop_size =  cumulative_loop_size_sum / count_non_skipped_loop_updates;
-    N_l = std::max(2*avg_n/average_cumulative_loop_size, 1);
-    max_loop_size = std::max(100*avg_n,1);
+    max_loop_size = std::max(10000*avg_n,1);
+
+    avg_cumul_loop_size_d = ((avg_cumul_loop_size_d * avg_num_samples)
+                             - cumulative_loop_size_list.at(cumulative_loop_size_list.size()
+                             - (int)avg_num_samples)
+                             + cumulative_loop_size)/avg_num_samples;
+    average_cumulative_loop_size = (int)std::round(avg_cumul_loop_size_d);
+    cumulative_loop_size_list.push_back(cumulative_loop_size);
+    prob_non_skip_update = (double)count_non_skipped_loop_updates/((double)equilibration_steps);
+    N_l_d = 2.0*avg_n_d/(avg_cumul_loop_size_d * prob_non_skip_update);
+    N_l = std::max((int)std::round(N_l_d), 1);
 
     logger->info("Starting estimation run");
     logger->flush();
@@ -686,6 +779,7 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
     for (int step=0; step<mc_steps; step++){
 
         ConfigurationGenerator::diagonalUpdatesXXZh(prob_tables, vertex_types);
+
         ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
 
         estimators.updateAllPropertiesProbabilistic(n, spin_configuration, sim_params,
@@ -707,8 +801,6 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
     }
 
     logger->info("Estimation run finished");
-
-    estimators.outputStepData();
 }
 
 void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTables &prob_tables,

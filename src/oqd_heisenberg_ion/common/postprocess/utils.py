@@ -118,7 +118,7 @@ def combine_dataset_stats(data_1, data_2):
     return data_mean, data_error
 
 
-def ed_energy(evals, T):
+def ed_energy(evals, T, num_evals=-1):
     """
     computes the equilibrium energy from exact diagonalization calculations at given temperature
 
@@ -135,11 +135,18 @@ def ed_energy(evals, T):
     energy = 0.0
     partition = 0.0
 
-    for i in range(len(evals)):
+    # Allow cutting off the sum to prevent overflow
+    if num_evals == -1:
+        num_evals = len(evals)
+
+    for i in range(num_evals):
         energy += np.exp(-beta * evals[i]) * evals[i]
         partition += np.exp(-beta * evals[i])
 
     energy /= partition
+
+    if np.isnan(energy):
+        energy = evals[0]
 
     return energy
 

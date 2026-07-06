@@ -32,6 +32,7 @@ end
 
 function get_longitudinal_field_term(Ket, k)
 
+    # bit = 0 is spin up and bit = 1 is spin down. This implements the operator: -S_k^z
     spin_k = 2 * ((Ket >> k) & 1) - 1
     return 0.5 * spin_k
 end

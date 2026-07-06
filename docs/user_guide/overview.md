@@ -7,7 +7,7 @@
 Heisenberg Ion is a Quantum Monte Carlo (QMC) Stochastic Series Expansion (SSE) and Exact Diagonalization (ED) simulator for the anisotropic Heisenberg model with a longitudinal field, defined by the Hamiltonian:
 
 $$
-H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i
+H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i
 \label{heisenberg_z_field}
 $$
 
@@ -20,7 +20,7 @@ $$
 For QMC, if the interactions are long-range, the coupling matrix must be ferromagnetic: $J_{ij} > 0 \ \forall \ 1 \leq i,j \leq N$, to avoid the sign problem. Our ED engine allows for entirely arbitrary couplings and also supports the inclusion of a transverse field term. The general ED Hamiltonian is:
 
 $$
-H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i - B\sum_{i} S_x^i
+H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i - B\sum_{i} S_x^i
 \label{heisenberg_z_x_fields}
 $$
 

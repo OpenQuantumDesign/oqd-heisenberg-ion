@@ -6,7 +6,7 @@ The general anisotropic Heisenberg model admits a variety of special cases such 
 Hamiltonian:
 
 $$
-H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i
+H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i
 \label{long_range_xxzhb}
 $$
 
@@ -19,7 +19,7 @@ $$
 Hamiltonian:
 
 $$
-H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i
+H = - \sum_{i < j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i
 \label{long_range_xxzh}
 $$
 

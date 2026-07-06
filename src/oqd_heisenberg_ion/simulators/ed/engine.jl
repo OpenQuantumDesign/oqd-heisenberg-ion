@@ -33,7 +33,7 @@ end
 function get_longitudinal_field_term(Ket, k)
 
     spin_k = 2 * ((Ket >> k) & 1) - 1
-    return -0.5 * spin_k
+    return 0.5 * spin_k
 end
 
 

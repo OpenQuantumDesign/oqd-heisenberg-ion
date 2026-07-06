@@ -865,46 +865,52 @@ Both of these simulators are wrapped in a lightweight Python preprocessor respon
 <h3 id="runtime-dependencies">Runtime Dependencies</h3>
 <ul>
 <li>Python 3.10+  </li>
-<li>Julia 1.12+   </li>
+<li>Julia 1.12+  </li>
 <li>CMake 3.24+  </li>
-<li>Clang 17+ or GCC 14+ (C++ Compiler) 
-CMake and a C++ compiler are required for building the long range QMC source code </li>
+<li>Clang 17+ or GCC 14+ (C++ Compiler)  </li>
 </ul>
+<p>CMake and a C++ compiler are required for building the long range QMC source code </p>
 <h3 id="python-packages">Python Packages</h3>
-<p>This package also requires a number of Python libraries:<br />
-- Numpy<br />
-- Scipy<br />
-- Matplotlib<br />
-These are installed automatically by pip as part of the Heisenberg Ion package install</p>
+<p>This package also requires a number of Python libraries:  </p>
+<ul>
+<li>Numpy  </li>
+<li>Scipy  </li>
+<li>Matplotlib  </li>
+</ul>
+<p>These are installed automatically by pip as part of the Heisenberg Ion package install</p>
 <h3 id="c-dependencies">C++ Dependencies</h3>
 <ul>
-<li>spdlog 
-This is fetched and compiled automatically by CMake while building the C++ source if required</li>
+<li>spdlog  </li>
+<li>HDF5  </li>
 </ul>
+<p>The spdlog dependency is fetched and compiled automatically by CMake while building the C++ source.
+The HDF5 package needs to installed. This can be done as follows: 
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install hdf5
+</span></code></pre></div></p>
 <h2 id="getting-started">Getting Started</h2>
 <p>To use this package, first clone the Heisenberg Ion repository:<br />
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git clone https://github.com/OpenQuantumDesign/oqd-heisenberg-ion.git
 </span></code></pre></div></p>
 <p>Then, install the package after navigating to the local project root:<br />
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip install .
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip install .
 </span></code></pre></div></p>
 <p>Execute an example long range QMC calculation with the following:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt
 </span></code></pre></div></p>
 <p>Note that the above commands expects the current working directory to be the project root i.e. the local directory where the src and example folders are located. The example input file being used in this calculation can be found at:<br />
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>examples/input_files
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>examples/input_files
 </span></code></pre></div></p>
 <p>The above calculation creates a folder titled <code>results</code> in the project root. A different output folder can be provided as a command line override as follows: 
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt -o root_folder [output folder path]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>oqd-heisenberg-ion -i examples/input_files/qmc_long_range.txt -o root_folder [output folder path]
 </span></code></pre></div></p>
 <p>Details about configuring inputs for each of the simulators can be found in the <a href="user_guide/input_specs/">Input Specification</a> section. Also, see the <a href="user_guide/overview/">User Guide</a> and the example notebook in the repository for user-level documentation. A description of the SSE algorithm used in this package can be found in the <a href="algorithms/sse/">Algorithms</a> section.</p>
 <h3 id="documentation">Documentation</h3>
 <p>Documentation is developed using MkDocs. To install documentation-related dependencies, use:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip install -e &quot;.[docs]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip install -e &quot;.[docs]
 </span></code></pre></div>
 <p>The documentation server can be deployed locally using: </p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cp -r examples/ docs/examples/
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mkdocs serve
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cp -r examples/ docs/examples/
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>mkdocs serve
 </span></code></pre></div>
 
 

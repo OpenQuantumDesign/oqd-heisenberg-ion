@@ -1007,7 +1007,7 @@ See <a href="../../feat_dev/">Features in Development</a> for details.</p>
 <h2 id="hamiltonian">Hamiltonian</h2>
 <p>Heisenberg Ion is a Quantum Monte Carlo (QMC) Stochastic Series Expansion (SSE) and Exact Diagonalization (ED) simulator for the anisotropic Heisenberg model with a longitudinal field, defined by the Hamiltonian:</p>
 <div class="arithmatex">\[
-H = - \sum_{i &lt; j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i
+H = - \sum_{i &lt; j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i
 \label{heisenberg_z_field}
 \]</div>
 <p>Here, <span class="arithmatex">\(S_k^i = \frac{1}{2} \sigma_k^i\)</span> is the spin-1/2 operator corresponding to site <span class="arithmatex">\(i\)</span>, for each <span class="arithmatex">\(k \in \{x,y,z\}\)</span>. The Pauli matrices <span class="arithmatex">\(\sigma_k\)</span> are defined as follows: </p>
@@ -1016,7 +1016,7 @@ H = - \sum_{i &lt; j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z
 \]</div>
 <p>For QMC, if the interactions are long-range, the coupling matrix must be ferromagnetic: <span class="arithmatex">\(J_{ij} &gt; 0 \ \forall \ 1 \leq i,j \leq N\)</span>, to avoid the sign problem. Our ED engine allows for entirely arbitrary couplings and also supports the inclusion of a transverse field term. The general ED Hamiltonian is:</p>
 <div class="arithmatex">\[
-H = - \sum_{i &lt; j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) + h\sum_{i} S_z^i - B\sum_{i} S_x^i
+H = - \sum_{i &lt; j} J_{ij} \left( S_x^i S_x^j + S_y^i S_y^j + \Delta S_z^i S_z^j \right) - h\sum_{i} S_z^i - B\sum_{i} S_x^i
 \label{heisenberg_z_x_fields}
 \]</div>
 <h2 id="exact-diagonalization">Exact Diagonalization</h2>

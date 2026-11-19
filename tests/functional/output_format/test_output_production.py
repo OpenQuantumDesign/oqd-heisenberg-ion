@@ -15,13 +15,13 @@ interaction_type='power_law'
 alpha=10.0
 spatial_dimension='1d'
 lattice_type='rectangular'
-N=[50, 100]
+N=[43, 100]
 J=1.0
 
 # Simulation Parameters
 T = 0.5
 equilibration_steps=100000
-simulation_steps=1000000
+simulation_steps=10000
 operator_list_update_multiplier=1.21
 loop_type='deterministic'
 
@@ -77,10 +77,18 @@ orchestrator = Orchestrator(simulator=simulator,
 orchestrator.simulate()
 
 num_param_sets = orchestrator.preprocessor.num_parameter_sets
-run_dir = orchestrator.preprocessor.processed_configs[1]["misc"]["run_folder"]
-shot_data_file = os.path.join(run_dir, 'qmc_output/spin_configurations.h5')
+for i in range(num_param_sets):
+    run_dir = orchestrator.preprocessor.processed_configs[i]["misc"]["run_folder"]
+    shot_data_file = os.path.join(run_dir, 'qmc_output/spin_configurations.h5')
 
-with h5py.File(shot_data_file, 'r') as f:
-    dataset = f['shot_data']
-    num_chunks = dataset.id.get_num_chunks()
-    print(f"Number of written chunks: {num_chunks}")
+    with h5py.File(shot_data_file, 'r') as f:
+        dataset = f['shot_data']
+        np_dataset = dataset[...]
+        num_chunks = dataset.id.get_num_chunks()
+        print(f"Number of written chunks: {num_chunks}")
+
+    if np.any(np_dataset == 0):
+        raise Exception("Shot data file contains zeros for parameter set {}, check if spin configurations were written for all steps".format(i))
+
+    if np.shape(np_dataset)[0] != simulation_steps:
+        raise Exception("Shot data file is truncated for parameter set {}, check if spin configurations were written for all steps".format(i))

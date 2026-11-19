@@ -498,17 +498,21 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
     }
     else {
         populateLinkedList(prob_tables, vertex_types);
-        bool loop_closed = false;
+
+        connected_legs.assign(num_total_legs, false);
+        
         for (int j_0 = 0; j_0 < num_total_legs; j_0++) {
 
-            if (!connected_legs.contains(j_0)) {
+            bool loop_closed = false;
+
+            if (!connected_legs.at(j_0)) {
 
                 int j = j_0;
                 int flip_spins = spin_labels.at(binary_dist(off_diagonal_spin_flip_generator));
 
                 while (!loop_closed) {
 
-                    connected_legs.insert(j);
+                    connected_legs.at(j) = true;
 
                     int p = j / num_legs_per_vertex;
                     int l_e = j % num_legs_per_vertex;
@@ -519,13 +523,24 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
                             + (num_legs_per_vertex-2)*l_e;
                     int l_x = vertex_types.allowed_exit_legs.at(loc_index + exit_leg_index);
 
+                    if (connected_legs.at(num_legs_per_vertex*p + l_x)) {
+                        exit_leg_index = 1 - exit_leg_index;
+                        l_x = vertex_types.allowed_exit_legs.at(loc_index + exit_leg_index);
+
+                        if (connected_legs.at(num_legs_per_vertex*p + l_x)) {
+                            logger->error("Both exit legs already used in XY off diagonal update\n");
+                            logger->flush();
+                            throw std::runtime_error("Both exit legs already used in XY off diagonal update\n");
+                        }
+                    }
+
                     if (flip_spins == 1) {
                         vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
                                                                                  vertex_type);
                     }
 
                     j = num_legs_per_vertex*p + l_x;
-                    connected_legs.insert(j);
+                    connected_legs.at(j) = true;
                     j = linked_list.at(j);
 
                     if (j == j_0) {
@@ -534,7 +549,6 @@ void ConfigurationGenerator::offDiagonalUpdatesXY(const ProbabilityTables &prob_
                 }
             }
         }
-        connected_legs.clear();
         mapVerticesToOperatorLocations(vertex_types, prob_tables);
     }
 }
@@ -550,17 +564,21 @@ void ConfigurationGenerator::offDiagonalUpdatesIsotropic(const ProbabilityTables
     }
     else {
         populateLinkedList(prob_tables, vertex_types);
-        bool loop_closed = false;
+
+        connected_legs.assign(num_total_legs, false);
+        
         for (int j_0 = 0; j_0 < num_total_legs; j_0++) {
 
-            if (!connected_legs.contains(j_0)) {
+            bool loop_closed = false;
+
+            if (!connected_legs.at(j_0)) {
 
                 int j = j_0;
                 int flip_spins = spin_labels.at(binary_dist(off_diagonal_spin_flip_generator));
 
                 while (!loop_closed) {
 
-                    connected_legs.insert(j);
+                    connected_legs.at(j) = true;
 
                     int p = j / num_legs_per_vertex;
                     int l_e = j % num_legs_per_vertex;
@@ -568,13 +586,19 @@ void ConfigurationGenerator::offDiagonalUpdatesIsotropic(const ProbabilityTables
                     int vertex_type = vertex_configuration.at(p);
                     int l_x = vertex_types.allowed_exit_legs.at(l_e);
 
+                    if (connected_legs.at(num_legs_per_vertex*p + l_x)) {
+                        logger->error("Exit leg already used in Heisenberg off diagonal update\n");
+                        logger->flush();
+                        throw std::runtime_error("Exit leg already used in Heisenberg off diagonal update\n");
+                    }
+
                     if (flip_spins == 1) {
                         vertex_configuration.at(p) = vertex_types.getFlippedSpinsVertexIndex(l_e, l_x,
                                                                                  vertex_type);
                     }
 
                     j = num_legs_per_vertex*p + l_x;
-                    connected_legs.insert(j);
+                    connected_legs.at(j) = true;
                     j = linked_list.at(j);
 
                     if (j == j_0) {
@@ -583,10 +607,8 @@ void ConfigurationGenerator::offDiagonalUpdatesIsotropic(const ProbabilityTables
                 }
             }
         }
-        connected_legs.clear();
         mapVerticesToOperatorLocations(vertex_types, prob_tables);
     }
-
 }
 
 void ConfigurationGenerator::mapVerticesToOperatorLocations(const VertexTypes &vertex_types,

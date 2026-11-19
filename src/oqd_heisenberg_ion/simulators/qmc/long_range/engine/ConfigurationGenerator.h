@@ -21,7 +21,7 @@ private:
     std::vector<int> p_list;
     std::vector<int> b_list;
 
-    std::unordered_set<int> connected_legs;
+    std::vector<bool> connected_legs;
 
     std::vector<int> first_vertex_leg;
     std::vector<int> last_vertex_leg;

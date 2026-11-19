@@ -1085,7 +1085,7 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         ConfigurationGenerator::getNewOperatorLocations(M_new-M);
         M = M_new;
 
-        ConfigurationGenerator::offDiagonalUpdatesXXZh(prob_tables, vertex_types);
+        ConfigurationGenerator::offDiagonalUpdatesIsotropic(prob_tables, vertex_types);
 
         ConfigurationGenerator::flipAllSpins();
 
@@ -1289,6 +1289,7 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
             estimators.populateShotDataFile(sim_params, extra_rows);
         }
     }
+
     logger->info("Estimation run finished");
 }
 

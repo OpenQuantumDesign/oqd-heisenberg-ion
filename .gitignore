@@ -9,9 +9,10 @@ scratch/
 *.h5
 /tests/functional/results
 /tests/functional/output_format/results
+/tests/functional/autocorrelation/results
 **/__pycache__
 **/build
 **/.idea
-**/heisenberg_ion.egg-info
+*egg-info
 /examples/results
 /figures

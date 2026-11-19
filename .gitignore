@@ -12,6 +12,6 @@ scratch/
 **/__pycache__
 **/build
 **/.idea
-**/heisenberg_ion.egg-info
+*egg-info
 /examples/results
 /figures

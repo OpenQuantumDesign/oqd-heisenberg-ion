@@ -796,7 +796,14 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZh(const ProbabilityTab
         }
 
         if ((step+1) % estimators.chunk_size == 0) {
-            estimators.populateShotDataFile(sim_params);
+            estimators.populateShotDataFile(sim_params, estimators.chunk_size);
+        }
+    }
+
+    if (sim_params.track_spin_configs) {
+        uint64_t extra_rows = static_cast<uint64_t>(mc_steps) % estimators.chunk_size;
+        if (extra_rows > 0) {
+            estimators.populateShotDataFile(sim_params, extra_rows);
         }
     }
 
@@ -966,7 +973,14 @@ void ConfigurationGenerator::simulateProbabilisticLoopsXXZ(const ProbabilityTabl
         }
 
         if ((step+1) % estimators.chunk_size == 0) {
-            estimators.populateShotDataFile(sim_params);
+            estimators.populateShotDataFile(sim_params, estimators.chunk_size);
+        }
+    }
+
+    if (sim_params.track_spin_configs) {
+        uint64_t extra_rows = static_cast<uint64_t>(mc_steps) % estimators.chunk_size;
+        if (extra_rows > 0) {
+            estimators.populateShotDataFile(sim_params, extra_rows);
         }
     }
 
@@ -1089,9 +1103,17 @@ void ConfigurationGenerator::simulateDeterministicIsotropic(const ProbabilityTab
         }
 
         if ((step+1) % estimators.chunk_size == 0) {
-            estimators.populateShotDataFile(sim_params);
+            estimators.populateShotDataFile(sim_params, estimators.chunk_size);
         }
     }
+
+    if (sim_params.track_spin_configs) {
+        uint64_t extra_rows = static_cast<uint64_t>(mc_steps) % estimators.chunk_size;
+        if (extra_rows > 0) {
+            estimators.populateShotDataFile(sim_params, extra_rows);
+        }
+    }
+
     logger->info("Estimation run finished");
 }
 
@@ -1235,7 +1257,14 @@ void ConfigurationGenerator::simulateDeterministicXY(const ProbabilityTables &pr
         }
 
         if ((step+1) % estimators.chunk_size == 0) {
-            estimators.populateShotDataFile(sim_params);
+            estimators.populateShotDataFile(sim_params, estimators.chunk_size);
+        }
+    }
+
+    if (sim_params.track_spin_configs) {
+        uint64_t extra_rows = static_cast<uint64_t>(mc_steps) % estimators.chunk_size;
+        if (extra_rows > 0) {
+            estimators.populateShotDataFile(sim_params, extra_rows);
         }
     }
     logger->info("Estimation run finished");

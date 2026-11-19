@@ -19,7 +19,6 @@ private:
 
     std::vector<int8_t> step_spin_configs;
     //std::vector<std::vector<int>> step_spin_configs_diagnostics;
-    int step_spin_config_offset = 0;
     bool track_spin_configs;
 
     std::vector<double> step_spin_stiffness;
@@ -53,7 +52,7 @@ public:
 
     //void outputDiagnostics(const SimulationParameters &sim_params) const;
 
-    void populateShotDataFile(const SimulationParameters &sim_params);
+    void populateShotDataFile(const SimulationParameters &sim_params, const uint64_t num_rows);
 
     //void outputPairCorrelations(const SimulationParameters &sim_params) const;
 

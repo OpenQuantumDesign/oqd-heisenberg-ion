@@ -193,6 +193,12 @@ void Estimators::populateShotDataFile(const SimulationParameters &sim_params, co
         throw std::runtime_error("H5Dwrite failed while populating shot data file");
     }
 
+    status = H5Fflush(shot_data_file_id, H5F_SCOPE_LOCAL);
+    if (status < 0) {
+        logger->error("H5Fflush failed while populating shot data file");
+        throw std::runtime_error("H5Fflush failed while populating shot data file");
+    }
+
     num_updates++;
     step_spin_configs.clear();
 

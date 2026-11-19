@@ -48,7 +48,7 @@ Estimators::Estimators(const SimulationParameters &sim_params, const bool &track
 
     if (sim_params.track_spin_configs) {
         initializeShotStorage(sim_params);
-        step_spin_configs.resize(chunk_size * sim_params.N);
+        //step_spin_configs.resize(chunk_size * sim_params.N);
     }
     else {
         chunk_size = 2 * simulation_steps;
@@ -74,10 +74,10 @@ void Estimators::outputStepData() const {
 }
 
 void Estimators::trackSpinConfigs(const std::vector<int> &spin_configs, const SimulationParameters &sim_params) {
-    std::transform(spin_configs.begin(), spin_configs.end(),
-        step_spin_configs.begin() + step_spin_config_offset,
-        [](int i) { return static_cast<int8_t>(i);});
-        step_spin_config_offset += sim_params.N;
+    
+    for (int i=0; i < sim_params.N; i++) {
+        step_spin_configs.push_back(static_cast<int8_t>(spin_configs.at(i)));
+    }
 
     //step_spin_configs_diagnostics.push_back(spin_configs);
 }
@@ -166,13 +166,13 @@ void Estimators::initializeShotStorage(const SimulationParameters &sim_params) {
     }
 }
 
-void Estimators::populateShotDataFile(const SimulationParameters &sim_params) {
+void Estimators::populateShotDataFile(const SimulationParameters &sim_params, const uint64_t num_rows) {
 
-    hsize_t subset_dims[2] = {chunk_size, static_cast<uint64_t>(sim_params.N)};
+    hsize_t subset_dims[2] = {num_rows, static_cast<uint64_t>(sim_params.N)};
 
     hid_t memspace_id = H5Screate_simple(2, subset_dims, nullptr);
 
-    hsize_t count[2] = {chunk_size, static_cast<uint64_t>(sim_params.N)};
+    hsize_t count[2] = {num_rows, static_cast<uint64_t>(sim_params.N)};
 
     hsize_t offset[2] = {static_cast<uint64_t>(num_updates * chunk_size), 0};
 
@@ -193,9 +193,14 @@ void Estimators::populateShotDataFile(const SimulationParameters &sim_params) {
         throw std::runtime_error("H5Dwrite failed while populating shot data file");
     }
 
+    status = H5Fflush(shot_data_file_id, H5F_SCOPE_LOCAL);
+    if (status < 0) {
+        logger->error("H5Fflush failed while populating shot data file");
+        throw std::runtime_error("H5Fflush failed while populating shot data file");
+    }
+
     num_updates++;
     step_spin_configs.clear();
-    step_spin_config_offset = 0;
 
     status = H5Sclose(memspace_id);
     if (status < 0) {
@@ -205,8 +210,6 @@ void Estimators::populateShotDataFile(const SimulationParameters &sim_params) {
 }
 
 void Estimators::closeShotDataContainers() const {
-
-
 
     herr_t status = H5Dclose(shot_data_dataset_id);
     if (status < 0) {

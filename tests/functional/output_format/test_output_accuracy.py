@@ -81,18 +81,16 @@ bechmark_shot_data_file = "/Users/shaeermoeed/Github/oqd_heisenberg_ion/tests/fu
 benchmark_shot_data = np.loadtxt(bechmark_shot_data_file, delimiter=",", skiprows=2, dtype=int)
 
 num_param_sets = orchestrator.preprocessor.num_parameter_sets
-run_dir = orchestrator.preprocessor.processed_configs[0]["misc"]["run_folder"]
-shot_data_file = os.path.join(run_dir, 'qmc_output/spin_configurations.h5')
+for i in range(num_param_sets):
+    run_dir = orchestrator.preprocessor.processed_configs[i]["misc"]["run_folder"]
+    shot_data_file = os.path.join(run_dir, 'qmc_output/spin_configurations.h5')
 
-with h5py.File(shot_data_file, 'r') as f:
-    dataset = f['shot_data']
-    shot_data_array = dataset[:]
+    with h5py.File(shot_data_file, 'r') as f:
+        dataset = f['shot_data']
+        shot_data_array = dataset[:]
 
-print(test_id)
-print(shot_data_array)
+    check_arr_equal = np.all(np.equal(shot_data_array, benchmark_shot_data))
 
-check_arr_equal = np.all(np.equal(shot_data_array, benchmark_shot_data))
-
-if not check_arr_equal:
-    raise Exception("Shot data not equal to the benchmark shot data")
-print("Shot data equal to the benchmark shot data")
+    if not check_arr_equal:
+        raise Exception("Shot data not equal to the benchmark shot data")
+    print("Shot data equal to the benchmark shot data")
